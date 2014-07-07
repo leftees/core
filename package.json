@@ -28,7 +28,7 @@
     },
     "scripts": {
     },
-    "gypfile": false,
+    "gypfile": true,
     "preferGlobal": true,
     "private": false,
     "analyze": true,
