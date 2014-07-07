@@ -1,4 +1,4 @@
-var binding = require("../build/Release/profiler");
+var binding = require("../../../../build/Release/profiler");
 
 function Snapshot() {}
 
