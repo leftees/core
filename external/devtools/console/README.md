@@ -6,7 +6,7 @@ More information and source code are available on [NPM](https://www.npmjs.org/pa
 
 ## Fork
 
-Official webkit-devtools-agent-frontend module does include both "Profile" and "Console" tools with minor bugs. This fork slightly modifies the code to provide only remote "Console" feature. This fork can easility be spawned as new process with custom agent port passed as argument.
+Official webkit-devtools-agent-frontend module does include both "Profiles" and "Console" tools with minor bugs. This fork slightly modifies the code to provide only remote "Console" feature. This fork can easily be spawned as new process with custom agent port passed as argument.
 
 
 ## Example
