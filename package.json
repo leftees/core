@@ -18,10 +18,17 @@
       "ljve.io"
     ],
     "dependencies": {
+    	"mocha": "~1.20.1",
+        "yargs": "~1.2.5",
+        "cli-color":"~0.3.2",
+        "ws": "~0.4.31",
+        "xmlhttprequest": "~1.5.0",
+        "webworker-threads": "~0.5.1",
+        "ncp": "~0.5.1"
     },
     "scripts": {
     },
-    "gypfile": true,
+    "gypfile": false,
     "preferGlobal": true,
     "private": false,
     "analyze": true,
