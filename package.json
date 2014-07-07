@@ -1,0 +1,30 @@
+{
+    "name": "ljve.io",
+    "version": "0.4.0",
+    "description": "Live Javascript Virtualized Environment",
+    "author": "Marco Minetti <marco.minetti@novetica.org>",
+    "contributors": [],
+    "bin":{
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/novetica/ljve.io"
+    },
+    "bugs": {
+      "url": "https://github.com/novetica/ljve.io/issues"
+    },
+    "keywords": [
+      "ljve",
+      "ljve.io"
+    ],
+    "dependencies": {
+    },
+    "scripts": {
+    },
+    "gypfile": true,
+    "preferGlobal": true,
+    "private": false,
+    "analyze": true,
+    "license": "GPL"
+}
+
