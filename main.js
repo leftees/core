@@ -19,6 +19,9 @@
 
  */
 
+//C: trick to notify existence code autocompletion
+var global = global || {};
+
 //C: detecting node debugger enabled (through node arguments)
 global.debugging = false;
 process.execArgv.forEach(function(arg) {
@@ -63,13 +66,13 @@ if (global.development == true && global.debugging == false){
   
   //C: attaching on child stderr data event to enable console proxy
   node_debug.stdout.on('data', function (data) {
-    //C: logging string but no last \n char (colors preserved)
+    //C: logging string but no last \n char (cli colors preserved)
     console.log(data.toString('utf8',0,data.length-1));
   });
 
   //C: attaching on child stderr data event to enable console proxy
   node_debug.stderr.on('data', function (data) {
-  //C: logging string but no last \n char (colors preserved)
+  //C: logging string but no last \n char (cli colors preserved)
     console.log(data.toString('utf8',0,data.length-1));
   });
 
