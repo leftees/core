@@ -19,9 +19,6 @@
 
  */
 
-//C: trick to notify existence code autocompletion
-var global = global || {};
-
 //C: detecting node debugger enabled (through node arguments)
 global.debugging = false;
 process.execArgv.forEach(function(arg) {
