@@ -38,9 +38,9 @@ The following tools have been used to develop the ljve.io project:
 
 ## License
 
-ljve.io - Live Javascript Virtualized Environment
-Copyright (C) 2010-2014  Marco Minetti
-Copyright (C) 2011-2013  Novetica
+ljve.io - Live Javascript Virtualized Environment  
+Copyright (C) 2010-2014 Marco Minetti  
+Copyright (C) 2011-2013 Novetica
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
