@@ -5,16 +5,16 @@
  Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
+ it under the terms of the GNU Affero General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+ GNU Affero General Public License for more details.
 
- You should have received a copy of the GNU General Public License
+ You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
@@ -22,14 +22,14 @@
 //C: detecting node debugger enabled (through node arguments)
 global.debugging = false;
 process.execArgv.forEach(function(arg) {
-  if (arg.indexOf('--debug') == 0 || arg.indexOf('debug') == 0){
+  if (arg.indexOf('--debug') === 0 || arg.indexOf('debug') === 0){
     global.debugging = true;
   }
 });
 
 //C: detecting whether Node is running as development environment
 global.development = true;
-if (process.env.NODE_ENV == 'production') {
+if (process.env.NODE_ENV === 'production') {
   global.development = false;
 }
 
@@ -37,13 +37,13 @@ if (process.env.NODE_ENV == 'production') {
 global.require = require;
 
 //C: detecting whether spawned node debugger launch is needed
-if (global.development == true && global.debugging == false){
+if (global.development === true && global.debugging === false){
   
   //C: getting current node process execArgv extended with debug flag
   var execArgv = ['--debug'].concat(process.execArgv);
   
   //C: enabling ECMAScript 6 by default
-  if (execArgv.indexOf('--harmony') == -1){
+  if (execArgv.indexOf('--harmony') === -1){
     execArgv.push('--harmony');
   }
   
@@ -89,7 +89,7 @@ if (global.development == true && global.debugging == false){
   
   //C: loading ljve application server executable module
   try {
-    //global.require('./core/main.server.js');
+    global.require('./core/main.server.js');
   } catch (err) {
     console.error(err.message);
   }
