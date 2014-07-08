@@ -1,7 +1,7 @@
 # ljve.io
 
-[![Build Status](https://travis-ci.org/novetica/ljve.io.svg?branch=master)](https://travis-ci.org/novetica/ljve.io)
-[![Dependency Status](https://david-dm.org/novetica/ljve.io.svg)](https://david-dm.org/novetica/ljve.io)
+[![Build Status](https://travis-ci.org/marcominetti/ljve.io.svg?branch=master)](https://travis-ci.org/marcominetti/ljve.io)
+[![Dependency Status](https://david-dm.org/marcominetti/ljve.io.svg)](https://david-dm.org/marcominetti/ljve.io)
 
 
 
