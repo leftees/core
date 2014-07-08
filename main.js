@@ -77,11 +77,21 @@ if (global.development === true && global.debugging === false){
   node_debug.on('close', function (code,signal) {
     process.exit(code);
   });
-  
-  //C: attaching on main signals to kill child
-  ['SIGINT'].forEach(function (e) {
+
+  //C: attaching on main process events to propagate them to child
+  ['exit','uncaughtException'].forEach(function (e) {
     process.on(e, function () {
       node_debug.kill();
+    });
+  });
+
+  //C: attaching on main signals to propagate them to child (not everyone useful, but should be a comprehensive list)
+  ['SIGHUP','SIGINT','SIGQUIT','SIGILL','SIGABRT','SIGFPE',/*'SIGKILL',*/'SIGSEGV','SIGPIPE','SIGALRM','SIGTERM',
+    'SIGUSR1','SIGUSR2','SIGCHLD','SIGCONT',/*'SIGSTOP',*/'SIGTSTP','SIGTTIN','SIGTTOU','SIGBUS','SIGPOLL','SIGPROF',
+    'SIGSYS','SIGTRAP','SIGURG','SIGVTALRM','SIGXCPU','SIGXFSZ','SIGIOT','SIGEMT','SIGSTKFLT','SIGIO','SIGCLD',
+    'SIGPWR','SIGINFO','SIGLOST','SIGWINCH','SIGUNUSED'].forEach(function (e) {
+    process.on(e, function () {
+      node_debug.kill(e);
     });
   });
 
@@ -93,4 +103,13 @@ if (global.development === true && global.debugging === false){
   } catch (err) {
     console.error(err.message);
   }
+
 }
+
+//C: attaching on main process kill events to force exit
+['exit', 'SIGTERM', 'SIGINT'].forEach(function(e) {
+  process.on(e, function() {
+    //T: implement graceful shutdown
+    process.exit();
+  });
+});

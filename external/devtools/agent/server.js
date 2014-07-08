@@ -149,8 +149,8 @@ var DevToolsAgentProxy = module.exports = function() {
 var proxy = new DevToolsAgentProxy();
 proxy.start();
 
-['exit', 'SIGTERM', 'SIGHUP'].forEach(function(s) {
-    process.on(s, function() {
+['exit', 'SIGTERM', 'SIGINT'].forEach(function(e) {
+    process.on(e, function() {
         proxy.stop();
     });
 });
