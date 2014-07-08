@@ -1,6 +1,5 @@
-# ljve.io - Live Javascript Virtualized Environment
-
-This repo contains the source code of ljve.io.
+# ljve.io
+## Live Javascript Virtualized Environment
 
 
 
