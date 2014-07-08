@@ -1,4 +1,4 @@
-# ljve - Live Javascript Virtualized Environment
+# Live Javascript Virtualized Environment
 
 [![Build Status](https://travis-ci.org/novetica/ljve.io.svg?branch=master)](https://travis-ci.org/novetica/ljve.io)
 
