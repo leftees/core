@@ -1,8 +1,7 @@
-# ljve.io
+# ljve.io - Live Javascript Virtualized Environment
 
-[![Build Status](https://travis-ci.org/marcominetti/ljve.io.svg?branch=master)](https://travis-ci.org/marcominetti/ljve.io)
-[![Dependency Status](https://david-dm.org/marcominetti/ljve.io.svg)](https://david-dm.org/marcominetti/ljve.io)
-[![Coverage Status](https://coveralls.io/repos/marcominetti/ljve.io/badge.png)](https://coveralls.io/r/marcominetti/ljve.io)
+This repo contains the source code of ljve.io.
+
 
 
 ## Usage

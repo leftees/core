@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "express": "*",
-    "debug": "*",
-    "strong-data-uri": "*"
-  }
-}

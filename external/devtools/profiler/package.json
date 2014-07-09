@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "dish": "*",
-    "underscore": "*"
-  }
-}
