@@ -28,13 +28,25 @@ process.execArgv.forEach(function(arg) {
 });
 
 //C: detecting whether Node is running as development environment
-global.development = true;
-if (process.env.NODE_ENV === 'production') {
-  global.development = false;
+global.development = false;
+if (process.env.NODE_ENV === 'development') {
+  global.development = true;
+}
+
+//C: detecting whether Node is running as testing environment
+global.testing = false;
+if (process.env.NODE_ENV === 'test') {
+  global.testing = true;
 }
 
 //C: exporting global require against server root (needed later)
-global.require = require;
+global.require = function(module){
+  if (module.indexOf('/') === 0) {
+    return require(__dirname + '/' + module);
+  } else {
+    return require(module);
+  }
+};
 
 //C: detecting whether spawned node debugger launch is needed
 if (global.development === true && global.debugging === false){
@@ -99,7 +111,7 @@ if (global.development === true && global.debugging === false){
   
   //C: loading ljve application server executable module
   try {
-    global.require('./core/main.server.js');
+    global.require('/core/main.server.js');
   } catch (err) {
     console.error(err.message);
   }
