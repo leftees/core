@@ -19,4 +19,8 @@
 
  */
 
-require('./main.js');
+//C: defining coverage CLI command
+global.main.commands.coverage = function() {
+  //C: simply executing test with proper coverage argument
+  global.main.commands.test(true);
+};

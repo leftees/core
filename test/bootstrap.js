@@ -19,13 +19,21 @@
 
  */
 
-describe('Bootloader', function() {
+//C: testing bootstrap and proper platform loading
+describe('bootstrap', function() {
+
+  //C: initializing bootstrap
   before(function () {
+    global.main.commands.run();
+    console.log();
   });
+
+  //C: testing...
 
   describe('platform', function(){
     it('should exists', function(){
       should.exist(platform);
     });
   });
+
 });

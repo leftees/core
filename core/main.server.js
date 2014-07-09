@@ -66,49 +66,41 @@ global.Exception.prototype.toString = function(){
   return this.message;
 };
 
-if (global.testing === false) {
 //C: referencing native node console
-  native.console = {};
-  ['log', 'warn', 'info', 'error', 'dir'].forEach(function (level) {
-    native.console[level] = console[level];
-  });
+native.console = {};
+['log', 'warn', 'info', 'error', 'dir'].forEach(function (level) {
+  native.console[level] = console[level];
+});
 
 //C: replacing console.log with coloured implementation
-  console.log = function () {
-    var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
-    native.console.log(native.cli.color.xterm(7)(formatted_message));
-  };
+console.log = function () {
+  var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
+  native.console.log(native.cli.color.xterm(7)(formatted_message));
+};
 
 //C: replacing console.warn with coloured implementation
-  console.warn = function () {
-    var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
-    native.console.log(native.cli.color.xterm(220)(formatted_message));
-  };
+console.warn = function () {
+  var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
+  native.console.log(native.cli.color.xterm(220)(formatted_message));
+};
 
 //C: replacing console.info with coloured implementation
-  console.info = function () {
-    var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
-    native.console.log(native.cli.color.xterm(32)(formatted_message));
-  };
+console.info = function () {
+  var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
+  native.console.log(native.cli.color.xterm(32)(formatted_message));
+};
 
 //C: replacing console.error with coloured implementation
-  console.error = function () {
-    var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
-    global.native.console.log(native.cli.color.xterm(1)(formatted_message));
-  };
+console.error = function () {
+  var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
+  global.native.console.log(native.cli.color.xterm(1)(formatted_message));
+};
 
 //C: replacing or defining console.debug with coloured implementation
-  console.debug = function () {
-    var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
-    native.console.log(native.cli.color.xterm(8)(formatted_message));
-  };
-} else {
-  native.console = {};
-  ['log', 'warn', 'info', 'error', 'dir'].forEach(function (level) {
-    native.console[level] = console[level];
-    console[level] = function(){};
-  });
-}
+console.debug = function () {
+  var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
+  native.console.log(native.cli.color.xterm(8)(formatted_message));
+};
 
 //C: creating temporary main namespace for modular CLI command support
 global.main = {};
@@ -121,7 +113,7 @@ global.main.commands.unknown = function(){
   console.error('unsupported command');
 };
 
-//C: defining legacy test CLI command (will be overridden by modular commands loading)
+//C: defining legacy test_ci CLI command (will be overridden by modular commands loading)
 global.main.commands.test = function(){
   console.error('unsupported command');
 };
@@ -149,12 +141,9 @@ if (!(target_command !== undefined && typeof target_command === 'function')){
     target_command = global.main.commands.unknown;
   } else {
     //C: selecting test command by default (hopefully overridden by loaded modular commands)
-    target_command = global.main.commands.test;
+    target_command = global.main.commands.test(true);
   }
 }
 
 //C: executing CLI command
 target_command();
-
-//C: deleting global.main namespace
-delete global.main;

@@ -19,13 +19,34 @@
 
  */
 
-global.main.commands.test = function() {
+//C: defining test CLI command
+global.main.commands.test = function(coverage) {
+
+  //C: loading chai for global assert/expect/should support
   var chai = require('chai');
   global.assert = chai.assert;
   global.expect = chai.expect;
   global.should = chai.should();
 
-  global.main.commands.run();
+  //C: loading mocha and initializing it with proper reporter (supports also coverage)
+  var mocha = require('mocha');
+  global.mocha = new mocha({
+    'ui': 'bdd',
+    'reporter': ((coverage === true) ? ((global.testing === true) ? 'mocha-lcov-reporter' : 'html-cov') : 'list')
+  });
 
-  global.require('/test/bootloader.js');
+  //C: initializing coverage stuff if required
+  if(coverage === true){
+    global.mocha.addFile('./test/coverage.js');
+  }
+
+  //C: queueing test files
+  //T: automatically load test files from test folder
+  global.mocha.addFile('./test/bootstrap.js');
+
+  //C: executing tests
+  global.mocha.run(function(failures){
+    //C: terminating process with number of failures as exit code
+    process.exit(failures);
+  });
 };
