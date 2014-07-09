@@ -66,41 +66,49 @@ global.Exception.prototype.toString = function(){
   return this.message;
 };
 
+if (global.testing === false) {
 //C: referencing native node console
-native.console = {};
-['log', 'warn', 'info', 'error', 'dir'].forEach(function(level) {
-  native.console[level] = console[level];
-});
+  native.console = {};
+  ['log', 'warn', 'info', 'error', 'dir'].forEach(function (level) {
+    native.console[level] = console[level];
+  });
 
 //C: replacing console.log with coloured implementation
-console.log = function(){
-  var formatted_message = native.util.format.apply(native.util,Array.prototype.slice.call(arguments));
-  native.console.log(native.cli.color.xterm(7)(formatted_message));
-};
+  console.log = function () {
+    var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
+    native.console.log(native.cli.color.xterm(7)(formatted_message));
+  };
 
 //C: replacing console.warn with coloured implementation
-console.warn = function(){
-  var formatted_message = native.util.format.apply(native.util,Array.prototype.slice.call(arguments));
-  native.console.log(native.cli.color.xterm(220)(formatted_message));
-};
+  console.warn = function () {
+    var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
+    native.console.log(native.cli.color.xterm(220)(formatted_message));
+  };
 
 //C: replacing console.info with coloured implementation
-console.info = function(){
-  var formatted_message = native.util.format.apply(native.util,Array.prototype.slice.call(arguments));
-  native.console.log(native.cli.color.xterm(32)(formatted_message));
-};
+  console.info = function () {
+    var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
+    native.console.log(native.cli.color.xterm(32)(formatted_message));
+  };
 
 //C: replacing console.error with coloured implementation
-console.error = function(){
-  var formatted_message = native.util.format.apply(native.util,Array.prototype.slice.call(arguments));
-  global.native.console.log(native.cli.color.xterm(1)(formatted_message));
-};
+  console.error = function () {
+    var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
+    global.native.console.log(native.cli.color.xterm(1)(formatted_message));
+  };
 
 //C: replacing or defining console.debug with coloured implementation
-console.debug = function(){
-  var formatted_message = native.util.format.apply(native.util,Array.prototype.slice.call(arguments));
-  native.console.log(native.cli.color.xterm(8)(formatted_message));
-};
+  console.debug = function () {
+    var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
+    native.console.log(native.cli.color.xterm(8)(formatted_message));
+  };
+} else {
+  native.console = {};
+  ['log', 'warn', 'info', 'error', 'dir'].forEach(function (level) {
+    native.console[level] = console[level];
+    console[level] = function(){};
+  });
+}
 
 //C: creating temporary main namespace for modular CLI command support
 global.main = {};
@@ -108,8 +116,13 @@ global.main = {};
 //C: creating supported CLI commands hashtable (will be populated afterwards)
 global.main.commands = {};
 
-//C: defining legacy help CLI command (will be overridden by modular commands loading)
-global.main.commands.help = function(){
+//C: defining legacy unknown CLI command (will be overridden by modular commands loading)
+global.main.commands.unknown = function(){
+  console.error('unsupported command');
+};
+
+//C: defining legacy test CLI command (will be overridden by modular commands loading)
+global.main.commands.test = function(){
   console.error('unsupported command');
 };
 
@@ -122,7 +135,7 @@ if (native.fs.existsSync(native.path.join(process.cwd(),'core/main')) === true) 
   //C: loading every .js files available in /core/main folder
   exec_files.forEach(function (file) {
     if (js_file_check.test(file) === true) {
-      global.require('./core/main/' + file);
+      global.require('/core/main/' + file);
     }
   });
 }
@@ -131,8 +144,13 @@ if (native.fs.existsSync(native.path.join(process.cwd(),'core/main')) === true) 
 var target_command = global.main.commands[native.args._[0]];
 //C: checking whether command doesn't exist or it's not executable
 if (!(target_command !== undefined && typeof target_command === 'function')){
-  //C: selecting help command by default (hopefully overridden by loaded modular commands)
-  target_command = global.main.commands.help;
+  if (global.testing === false) {
+    //C: selecting unknown command by default (hopefully overridden by loaded modular commands)
+    target_command = global.main.commands.unknown;
+  } else {
+    //C: selecting test command by default (hopefully overridden by loaded modular commands)
+    target_command = global.main.commands.test;
+  }
 }
 
 //C: executing CLI command

@@ -5,6 +5,7 @@
   "author": "Marco Minetti <marco.minetti@novetica.org>",
   "contributors": [],
   "bin":{
+    "ljve": "./main.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,10 @@
   ],
   "dependencies": {
   	"mocha": "*",
+    "chai": "*",
+    "blanket": "*",
+    "coveralls": "*",
+    "mocha-lcov-reporter": "*",
     "yargs": "*",
     "cli-color":"*",
     "ws": "*",
@@ -28,6 +33,16 @@
     "underscore": "*"
   },
   "scripts": {
+    "test": "NODE_ENV=test ./node_modules/mocha/bin/mocha -u bdd -r blanket -R mocha-lcov-reporter test.js | ./node_modules/coveralls/bin/coveralls.js"
+  },
+  "config":{
+    "blanket": {
+      "pattern": [ "core", "app" ],
+      "data-cover-never": "node_modules",
+      "data-cover-reporter-options": {
+        "shortnames": false
+      }
+    }
   },
   "gypfile": true,
   "preferGlobal": true,
