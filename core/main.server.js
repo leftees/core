@@ -71,34 +71,38 @@ native.console = {};
 ['log', 'warn', 'info', 'error', 'dir'].forEach(function (level) {
   native.console[level] = console[level];
 });
+//C: adding emulation for console.debug
+native.console.debug = native.console.log;
 
-console.format = function(args){
-  return native.util.format.apply(native.util, args);
+//C: defining centralized print with level and color support (xterm int code as second argument)
+console.print = function (level,color,args) {
+  var formatted_message = native.util.format.apply(native.util, args);
+  return native.console[level](native.cli.color.xterm(color)(formatted_message));
 };
 
 //C: replacing console.log with coloured implementation
 console.log = function () {
-  native.console.log(native.cli.color.xterm(7)(console.format(Array.prototype.slice.call(arguments))));
+  console.print('log',7, Array.prototype.slice.call(arguments));
 };
 
 //C: replacing console.warn with coloured implementation
 console.warn = function () {
-  native.console.warn(native.cli.color.xterm(220)(console.format(Array.prototype.slice.call(arguments))));
+  console.print('warn',220, Array.prototype.slice.call(arguments));
 };
 
 //C: replacing console.info with coloured implementation
 console.info = function () {
-  native.console.info(native.cli.color.xterm(32)(console.format(Array.prototype.slice.call(arguments))));
+  console.print('info',32, Array.prototype.slice.call(arguments));
 };
 
 //C: replacing console.error with coloured implementation
 console.error = function () {
-  global.native.console.error(native.cli.color.xterm(1)(console.format(Array.prototype.slice.call(arguments))));
+  console.print('error',1, Array.prototype.slice.call(arguments));
 };
 
 //C: replacing or defining console.debug with coloured implementation
 console.debug = function () {
-  native.console.log(native.cli.color.xterm(8)(console.format(Array.prototype.slice.call(arguments))));
+  console.print('debug',8, Array.prototype.slice.call(arguments));
 };
 
 //C: creating temporary main namespace for modular CLI command support
