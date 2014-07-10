@@ -1,0 +1,12 @@
+[submodule "external/devtools/inspector"]
+	path = external/devtools/inspector
+	url = https://github.com/marcominetti/webkit-devtools-agent-frontend-inspector.git
+[submodule "external/devtools/console"]
+	path = external/devtools/console
+	url = https://github.com/marcominetti/webkit-devtools-agent-frontend-console.git
+[submodule "external/devtools/profiler"]
+	path = external/devtools/profiler
+	url = https://github.com/marcominetti/webkit-devtools-agent-frontend-profiler.git
+[submodule "external/devtools/agent"]
+	path = external/devtools/agent
+	url = https://github.com/marcominetti/node-webkit-agent.git
