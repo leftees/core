@@ -72,34 +72,33 @@ native.console = {};
   native.console[level] = console[level];
 });
 
+console.format = function(args){
+  return native.util.format.apply(native.util, args);
+};
+
 //C: replacing console.log with coloured implementation
 console.log = function () {
-  var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
-  native.console.log(native.cli.color.xterm(7)(formatted_message));
+  native.console.log(native.cli.color.xterm(7)(console.format(Array.prototype.slice.call(arguments))));
 };
 
 //C: replacing console.warn with coloured implementation
 console.warn = function () {
-  var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
-  native.console.log(native.cli.color.xterm(220)(formatted_message));
+  native.console.warn(native.cli.color.xterm(220)(console.format(Array.prototype.slice.call(arguments))));
 };
 
 //C: replacing console.info with coloured implementation
 console.info = function () {
-  var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
-  native.console.log(native.cli.color.xterm(32)(formatted_message));
+  native.console.info(native.cli.color.xterm(32)(console.format(Array.prototype.slice.call(arguments))));
 };
 
 //C: replacing console.error with coloured implementation
 console.error = function () {
-  var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
-  global.native.console.log(native.cli.color.xterm(1)(formatted_message));
+  global.native.console.error(native.cli.color.xterm(1)(console.format(Array.prototype.slice.call(arguments))));
 };
 
 //C: replacing or defining console.debug with coloured implementation
 console.debug = function () {
-  var formatted_message = native.util.format.apply(native.util, Array.prototype.slice.call(arguments));
-  native.console.log(native.cli.color.xterm(8)(formatted_message));
+  native.console.log(native.cli.color.xterm(8)(console.format(Array.prototype.slice.call(arguments))));
 };
 
 //C: creating temporary main namespace for modular CLI command support
