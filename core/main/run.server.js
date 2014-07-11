@@ -21,17 +21,34 @@
 
 //C: defining run CLI command
 global.main.commands.run = function(){
+  //C: processing arguments
+  var root = native.args.root;
+  //C: checking whether root folder is valid
+  if (root !== undefined && typeof root === 'string'){
+    //C: normalizing root (removing last separators)
+    //T: support windows directory separator
+    root = root.replace(/\/*$/,'');
+    if (native.fs.existsSync(root) === true){
+      //C: storing new root folder
+      global.main.path.app = root;
+    } else {
+      throw new Exception('specified root folder \'%s\' does not exist, please use absolute path', root);
+    }
+  }
+
   //C: printing logo
   global.main.commands.logo();
   console.log();
   //C: printing version
   global.main.commands.version.print();
   console.log();
-  //C: deleting global.main namespace (not required)
-  delete global.main;
+
   //C: loading ljve application server
   //var bootstrap = global.require('/core/bootstrap.server.js');
   //T: check if root folder exists through args.root (--root)
   //C: power-on-self-test, initializing application server
-  //bootstrap.post(native.args.root||process.cwd());
+  //bootstrap.post(global.main.path.core);
+
+  //C: deleting global.main namespace (not required)
+  delete global.main;
 };

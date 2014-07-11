@@ -19,6 +19,14 @@
 
  */
 
+//C: creating temporary main namespace for modular CLI command support
+global.main = {};
+
+//C: storing root paths
+global.main.path = {};
+global.main.path.app = process.cwd();
+global.main.path.core = __dirname;
+
 //C: detecting node debugger enabled (through node arguments)
 global.debugging = false;
 process.execArgv.forEach(function(arg) {
@@ -42,7 +50,7 @@ if (process.env.NODE_ENV === 'test') {
 //C: exporting global require against server root (needed later)
 global.require = function(module){
   if (module.indexOf('/') === 0) {
-    return require(__dirname + '/' + module);
+    return require(global.main.path.core + '/' + module);
   } else {
     return require(module);
   }

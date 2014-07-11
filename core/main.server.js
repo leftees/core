@@ -105,9 +105,6 @@ console.debug = function () {
   console.print('debug',8, Array.prototype.slice.call(arguments));
 };
 
-//C: creating temporary main namespace for modular CLI command support
-global.main = {};
-
 //C: creating supported CLI commands hashtable (will be populated afterwards)
 global.main.commands = {};
 
@@ -122,9 +119,9 @@ global.main.commands.test = function(){
 };
 
 //C: populating supported CLI commands from /core/main folder (whether exists)
-if (native.fs.existsSync(native.path.join(process.cwd(),'core/main')) === true) {
+if (native.fs.existsSync(native.path.join(global.main.path.core,'core/main')) === true) {
   //C: getting files available in /core/main folder
-  var exec_files = native.fs.readdirSync(native.path.join(process.cwd(),'core/main'));
+  var exec_files = native.fs.readdirSync(native.path.join(global.main.path.core,'core/main'));
   //C: caching .js extension check regex
   var js_file_check = /.js$/;
   //C: loading every .js files available in /core/main folder
