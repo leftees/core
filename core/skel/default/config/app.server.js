@@ -19,6 +19,7 @@
 
  */
 
+//O: Contains general application info.
 platform.configuration.application = {
   "name": "My Example Application",
   "version": "0.0.1",

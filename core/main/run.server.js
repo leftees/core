@@ -30,7 +30,7 @@ global.main.commands.run = function(){
     root = root.replace(/\/*$/,'');
     if (native.fs.existsSync(root) === true){
       //C: storing new root folder
-      global.main.path.app = root;
+      global.main.path.app = native.path.normalize(root);
     } else {
       throw new Exception('specified root folder \'%s\' does not exist, please use absolute path', root);
     }
@@ -44,10 +44,9 @@ global.main.commands.run = function(){
   console.log();
 
   //C: loading ljve application server
-  //var bootstrap = global.require('/core/bootstrap.server.js');
-  //T: check if root folder exists through args.root (--root)
+  var bootstrap = global.require(global.main.path.core + '/core/bootstrap.server.js');
   //C: power-on-self-test, initializing application server
-  //bootstrap.post(global.main.path.core);
+  bootstrap.post();
 
   //C: deleting global.main namespace (not required)
   delete global.main;
