@@ -119,15 +119,15 @@ global.main.commands.test = function(){
 };
 
 //C: populating supported CLI commands from /core/main folder (whether exists)
-if (native.fs.existsSync(native.path.join(global.main.path.core,'core/main')) === true) {
+if (native.fs.existsSync(native.path.join(global.main.path.core,'/core/main')) === true) {
   //C: getting files available in /core/main folder
-  var exec_files = native.fs.readdirSync(native.path.join(global.main.path.core,'core/main'));
+  var exec_files = native.fs.readdirSync(native.path.join(global.main.path.core,'/core/main'));
   //C: caching .js extension check regex
   var js_file_check = /.js$/;
   //C: loading every .js files available in /core/main folder
   exec_files.forEach(function (file) {
     if (js_file_check.test(file) === true) {
-      global.require('/core/main/' + file);
+      global.require(global.main.path.core + '/core/main/' + file);
     }
   });
 }
