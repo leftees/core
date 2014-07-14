@@ -60,6 +60,8 @@ global.Exception = function(message){
   }
   //C: storing arguments as exception data
   this.data = arguments_array;
+  //C: initializing dump as null (will be populated by embedded runtime debugger)
+  this.dump = null;
 };
 //C: overriding toString() function to provide Error emulation
 global.Exception.prototype.toString = function(){

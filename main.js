@@ -45,6 +45,7 @@ if (process.env.NODE_ENV === 'development') {
 global.testing = false;
 if (process.env.NODE_ENV === 'test') {
   global.testing = true;
+  global.development = true;
 }
 
 //C: exporting global require against server root (needed later)

@@ -33,7 +33,7 @@ platform.kernel.get = function(name,root,divisor) {
   var subname;
   var tree;
   var count;
-  if (target === undefined){
+  if (target === undefined || target === null){
     target = global;
   }
 
@@ -52,16 +52,17 @@ platform.kernel.get = function(name,root,divisor) {
 //F: Sets the value of a property in current environment.
 //A: name: Specifies name of property to be set.
 //A: value: Specifies the value to be set.
+//A: [create]: Specifies whether missing tree part should be created as objects. Default is true.
 //A: [root]: Specifies which object should be use as root to set property value. Default is global.
 //A: [divisor]: Specifies which char/string should be used split the name property tree. Default is '.'.
 //R: Returns the value of property.
 //H: While traversing the property tree every get() property function and set() property function leaf will be evaluated if any.
-platform.kernel.set = function(name,value,createParents,root,divisor) {
+platform.kernel.set = function(name,value,create,root,divisor) {
   var target = root;
   var subname;
   var tree;
   var count;
-  if (target === undefined){
+  if (target === undefined || target === null){
     target = global;
   }
 
@@ -70,7 +71,11 @@ platform.kernel.set = function(name,value,createParents,root,divisor) {
   for (count = 0; count < tree.length-1; count++) {
     subname = tree [count];
     if (target [subname] === undefined) {
-      throw new Error("Unable to set \"" + name + "\": member \"" + subname + "\" doesn't exists.");
+      if (create === false) {
+        throw new Error("Unable to set \"" + name + "\": member \"" + subname + "\" doesn't exists.");
+      } else {
+        target [subname] = {};
+      }
     }
     target = target [subname];
   }
@@ -91,7 +96,7 @@ platform.kernel.unset = function(name,root,divisor) {
   var subname;
   var tree;
   var count;
-  if (target === undefined){
+  if (target === undefined || target === null){
     target = global;
   }
 
@@ -125,7 +130,7 @@ platform.kernel.invoke = function(name,args,scope,root,divisor) {
   var subname;
   var tree;
   var count;
-  if (target === undefined){
+  if (target === undefined || target === null){
     target = global;
   }
 
@@ -145,21 +150,20 @@ platform.kernel.invoke = function(name,args,scope,root,divisor) {
   }
 };
 
-//F: Invokes a function in current environment.
-//A: name: Specifies name of property to invoke.
-//A: [args]: Specifies the arguments for the function.
-//A: [scope]: Specifies which object should be use as scope to get property value. Default is global.
-//A: [root]: Specifies which object should be use as root to get property value. Default is global.
+//F: Create a new instance from classes defined in current environment.
+//A: name: Specifies name of class to instance.
+//A: [args]: Specifies the arguments for the instance constructor.
+//A: [root]: Specifies which object should be use as root to get property value. Default is platform.classes.
 //A: [divisor]: Specifies which char/string should be used split the name property tree. Default is '.'.
-//R: Returns the returned value of invoked function.
+//R: Returns the new instance of required class.
 //H: While traversing the property tree every get() property function will be evaluated if any.
-platform.kernel.new = function (name,args,revision,root,divisor) {
+platform.kernel.new = function (name,args,root,divisor) {
   var target = root;
   var subname;
   var tree;
   var count;
   var new_instance;
-  if (target === undefined){
+  if (target === undefined || target === null){
     target = platform.classes;
   }
 

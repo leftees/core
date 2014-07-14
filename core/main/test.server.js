@@ -43,6 +43,7 @@ global.main.commands.test = function(coverage) {
   //C: queueing test files
   //T: automatically load test files from test folder
   global.mocha.addFile('./test/bootstrap.js');
+  global.mocha.addFile('./test/kernel.js');
 
   //C: executing tests
   global.mocha.run(function(failures){

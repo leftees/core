@@ -28,8 +28,6 @@ describe('bootstrap', function() {
     console.log();
   });
 
-  //C: testing...
-
   describe('platform', function(){
     it('should exists', function(){
       should.exist(platform);
@@ -37,3 +35,4 @@ describe('bootstrap', function() {
   });
 
 });
+
