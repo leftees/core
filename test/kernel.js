@@ -233,60 +233,46 @@ describe('kernel', function() {
   describe('new', function() {
 
     before(function(){
-      platform.kernel.set('doexist.fail',false);
-      platform.kernel.set('doexist.test',function(a){ return a; });
-      platform.kernel.set('doexist.testA.test',function(a){ return a; });
+      var test_myclass = function(a,b){
+        this.member1 = a;
+        this.__member2__ = b;
+      };
+      test_myclass.prototype.member2 = function(){
+        return this.__member2__;
+      };
+      platform.classes.register('test.myclass',test_myclass);
+      platform.kernel.set('doexist.test',test_myclass);
     });
 
     it('with missing tree should fail', function () {
       (function () {
-        platform.kernel.invoke('donotexist.test');
+        platform.kernel.new('donotexist.test');
       }).should.throw();
     });
 
     it('with missing tree should succeed', function () {
       (function () {
-        platform.kernel.invoke('doexist.test');
+        platform.kernel.new('doexist.test');
       }).should.not.throw();
     });
 
-    it('with correct tree and invalid function should fail', function () {
-      (function () {
-        platform.kernel.invoke('doexist.fail');
-      }).should.throw();
+    it('with registered name and constructor args should succeed', function () {
+      var result = platform.kernel.new('test.myclass',['1','2']);
+      result.should.be.an.instanceOf(platform.classes.get('test.myclass'));
+      result.member1.should.equal('1');
+      result.member2().should.equal('2');
     });
 
-    it('with correct tree and no args should succeed', function () {
-      var result = platform.kernel.invoke('doexist.test');
-      should.not.exist(result);
-    });
-
-    it('with correct tree and custom divisor should succeed', function () {
-      var result = platform.kernel.invoke('doexist|test',['1'],null,null,'|');
-      should.exist(result);
-      result.should.equal('1');
-    });
-
-    it('with correct tree, custom root and no create should succeed', function () {
-      var result = platform.kernel.invoke('test',['2'],null,global.doexist,'|');
-      should.exist(result);
-      result.should.equal('2');
-    });
-
-    it('with correct deep tree and explicit default params should succeed', function () {
-      var result = platform.kernel.invoke('doexist.testA.test',['3'],null,null,'.');
-      should.exist(result);
-      result.should.equal('3');
-    });
-
-    it('with correct tree, custom root and custom divisor should succeed', function () {
-      var result = platform.kernel.invoke('testA|test',['A'],null,global.doexist,'|');
-      should.exist(result);
-      result.should.equal('A');
+    it('with corret tree and constructor args should succeed', function () {
+      var result = platform.kernel.new('test',['3','4'],global.doexist);
+      result.should.be.an.instanceOf(doexist.test);
+      result.member1.should.equal('3');
+      result.member2().should.equal('4');
     });
 
     after(function(){
       platform.kernel.unset('doexist');
+      platform.classes.unregister('test.myclass');
     });
 
   });
