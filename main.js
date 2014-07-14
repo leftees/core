@@ -48,13 +48,7 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 //C: exporting global require against server root (needed later)
-global.require = function(module){
-  if (module.indexOf('/') === 0) {
-    return require(global.main.path.core + '/' + module);
-  } else {
-    return require(module);
-  }
-};
+global.require = require;
 
 //C: detecting whether spawned node debugger launch is needed
 if (global.development === true && global.debugging === false){
@@ -119,7 +113,7 @@ if (global.development === true && global.debugging === false){
   
   //C: loading ljve application server executable module
   try {
-    global.require('/core/main.server.js');
+    global.require(global.main.path.core + '/core/main.server.js');
   } catch (err) {
     console.error(err.message);
   }
