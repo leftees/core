@@ -22,10 +22,53 @@
 //N: Provides class helper to register/unregister and instance environment-level classes.
 platform.classes = platform.classes || {};
 
-/*platform.classes.register = function(name,initializer,prototype,revision){
+//O: Stores the registered classes constructors.
+platform.classes.__store__ = {};
 
-};*/
+//F: Registers a class into current environment.
+//A: name: Specifies name of new class to register.
+//A: constructor: Specifies constructor with prototype object for new class instances.
+//R: Returns true if class is successfully registered.
+platform.classes.register = function(name,constructor){
+  if (platform.classes.exists(name) === false) {
+    platform.classes.__store__[name] = constructor;
+    return true;
+  } else {
+    throw new Exception('constructor for \'%s\' already exists',name);
+  }
+};
 
-/*platform.classes.unregister = function(name,revision){
+//F: Unregisters a class from current environment.
+//A: name: Specifies name of new class to unregister.
+//R: Returns true if class is successfully unregistered.
+platform.classes.unregister = function(name){
+  if (platform.classes.exists(name) === true) {
+    return delete platform.classes.__store__[name];
+  }
+};
 
-};*/
+//F: Gets a class constructor from current environment.
+//A: name: Specifies name of new class to get.
+//R: Returns class constructor.
+platform.classes.get = function(name){
+  if (platform.classes.exists(name) === true) {
+    return platform.classes.__store__[name];
+  } else {
+    throw new Exception('constructor for \'%s\' not found',name);
+  }
+};
+
+//F: Checks whether a class is registered in current environment.
+//A: name: Specifies name of new class to check.
+//R: Returns true if class is registered.
+platform.classes.exists = function(name){
+  return (platform.classes.__store__.hasOwnProperty(name) && typeof platform.classes.__store__[name] === 'function');
+};
+
+//F: Checks whether an object is an instance of a registered class in current environment.
+//A: object: Specifies object to check.
+//A: name: Specifies name of class to compare.
+//R: Returns true if object is an instance of specified class.
+platform.classes.instanceOf = function(object,name){
+  return (object !== undefined && platform.classes.__store__.hasOwnProperty(name) === object.constructor);
+};
