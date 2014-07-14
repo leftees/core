@@ -42,69 +42,31 @@ bootstrap.post = function(){
 
   //T: creating default folders
 
-  var config_files;
   //C: loading core configuration from core root
   console.log('loading core configuration');
-  if (native.fs.existsSync(bootstrap.mapPath('/core/config',global.main.path.core)) === true) {
-    config_files = native.fs.readdirSync(bootstrap.mapPath('/core/config',global.main.path.core));
-    config_files.forEach(function (file) {
-      if (bootstrap.regexs.serverJS.test(file) === true) {
-        bootstrap.load(global.main.path.core + '/core/config/' + file);
-      }
-    });
-  }
+  bootstrap.loadFolder(global.main.path.core,'/core/config/');
+
   //C: loading core configuration overrides from app root
-  if (native.fs.existsSync(bootstrap.mapPath('/core/config',global.main.path.app)) === true) {
-    config_files = native.fs.readdirSync(bootstrap.mapPath('/core/config',global.main.path.app));
-    config_files.forEach(function (file) {
-      if (bootstrap.regexs.serverJS.test(file) === true) {
-        bootstrap.load(global.main.path.app + '/core/config/' + file);
-      }
-    });
-  }
+  bootstrap.loadFolder(global.main.path.app,'/core/config/');
+
   //C: loading app configuration overrides from app root
   console.log('loading app configuration');
-  if (native.fs.existsSync(bootstrap.mapPath('/config',global.main.path.app)) === true) {
-    config_files = native.fs.readdirSync(bootstrap.mapPath('/config',global.main.path.app));
-    config_files.forEach(function (file) {
-      if (bootstrap.regexs.serverJS.test(file) === true) {
-        bootstrap.load(global.main.path.app + '/config/' + file);
-      }
-    });
-  }
+  bootstrap.loadFolder(global.main.path.app,'/config/');
 
   //C: loading preload module
   console.log('loading bootstrap modules');
-  platform.configuration.server.bootloader.preload.forEach(function(file){
-    if (bootstrap.regexs.serverJS.test(file) === true) {
-      bootstrap.load('/core/' + file);
-    } else if(bootstrap.regexs.webURI.test(file) === true) {
-      bootstrap.load(file);
-    }
-  });
+  bootstrap.loadModules(platform.configuration.server.bootloader.preload,'/core/');
 
   //C: loading preprocessors for code augmentation
   console.log('loading core kernel preprocessors');
-  platform.configuration.server.kernel.preprocessors.forEach(function(file){
-    if (bootstrap.regexs.serverJS.test(file) === true) {
-      bootstrap.load('/core/kernel/preprocessors/server/' + file);
-    } else if(bootstrap.regexs.webURI.test(file) === true) {
-      bootstrap.load(file);
-    }
-  });
+  bootstrap.loadModules(platform.configuration.server.kernel.preprocessors,'/core/kernel/preprocessors/server/');
 
   //T: switching to code-augmentation enabled bootstrap.load
   //bootstrap.load = platform.kernel.load;
 
   //C: loading preload module
   console.log('loading bootstrap modules');
-  platform.configuration.server.bootloader.modules.forEach(function(file){
-    if (bootstrap.regexs.serverJS.test(file) === true) {
-      bootstrap.load('/core/' + file);
-    } else if(bootstrap.regexs.webURI.test(file) === true) {
-      bootstrap.load(file);
-    }
-  });
+  bootstrap.loadModules(platform.configuration.server.bootloader.modules,'/core/');
 
   //T: switch to PXE (pre execution environment)
 };
@@ -198,6 +160,27 @@ bootstrap.load = function(uri){
   } catch (ex) {
     throw new Exception("error loading \'%s\': %s", uri, ex.message, ex);
   }
+};
+
+bootstrap.loadFolder = function(root,path){
+  if (native.fs.existsSync(bootstrap.mapPath(path,root)) === true) {
+    var config_files = native.fs.readdirSync(bootstrap.mapPath(path,root));
+    config_files.forEach(function (file) {
+      if (bootstrap.regexs.serverJS.test(file) === true) {
+        bootstrap.load(root + path + file);
+      }
+    });
+  }
+};
+
+bootstrap.loadModules = function(modules,path){
+  modules.forEach(function(file){
+    if (bootstrap.regexs.serverJS.test(file) === true) {
+      bootstrap.load(path + file);
+    } else if(bootstrap.regexs.webURI.test(file) === true) {
+      bootstrap.load(file);
+    }
+  });
 };
 
 //C: exporting bootstrap object
