@@ -27,7 +27,7 @@ platform.kernel = platform.kernel || {};
 //A: [file]: Specifies the file name containing code to be augmented.
 //A: [module]: Specifies name of the module that is augmenting code
 //R: Returns the augmented code.
-platform.kernel.preprocess = function(code, module, file){
+platform.kernel.preprocess = function(code, file, module){
   //T: migrate preprocessor stack from 0.3.x branch
   return code;
 };

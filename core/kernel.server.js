@@ -42,7 +42,7 @@ platform.kernel.get = function(name,root,divisor) {
   for (count = 0; count < tree.length; count++) {
     subname = tree [count];
     if (target [subname] === undefined) {
-      throw new Error("Unable to get \"" + name + "\": member \"" + subname + "\" doesn't exists.");
+      throw new Exception('unable to get \'%s\': member \'%s\' does not exist',name,subname);
     }
     target = target [subname];
   }
@@ -72,7 +72,7 @@ platform.kernel.set = function(name,value,create,root,divisor) {
     subname = tree [count];
     if (target [subname] === undefined) {
       if (create === false) {
-        throw new Error("Unable to set \"" + name + "\": member \"" + subname + "\" doesn't exists.");
+        throw new Exception('unable to set \'%s\': member \'%s\' does not exist',name,subname);
       } else {
         target [subname] = {};
       }
@@ -105,7 +105,7 @@ platform.kernel.unset = function(name,root,divisor) {
   for (count = 0; count < tree.length-1; count++) {
     subname = tree [count];
     if (target [subname] === undefined) {
-      throw new Error("Unable to unset \"" + name + "\": member \"" + subname + "\" doesn't exists.");
+      throw new Exception('unable to unset \'%s\': member \'%s\' does not exist',name,subname);
     }
     target = target [subname];
   }
@@ -114,7 +114,7 @@ platform.kernel.unset = function(name,root,divisor) {
     //T: clean augmented data if any
     return (delete target [subname]);
   }
-  throw new Error("Unable to unset \"" + name + "\": member \"" + subname + "\" doesn't exists.");
+  throw new Exception('unable to unset \'%s\': member \'%s\' does not exist',name,subname);
 };
 
 //F: Invokes a function in current environment.
@@ -139,32 +139,42 @@ platform.kernel.invoke = function(name,args,scope,root,divisor) {
   for (count = 0; count < tree.length; count++) {
     subname = tree [count];
     if (target [subname] === undefined) {
-      throw new Error("Unable to invoke \"" + name + "\": member \"" + subname + "\" doesn't exists.");
+      throw new Exception('unable to invoke \'%s\': member \'%s\' does not exist',name,subname);
     }
     target = target [subname];
   }
   if (typeof target === 'function') {
     return target.apply(scope,args);
   } else {
-    throw new Error("Unable to invoke \"" + name + "\": it is not a function.");
+    throw new Exception('unable to invoke \'%s\': member \'%s\' is not a function',name,subname);
   }
 };
 
 //F: Create a new instance from classes defined in current environment.
 //A: name: Specifies name of class to instance.
 //A: [args]: Specifies the arguments for the instance constructor.
-//A: [root]: Specifies which object should be use as root to get property value. Default is platform.classes.
+//A: [root]: Specifies which object should be use as root to get property value. Default is global.
 //A: [divisor]: Specifies which char/string should be used split the name property tree. Default is '.'.
 //R: Returns the new instance of required class.
 //H: While traversing the property tree every get() property function will be evaluated if any.
+//H: If no custom root is specified, this function will try to instance registered classes through platform.classes.
 platform.kernel.new = function (name,args,root,divisor) {
   var target = root;
   var subname;
   var tree;
   var count;
   var new_instance;
-  if (target === undefined || target === null){
-    target = platform.classes;
+
+  //C: looking for registered class names if no root has been specified
+  if (target === undefined || target === null) {
+    if (platform.classes.exists(name) === true) {
+      target = platform.classes.get(name);
+      new_instance = Object.create(target.prototype);
+      target.apply(new_instance, args);
+      return new_instance;
+    } else {
+      target = global;
+    }
   }
 
   subname = null;
@@ -172,8 +182,7 @@ platform.kernel.new = function (name,args,root,divisor) {
   for (count = 0; count < tree.length; count++) {
     subname = tree [count];
     if (target [subname] === undefined) {
-      //T: check in global if root is not specified and find fails
-      throw new Error("Unable to instance new \"" + name + "\": member \"" + subname + "\" doesn't exists.");
+      throw new Exception('unable to instance class \'%s\': member \'%s\' does not exist',name,subname);
     }
     target = target [subname];
   }
@@ -192,7 +201,7 @@ platform.kernel.new = function (name,args,root,divisor) {
 platform.kernel.inject = function (code,file,module,preprocess) {
   var preprocessed_code;
   if (preprocess === true && platform.kernel.preprocess !== undefined && typeof platform.kernel.preprocess === 'function') {
-    preprocessed_code = platform.kernel.preprocess(code,module,file);
+    preprocessed_code = platform.kernel.preprocess(code,file,module);
   } else {
     preprocessed_code = code;
   }
