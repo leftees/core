@@ -23,7 +23,7 @@
 if (global.debugging === true) {
   //T: support custom ports (both for debugger and frontend)
   //C: executing node-inspector frontend in a separate process
-  var inspector = require('child_process').spawn('node', ['./external/devtools/inspector/main.js']);
+  var inspector = require('child_process').spawn('node', [global.main.path.core + '/external/devtools/inspector/main.js']);
   //C: attaching exit events to kill node-inspector
   ['exit','SIGINT','SIGTERM'].forEach(function (e) {
     process.on(e, function () {
@@ -39,17 +39,17 @@ if (global.debugging === true) {
 if (global.development === true) {
   //T: support custom ports (both for console and frontend)
   //C: activating node-webkit-agent for console
-  var agentConsole = new (global.require('./external/devtools/agent/index'))();
+  var agentConsole = new (global.require(global.main.path.core + '/external/devtools/agent/index'))();
   agentConsole.start(9999, '0.0.0.0', 3333, false);
   //C: executing console frontend in a separate process
-  var console = require('child_process').spawn('node', ['./external/devtools/console/main.js', 9999]);
+  var console = require('child_process').spawn('node', [global.main.path.core + '/external/devtools/console/main.js', 9999]);
 
   //T: support custom ports (both for console and frontend)
   //C: activating node-webkit-agent for profiler
-  var agentProfiler = new (global.require('./external/devtools/agent/index'))();
+  var agentProfiler = new (global.require(global.main.path.core + '/external/devtools/agent/index'))();
   agentProfiler.start(9998, '0.0.0.0', 3332, false);
   //C: executing profiler frontend in a separate process
-  var profiler = require('child_process').spawn('node', ['./external/devtools/profiler/main.js', 9998]);
+  var profiler = require('child_process').spawn('node', [global.main.path.core + '/external/devtools/profiler/main.js', 9998]);
 
   //C: attaching exit events to stop agents and kill frontends
   ['exit','SIGINT','SIGTERM'].forEach(function (e) {
