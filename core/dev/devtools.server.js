@@ -24,104 +24,64 @@ platform.development = platform.development || {};
 
 platform.development.tools = platform.development.tools || {};
 
-
-platform.development.tools.inspector = {};
-platform.development.tools.inspector.__process__ = undefined;
-platform.development.tools.inspector.start = function () {
-  if (platform.development.tools.inspector.__process__ === undefined) {
-    //T: support custom ports (both for debugger and frontend)
-    platform.development.tools.__start_frontend__('inspector',null);
+platform.development.tools.__start__ = function(name,port,internal_port){
+  if (platform.development.tools[name].__process__ === undefined && (platform.development.tools[name].hasOwnProperty('__agent__') === false || (platform.development.tools[name].hasOwnProperty('__agent__') === true && platform.development.tools[name].__agent__ === undefined))) {
+    //T: support custom ports (both for frontend)
+    if (platform.development.tools[name].hasOwnProperty('__agent__') === true) {
+      //C: activating node-webkit-agent for console
+      platform.development.tools[name].__agent__ = new (global.require(platform.runtime.path.core + '/external/devtools/agent/index'))();
+      platform.development.tools[name].__agent__.start(port, '0.0.0.0', internal_port, false);
+    }
+    //C: executing console frontend in a separate process
+    platform.development.tools[name].__process__ = require('child_process').spawn('node', [platform.runtime.path.core + '/external/devtools/' + name + '/main.js', port]);
   } else {
-    throw new Exception('inspector tool is already running');
-  }
-};
-platform.development.tools.inspector.stop = function () {
-  if (platform.development.tools.inspector.__process__ !== undefined) {
-    platform.development.tools.inspector.__process__.kill();
-    platform.development.tools.inspector.__process__ = undefined;
-  } else {
-    throw new Exception('inspector tool is not running');
+    throw new Exception('%s tool is already running',name);
   }
 };
 
-platform.development.tools.__start_agent__ = function(name,port,internal_port){
-  //T: support custom ports (both for console and frontend)
-  //C: activating node-webkit-agent for console
-  platform.development.tools[name].__agent__ = new (global.require(platform.runtime.path.core + '/external/devtools/agent/index'))();
-  platform.development.tools[name].__agent__.start(port, '0.0.0.0', internal_port, false);
-  };
-
-platform.development.tools.__start_frontend__ = function(name,port){
-  //C: executing console frontend in a separate process
-  platform.development.tools[name].__process__ = require('child_process').spawn('node', [platform.runtime.path.core + '/external/devtools/' + name + '/main.js', port]);
-};
-
-platform.development.tools.console = {};
-platform.development.tools.console.__process__ = undefined;
-platform.development.tools.console.__agent__ = undefined;
-platform.development.tools.console.start = function () {
-  if (platform.development.tools.console.__process__ === undefined && platform.development.tools.console.__agent__ === undefined) {
-    platform.development.tools.__start_agent__('console',9999,3333);
-    platform.development.tools.__start_frontend__('console',9999);
-  } else {
-    throw new Exception('console tool is already running');
-  }
-};
-platform.development.tools.console.stop = function () {
-  if (platform.development.tools.console.__process__ !== undefined && platform.development.tools.console.__agent__ !== undefined) {
-    platform.development.tools.console.__agent__.stop();
-    platform.development.tools.console.__process__.kill();
-    platform.development.tools.console.__process__ = undefined;
-    platform.development.tools.console.__agent__ = undefined;
-  } else {
-    throw new Exception('console tool is not running');
-  }
-};
-
-platform.development.tools.profiler = {};
-platform.development.tools.profiler.__process__ = undefined;
-platform.development.tools.profiler.__agent__ = undefined;
-platform.development.tools.profiler.start = function () {
-  if (platform.development.tools.profiler.__process__ === undefined && platform.development.tools.profiler.__agent__ === undefined) {
-    platform.development.tools.__start_agent__('profiler',9998,3332);
-    platform.development.tools.__start_frontend__('profiler',9998);
-  } else {
-    throw new Exception('profiler tool is already running');
-  }
-};
-platform.development.tools.profiler.stop = function () {
-  if (platform.development.tools.profiler.__process__ !== undefined && platform.development.tools.profiler.__agent__ !== undefined) {
-    platform.development.tools.profiler.__agent__.stop();
-    platform.development.tools.profiler.__process__.kill();
-    platform.development.tools.profiler.__process__ = undefined;
-    platform.development.tools.profiler.__agent__ = undefined;
+platform.development.tools.__stop__ = function(name){
+  if (platform.development.tools[name].__process__ !== undefined && (platform.development.tools[name].hasOwnProperty('__agent__') === false || (platform.development.tools[name].hasOwnProperty('__agent__') === true && platform.development.tools[name].__agent__ !== undefined))) {
+    if (platform.development.tools[name].hasOwnProperty('__agent__') === true) {
+      platform.development.tools[name].__agent__.stop();
+      platform.development.tools[name].__agent__ = undefined;
+    }
+    platform.development.tools[name].__process__.kill();
+    platform.development.tools[name].__process__ = undefined;
   } else {
     throw new Exception('profiler tool is not running');
   }
 };
 
+platform.development.tools.inspector = {};
+platform.development.tools.inspector.__process__ = undefined;
+platform.development.tools.inspector.start = platform.development.tools.__start__.bind(null,'inspector');
+platform.development.tools.inspector.stop = platform.development.tools.__stop__.bind(null,'inspector');
+
+platform.development.tools.console = {};
+platform.development.tools.console.__process__ = undefined;
+platform.development.tools.console.__agent__ = undefined;
+platform.development.tools.console.start = platform.development.tools.__start__.bind(null,'console',9999,3333);
+platform.development.tools.console.stop = platform.development.tools.__stop__.bind(null,'console');
+
+platform.development.tools.profiler = {};
+platform.development.tools.profiler.__process__ = undefined;
+platform.development.tools.profiler.__agent__ = undefined;
+platform.development.tools.profiler.start = platform.development.tools.__start__.bind(null,'profiler',9998,3332);
+platform.development.tools.profiler.stop = platform.development.tools.__stop__.bind(null,'profiler');
+
 //C: attaching exit events to kill node-inspector
 ['exit','SIGINT','SIGTERM'].forEach(function (e) {
   process.on(e, function () {
     try {
-      if(platform.development.tools.inspector !== undefined)
-      {
-        platform.development.tools.inspector.stop();
-      }
+      platform.development.tools.inspector.stop();
     } finally {
     }
     try {
-      if(platform.development.tools.console !== undefined)
-      {
-        platform.development.tools.console.stop();
-      }
+      platform.development.tools.console.stop();
     } finally {
     }
     try {
-      if(platform.development.tools.profiler !== undefined)
-      {
-        platform.development.tools.profiler.stop();
-      }
+      platform.development.tools.profiler.stop();
     } finally {
     }
   });
