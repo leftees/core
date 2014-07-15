@@ -24,7 +24,7 @@ var bootstrap = {};
 
 //C: defining reusable regular exceptions
 bootstrap.regexs = {};
-bootstrap.regexs.webURI = /^http[s]{0,1}:\/\//;
+//bootstrap.regexs.webURI = /^http[s]{0,1}:\/\//;
 bootstrap.regexs.serverJS = /\.server\.js$/;
 
 //C: creating and enforcing global platform namespace
@@ -97,8 +97,9 @@ bootstrap.mapPath = function(path,root) {
 bootstrap.get = function(uri,load) {
   //T: define a resource class for delayed io/data loading
   var result = {};
+  //T: implement support for remote resources (requires io/caching)
   //C: testing whether uri is an HTTP/HTTPS URL
-  if (bootstrap.regexs.webURI.test(uri) === true) {
+  /*if (bootstrap.regexs.webURI.test(uri) === true) {
        //C: creating result with .uri and delayed .data properties
       result.uri = uri;
       result.__data = undefined;
@@ -118,7 +119,7 @@ bootstrap.get = function(uri,load) {
         return this.__data;
       }, set: function(){} });
       return result;
-  } else {
+  } else {*/
     //C: trying to resolve file against app, core and system root paths
     var file;
     if (native.fs.existsSync(bootstrap.mapPath(uri,global.main.path.app)) === true) {
@@ -148,7 +149,7 @@ bootstrap.get = function(uri,load) {
     } else {
       throw new Exception("file \'%s\' not found", uri);
     }
-  }
+  //}
 };
 
 //C: defining early bootstrap .js load function
@@ -177,9 +178,9 @@ bootstrap.loadModules = function(modules,path){
   modules.forEach(function(file){
     if (bootstrap.regexs.serverJS.test(file) === true) {
       bootstrap.load(path + file);
-    } else if(bootstrap.regexs.webURI.test(file) === true) {
+    } /*else if(bootstrap.regexs.webURI.test(file) === true) {
       bootstrap.load(file);
-    }
+    }*/
   });
 };
 
