@@ -19,57 +19,120 @@
 
  */
 
-//C: loading node-inspector (only if debug is enabled)
-if (global.debugging === true) {
-  //T: support custom ports (both for debugger and frontend)
-  //C: executing node-inspector frontend in a separate process
-  var inspector = require('child_process').spawn('node', [global.main.path.core + '/external/devtools/inspector/main.js']);
-  //C: attaching exit events to kill node-inspector
-  ['exit','SIGINT','SIGTERM'].forEach(function (e) {
-    process.on(e, function () {
-      try {
-        inspector.kill();
-      } finally {
+//N: Provides development tools classes and objects.
+platform.development = platform.development || {};
+
+platform.development.tools = platform.development.tools || {};
+
+
+platform.development.tools.inspector = {};
+platform.development.tools.inspector.__process__ = undefined;
+platform.development.tools.inspector.start = function () {
+  if (platform.development.tools.inspector.__process__ === undefined) {
+    //T: support custom ports (both for debugger and frontend)
+    //C: executing node-inspector frontend in a separate process
+    platform.development.tools.inspector.__process__ = require('child_process').spawn('node', [platform.runtime.path.core + '/external/devtools/inspector/main.js']);
+  } else {
+    throw new Exception('inspector tool is already running');
+  }
+};
+platform.development.tools.inspector.stop = function () {
+  if (platform.development.tools.inspector.__process__ !== undefined) {
+    platform.development.tools.inspector.__process__.kill();
+    platform.development.tools.inspector.__process__ = undefined;
+  } else {
+    throw new Exception('inspector tool is not running');
+  }
+};
+
+platform.development.tools.console = {};
+platform.development.tools.console.__process__ = undefined;
+platform.development.tools.console.__agent__ = undefined;
+platform.development.tools.console.start = function () {
+  if (platform.development.tools.console.__process__ === undefined && platform.development.tools.console.__agent__ === undefined) {
+    //T: support custom ports (both for console and frontend)
+    //C: activating node-webkit-agent for console
+    platform.development.tools.console.__agent__ = new (global.require(platform.runtime.path.core + '/external/devtools/agent/index'))();
+    platform.development.tools.console.__agent__.start(9999, '0.0.0.0', 3333, false);
+    //C: executing console frontend in a separate process
+    platform.development.tools.console.__process__ = require('child_process').spawn('node', [platform.runtime.path.core + '/external/devtools/console/main.js', 9999]);
+  } else {
+    throw new Exception('console tool is already running');
+  }
+};
+platform.development.tools.console.stop = function () {
+  if (platform.development.tools.console.__process__ !== undefined && platform.development.tools.console.__agent__ !== undefined) {
+    platform.development.tools.console.__agent__.stop();
+    platform.development.tools.console.__process__.kill();
+    platform.development.tools.console.__process__ = undefined;
+    platform.development.tools.console.__agent__ = undefined;
+  } else {
+    throw new Exception('console tool is not running');
+  }
+};
+
+platform.development.tools.profiler = {};
+platform.development.tools.profiler.__process__ = undefined;
+platform.development.tools.profiler.__agent__ = undefined;
+platform.development.tools.profiler.start = function () {
+  if (platform.development.tools.profiler.__process__ === undefined && platform.development.tools.profiler.__agent__ === undefined) {
+    //T: support custom ports (both for profiler and frontend)
+    //C: activating node-webkit-agent for profiler
+    platform.development.tools.profiler.__agent__ = new (global.require(platform.runtime.path.core + '/external/devtools/agent/index'))();
+    platform.development.tools.profiler.__agent__.start(9998, '0.0.0.0', 3332, false);
+    //C: executing profiler frontend in a separate process
+    platform.development.tools.profiler.__process__ = require('child_process').spawn('node', [platform.runtime.path.core + '/external/devtools/profiler/main.js', 9998]);
+  } else {
+    throw new Exception('profiler tool is already running');
+  }
+};
+platform.development.tools.profiler.stop = function () {
+  if (platform.development.tools.profiler.__process__ !== undefined && platform.development.tools.profiler.__agent__ !== undefined) {
+    platform.development.tools.profiler.__agent__.stop();
+    platform.development.tools.profiler.__process__.kill();
+    platform.development.tools.profiler.__process__ = undefined;
+    platform.development.tools.profiler.__agent__ = undefined;
+  } else {
+    throw new Exception('profiler tool is not running');
+  }
+};
+
+//C: attaching exit events to kill node-inspector
+['exit','SIGINT','SIGTERM'].forEach(function (e) {
+  process.on(e, function () {
+    try {
+      if(platform.development.tools.inspector !== undefined)
+      {
+        platform.development.tools.inspector.stop();
       }
-    });
+    } finally {
+    }
+    try {
+      if(platform.development.tools.console !== undefined)
+      {
+        platform.development.tools.console.stop();
+      }
+    } finally {
+    }
+    try {
+      if(platform.development.tools.profiler !== undefined)
+      {
+        platform.development.tools.profiler.stop();
+      }
+    } finally {
+    }
   });
+});
+
+//C: starting node-inspector (only if debug is enabled)
+if (platform.runtime.debugging === true) {
+  //T: add autostart support in configuration
+  platform.development.tools.inspector.start();
 }
 
-//C: loading devtools stuff (only if development is enabled - NODE_ENV=development)
-if (global.development === true) {
-  //T: support custom ports (both for console and frontend)
-  //C: activating node-webkit-agent for console
-  var agentConsole = new (global.require(global.main.path.core + '/external/devtools/agent/index'))();
-  agentConsole.start(9999, '0.0.0.0', 3333, false);
-  //C: executing console frontend in a separate process
-  var console = require('child_process').spawn('node', [global.main.path.core + '/external/devtools/console/main.js', 9999]);
-
-  //T: support custom ports (both for console and frontend)
-  //C: activating node-webkit-agent for profiler
-  var agentProfiler = new (global.require(global.main.path.core + '/external/devtools/agent/index'))();
-  agentProfiler.start(9998, '0.0.0.0', 3332, false);
-  //C: executing profiler frontend in a separate process
-  var profiler = require('child_process').spawn('node', [global.main.path.core + '/external/devtools/profiler/main.js', 9998]);
-
-  //C: attaching exit events to stop agents and kill frontends
-  ['exit','SIGINT','SIGTERM'].forEach(function (e) {
-    process.on(e, function () {
-      try {
-        console.kill();
-      } finally {
-      }
-      try {
-        agentConsole.stop();
-      } finally {
-      }
-      try {
-        profiler.kill();
-      } finally {
-      }
-      try {
-        agentProfiler.stop();
-      } finally {
-      }
-    });
-  });
+//C: starting development tools (only if development is enabled - NODE_ENV=development)
+if (platform.runtime.development === true) {
+  //T: add autostart support in configuration
+  platform.development.tools.console.start();
+  platform.development.tools.profiler.start();
 }

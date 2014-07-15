@@ -22,9 +22,6 @@
 //N: Contains platform configuration.
 platform.configuration = {};
 
-//N: Contains platform runtime configuration for automatic/volatile data.
-platform.configuration.runtime = {};
-
 //O: Contains general application info.
 platform.configuration.application = {
   "name": "Novetica Ljve",
@@ -41,8 +38,8 @@ platform.configuration.server.bootloader = {};
 //O: Contains Javascript core modules, as array, to be inject during bootstrap (these are not augmented).
 //H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. "http://cdn.example.com/...").
 platform.configuration.server.bootloader.preload = [
-  'dev/devtools.server.js',
   'runtime.server.js',
+  'dev/devtools.server.js',
   'kernel.server.js',
   'kernel/preprocess.server.js'
 ];
@@ -51,6 +48,7 @@ platform.configuration.server.bootloader.preload = [
 //H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. "http://cdn.example.com/...").
 platform.configuration.server.bootloader.modules = [
   'runtime.server.js',
+  'dev/devtools.server.js',
   'kernel.server.js',
   'kernel/preprocess.server.js',
   'kernel/prototype.server.js',

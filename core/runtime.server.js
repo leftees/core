@@ -19,32 +19,34 @@
 
  */
 
-//N: Contains platform shared configuration.
-platform.configuration = platform.configuration || {};
+//N: Provides platform runtime namepace for automatic/volatile data.
+platform.runtime = platform.runtime || {};
 
-//N: Contains platform runtime configuration for automatic/volatile data.
-platform.configuration.runtime = platform.configuration.runtime || {};
+//N: Contains runtime automatic/volatile data (app related).
+platform.runtime.app = platform.runtime.app || {};
 
-//N: Contains platform runtime configuration for automatic/volatile data (app related).
-platform.configuration.runtime.app = platform.configuration.runtime.app || {};
+//N: Contains runtime automatic/volatile data (core related).
+platform.runtime.core = platform.runtime.core || {};
 
-//N: Contains platform runtime configuration for automatic/volatile data (core related).
-platform.configuration.runtime.core = platform.configuration.runtime.core || {};
+platform.runtime.core = platform.runtime.core || {};
 
-//N: Contains platform runtime configuration for automatic/volatile data (environment related).
-platform.configuration.runtime.env = platform.configuration.runtime.env || {};
+//N: Contains runtime automatic/volatile data (environment related).
+platform.runtime.env = platform.runtime.env || {};
 
 //C: populating runtime environment related data
-platform.configuration.runtime.env.vendor = 'node.js';
-platform.configuration.runtime.env.version = process.version;
-platform.configuration.runtime.env.os = platform.configuration.runtime.env.os || {};
-platform.configuration.runtime.env.os.platform = process.platform;
-platform.configuration.runtime.env.os.arch = process.arch;
+platform.runtime.env.vendor = 'node.js';
+platform.runtime.env.version = process.version;
+platform.runtime.env.os = platform.runtime.env.os || {};
+platform.runtime.env.os.platform = process.platform;
+platform.runtime.env.os.arch = process.arch;
 
-//C: moving global env configuration to runtime.env namespace
-platform.configuration.runtime.env.debugging = global.debugging;
-platform.configuration.runtime.env.development = global.development;
-platform.configuration.runtime.env.testing = global.testing;
+//C: moving global environment to runtime.env namespace
+platform.runtime.debugging = global.debugging;
+platform.runtime.development = global.development;
+platform.runtime.testing = global.testing;
 delete global.debugging;
 delete global.development;
 delete global.testing;
+
+//C: moving global environment to runtime.env namespace
+platform.runtime.path = global.main.path;
