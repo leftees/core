@@ -33,4 +33,3 @@ node_modules
 # Nodeclipse project data
 .settings
 .project
-.jshintrc
