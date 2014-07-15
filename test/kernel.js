@@ -19,7 +19,6 @@
 
  */
 
-//C: testing bootstrap and proper platform loading
 describe('kernel', function() {
 
   describe('namespace', function(){
@@ -230,51 +229,35 @@ describe('kernel', function() {
 
   });
 
-  describe('new', function() {
+  describe('inject', function() {
 
-    before(function(){
-      var test_myclass = function(a,b){
-        this.member1 = a;
-        this.__member2__ = b;
-      };
-      test_myclass.prototype.member2 = function(){
-        return this.__member2__;
-      };
-      platform.classes.register('test.myclass',test_myclass);
-      platform.kernel.set('doexist.test',test_myclass);
+    it('with return value and default args should succeed', function () {
+      var result = platform.kernel.inject('true;');
+      should.exist(result);
+      result.should.equal(true);
     });
 
-    it('with missing tree should fail', function () {
-      (function () {
-        platform.kernel.new('donotexist.test');
-      }).should.throw();
+    it('with function return value and default args should succeed', function () {
+      var result = platform.kernel.inject('(function() { return true; })()');
+      should.exist(result);
+      result.should.equal(true);
     });
 
-    it('with missing tree should succeed', function () {
-      (function () {
-        platform.kernel.new('doexist.test');
-      }).should.not.throw();
+    it('with return value, no file, no module and preprocess enabled should succeed', function () {
+      var result = platform.kernel.inject('true;',null,null,true);
+      should.exist(result);
+      result.should.equal(true);
     });
 
-    it('with registered name and constructor args should succeed', function () {
-      var result = platform.kernel.new('test.myclass',['1','2']);
-      result.should.be.an.instanceOf(platform.classes.get('test.myclass'));
-      result.member1.should.equal('1');
-      result.member2().should.equal('2');
+    it('with function return value, no file, no module and preprocess enabled  should succeed', function () {
+      var result = platform.kernel.inject('(function() { return true; })()',null,null,true);
+      should.exist(result);
+      result.should.equal(true);
     });
 
-    it('with corret tree and constructor args should succeed', function () {
-      var result = platform.kernel.new('test',['3','4'],global.doexist);
-      result.should.be.an.instanceOf(doexist.test);
-      result.member1.should.equal('3');
-      result.member2().should.equal('4');
-    });
-
-    after(function(){
-      platform.kernel.unset('doexist');
-      platform.classes.unregister('test.myclass');
-    });
+    //T: add tests for preprocessing
 
   });
+
 });
 

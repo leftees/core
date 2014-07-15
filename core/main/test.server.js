@@ -44,10 +44,14 @@ global.main.commands.test = function(coverage) {
   //T: automatically load test files from test folder
   global.mocha.addFile('./test/bootstrap.js');
   global.mocha.addFile('./test/kernel.js');
+  global.mocha.addFile('./test/classes.js');
+
+  global.mocha.addFile('./test/devtools.js');
 
   //C: executing tests
   global.mocha.run(function(failures){
     //C: terminating process with number of failures as exit code
     process.exit(failures);
   });
+
 };
