@@ -64,7 +64,8 @@
   "white" : false, // Check against strict whitespace and indentation rules.
 
   "predef" : [ // Extra globals.
-    "platform"
+    "platform",
+    "Exception"
   ],
   "indent" : 2 // Indent spacing.
 }
