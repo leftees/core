@@ -60,21 +60,22 @@ platform.development.tools.inspector = {};
 platform.development.tools.inspector.__process__ = undefined;
 platform.development.tools.inspector.start = platform.development.tools.__start__.bind(null,'inspector');
 platform.development.tools.inspector.stop = platform.development.tools.__stop__.bind(null,'inspector');
-Object.defineProperty(platform.development.tools.inspector,'running',{ get: platform.development.tools.__is_running__.bind(null,'inspector'), set: function(){}});
 
 platform.development.tools.console = {};
 platform.development.tools.console.__process__ = undefined;
 platform.development.tools.console.__agent__ = undefined;
 platform.development.tools.console.start = platform.development.tools.__start__.bind(null,'console',9999,3333);
 platform.development.tools.console.stop = platform.development.tools.__stop__.bind(null,'console');
-Object.defineProperty(platform.development.tools.console,'running',{ get: platform.development.tools.__is_running__.bind(null,'console'), set: function(){}});
 
 platform.development.tools.profiler = {};
 platform.development.tools.profiler.__process__ = undefined;
 platform.development.tools.profiler.__agent__ = undefined;
 platform.development.tools.profiler.start = platform.development.tools.__start__.bind(null,'profiler',9998,3332);
 platform.development.tools.profiler.stop = platform.development.tools.__stop__.bind(null,'profiler');
-Object.defineProperty(platform.development.tools.profiler,'running',{ get: platform.development.tools.__is_running__.bind(null,'profiler'), set: function(){}});
+
+['inspector','console','profiler'].forEach(function(name){
+  Object.defineProperty(platform.development.tools[name],'running',{ get: platform.development.tools.__is_running__.bind(null,name), set: function(){}});
+});
 
 //C: attaching exit events to kill node-inspector
 ['exit','SIGINT','SIGTERM'].forEach(function (e) {
