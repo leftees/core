@@ -167,7 +167,7 @@ platform.kernel.new = function (name,args,root,divisor) {
 
   //C: looking for registered class names if no root has been specified
   if (target === undefined || target === null) {
-    if (platform.classes.exists(name) === true) {
+    if (platform.classes.exist(name) === true) {
       target = platform.classes.get(name);
       new_instance = Object.create(target.prototype);
       target.apply(new_instance, args);

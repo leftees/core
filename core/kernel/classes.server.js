@@ -30,11 +30,11 @@ platform.classes.__store__ = {};
 //A: constructor: Specifies constructor with prototype object for new class instances.
 //R: Returns true if class is successfully registered.
 platform.classes.register = function(name,constructor){
-  if (platform.classes.exists(name) === false) {
+  if (platform.classes.exist(name) === false) {
     platform.classes.__store__[name] = constructor;
     return true;
   } else {
-    throw new Exception('constructor for \'%s\' already exists',name);
+    throw new Exception('class \'%s\' already exists',name);
   }
 };
 
@@ -42,8 +42,10 @@ platform.classes.register = function(name,constructor){
 //A: name: Specifies name of new class to unregister.
 //R: Returns true if class is successfully unregistered.
 platform.classes.unregister = function(name){
-  if (platform.classes.exists(name) === true) {
+  if (platform.classes.exist(name) === true) {
     return delete platform.classes.__store__[name];
+  } else {
+    throw new Exception('class \'%s\' does not exist',name);
   }
 };
 
@@ -51,7 +53,7 @@ platform.classes.unregister = function(name){
 //A: name: Specifies name of new class to get.
 //R: Returns class constructor.
 platform.classes.get = function(name){
-  if (platform.classes.exists(name) === true) {
+  if (platform.classes.exist(name) === true) {
     return platform.classes.__store__[name];
   } else {
     throw new Exception('constructor for \'%s\' not found',name);
@@ -61,7 +63,7 @@ platform.classes.get = function(name){
 //F: Checks whether a class is registered in current environment.
 //A: name: Specifies name of new class to check.
 //R: Returns true if class is registered.
-platform.classes.exists = function(name){
+platform.classes.exist = function(name){
   return (platform.classes.__store__.hasOwnProperty(name) && typeof platform.classes.__store__[name] === 'function');
 };
 
@@ -70,5 +72,5 @@ platform.classes.exists = function(name){
 //A: name: Specifies name of class to compare.
 //R: Returns true if object is an instance of specified class.
 platform.classes.instanceOf = function(object,name){
-  return (object !== undefined && platform.classes.__store__.hasOwnProperty(name) === object.constructor);
+  return (object !== undefined && platform.classes.__store__.hasOwnProperty(name) === true && platform.classes.__store__[name] === object.constructor);
 };
