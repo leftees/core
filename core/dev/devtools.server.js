@@ -25,7 +25,7 @@ platform.development = platform.development || {};
 platform.development.tools = platform.development.tools || {};
 
 platform.development.tools.__start__ = function(name,port,internal_port){
-  if (platform.development.tools[name].__process__ === undefined && (platform.development.tools[name].hasOwnProperty('__agent__') === false || (platform.development.tools[name].hasOwnProperty('__agent__') === true && platform.development.tools[name].__agent__ === undefined))) {
+  if (platform.development.tools.__is_running__(name) === false) {
     //T: support custom ports (both for frontend)
     if (platform.development.tools[name].hasOwnProperty('__agent__') === true) {
       //C: activating node-webkit-agent for console
@@ -39,8 +39,12 @@ platform.development.tools.__start__ = function(name,port,internal_port){
   }
 };
 
+platform.development.tools.__is_running__ = function(name){
+  return (platform.development.tools[name].__process__ !== undefined && (platform.development.tools[name].hasOwnProperty('__agent__') === false || (platform.development.tools[name].hasOwnProperty('__agent__') === true && platform.development.tools[name].__agent__ !== undefined)));
+};
+
 platform.development.tools.__stop__ = function(name){
-  if (platform.development.tools[name].__process__ !== undefined && (platform.development.tools[name].hasOwnProperty('__agent__') === false || (platform.development.tools[name].hasOwnProperty('__agent__') === true && platform.development.tools[name].__agent__ !== undefined))) {
+  if (platform.development.tools.__is_running__(name) === true) {
     if (platform.development.tools[name].hasOwnProperty('__agent__') === true) {
       platform.development.tools[name].__agent__.stop();
       platform.development.tools[name].__agent__ = undefined;
@@ -56,18 +60,21 @@ platform.development.tools.inspector = {};
 platform.development.tools.inspector.__process__ = undefined;
 platform.development.tools.inspector.start = platform.development.tools.__start__.bind(null,'inspector');
 platform.development.tools.inspector.stop = platform.development.tools.__stop__.bind(null,'inspector');
+Object.defineProperty(platform.development.tools.inspector,'running',{ get: platform.development.tools.__is_running__.bind(null,'inspector'), set: function(){}});
 
 platform.development.tools.console = {};
 platform.development.tools.console.__process__ = undefined;
 platform.development.tools.console.__agent__ = undefined;
 platform.development.tools.console.start = platform.development.tools.__start__.bind(null,'console',9999,3333);
 platform.development.tools.console.stop = platform.development.tools.__stop__.bind(null,'console');
+Object.defineProperty(platform.development.tools.console,'running',{ get: platform.development.tools.__is_running__.bind(null,'console'), set: function(){}});
 
 platform.development.tools.profiler = {};
 platform.development.tools.profiler.__process__ = undefined;
 platform.development.tools.profiler.__agent__ = undefined;
 platform.development.tools.profiler.start = platform.development.tools.__start__.bind(null,'profiler',9998,3332);
 platform.development.tools.profiler.stop = platform.development.tools.__stop__.bind(null,'profiler');
+Object.defineProperty(platform.development.tools.profiler,'running',{ get: platform.development.tools.__is_running__.bind(null,'profiler'), set: function(){}});
 
 //C: attaching exit events to kill node-inspector
 ['exit','SIGINT','SIGTERM'].forEach(function (e) {
