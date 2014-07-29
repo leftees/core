@@ -162,17 +162,25 @@ if (platform.runtime.development === true) {
 }
 
 //T: add autostart support in configuration
+//O: Provides support for memory monitoring and management (based on memwatch).
 platform.development.tools.memory = {};
 platform.development.tools.memory.__memwatch__ = require('memwatch');
 platform.development.tools.memory.__heapdiff__ = null;
+
+//F: Starts memory heap diff analysis.
 platform.development.tools.memory.start = function(){
   platform.development.tools.memory.__heapdiff__ = new platform.development.tools.memory.__memwatch__.HeapDiff();
 };
+
+//F: Stops memory heap and returns diff analysis.
+//R: Returns head diff object from memwatch module.
 platform.development.tools.memory.stop = function(){
   var heapdiff = platform.development.tools.memory.__heapdiff__;
   platform.development.tools.memory.__heapdiff__ = null;
   return heapdiff.end();
 };
+
+//F: Forces V8 runtime garbage collection.
 platform.development.tools.memory.collect = function(){
   return platform.development.tools.memory.__memwatch__.gc();
 };
@@ -180,10 +188,12 @@ platform.development.tools.memory.collect = function(){
 //C: starting memory watcher (only if debug is enabled)
 //T: add platform event for memory leak/stats
 if (platform.runtime.debugging === true) {
+  //C: attaching to memwatch leak event
   platform.development.tools.memory.__memwatch__.on('leak', function (info) {
-    console.warn(info);
+    console.warn('possible memory leak detected: %s', info.reason);
   });
+  //C: attaching to memwatch stats event
   platform.development.tools.memory.__memwatch__.on('stats', function (stats) {
-    console.debug(stats);
+    console.debug('memory status: %s bytes, %s gc, %s leak',stats.current_base,stats.heap_compactions,stats.usage_trend);
   });
 }
