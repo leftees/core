@@ -65,6 +65,7 @@
 
   "predef" : [ // Extra globals.
     "platform",
+    "native",
     "Exception"
   ],
   "indent" : 2 // Indent spacing.
