@@ -39,9 +39,7 @@ global.main.commands.create = function(){
     throw new Exception('skeleton folder not found, please check ljve is correctly installed');
   }
   //C: copying skel folder to new root folder
-  ncp = require('ncp').ncp;
-  ncp.limit = 16;
-  ncp(skel, target, function (err) {
+  native.fs.copy(skel, target, function (err) {
     if (err) {
       throw new Exception(err.message, err);
     }
