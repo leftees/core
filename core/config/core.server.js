@@ -82,10 +82,12 @@ platform.configuration.server.http = {};
 //O: Contains HTTP and TLS port configurations.
 //H: Multiple ports are supported through piped name, e.g. '8080\8081' activate both ports with same configuration.
 platform.configuration.server.http.ports = {
+    //V: Define port to be configured.
     '8080': {
       //V: Define standard unsecure HTTP server on specified ports.
       'secure': false
     },
+    //V: Define port to be configured.
     '8443': {
       //V: Defines secure HTTPS server on specified ports.
       'secure': true,
@@ -114,13 +116,20 @@ platform.configuration.server.http.ports = {
 //O: Contains IO and store configuration.
 platform.configuration.server.io = {};
 
+//O: Contains store specific configuration.
 platform.configuration.server.io.store = platform.configuration.server.io.store || {};
 
+//O: Contains multiple custom backends for IO multistore support.
+//H: Priority '0' and name 'app' are reserved for backends.
 platform.configuration.server.io.store.backends = {
-  'core':{
+  //V: Define custom backend name to be configured.
+  'core-override':{
+    //V: Define backend class (it should be registered through platform.classes methods).
     'class': '',
+    //V: Define backend class constructor parameters as array (see platform.kernel.new).
     'params': [],
-    'priority': 0
+    //V: Define backend target priority.
+    'priority': 1
   }
 };
 */
