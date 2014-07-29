@@ -23,12 +23,15 @@
 global.native = {};
 
 //C: loading native modules and node-specific ones
-native.fs = require('fs');
+native.fs = require('fs-extra');
 native.path = require('path');
 native.util = require('util');
+native.http = require('http');
+native.https = require('https');
 native.args = require('yargs').argv;
 native.cli = {};
 native.cli.color = require('cli-color');
+native.zlib = require('zlib');
 
 //C: injecting core HTML5 classes implementation (we like a mirrored environment)
 //T: test W3C compliance for Worker

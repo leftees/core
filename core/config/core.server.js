@@ -29,38 +29,98 @@ platform.configuration.application = {
   "domain": "localhost"
 };
 
-//N: Contains server configuration.
+//O: Contains server configuration.
 platform.configuration.server = {};
 
-//N: Contains bootloader configuration (server-side).
+//O: Contains bootloader configuration (server-side).
 platform.configuration.server.bootloader = {};
 
 //O: Contains Javascript core modules, as array, to be inject during bootstrap (these are not augmented).
 //H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. "http://cdn.example.com/...").
 platform.configuration.server.bootloader.preload = [
   'runtime.server.js',
+  'utility.server.js',
   'dev/devtools.server.js',
-  'kernel.server.js',
-  'kernel/preprocess.server.js'
+  'kernel/kernel.server.js',
+  'kernel/preprocess.server.js',
+  'kernel/prototype.server.js',
+  'kernel/classes.server.js',
+  'io/backend/file.server.js',
+  'io/store.server.js',
+  'io/io.server.js',
+  'io/cache.server.js',
 ];
 
 //O: Contains Javascript core modules, as array, to be inject after bootstrap to load application server (these are augmented).
 //H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. "http://cdn.example.com/...").
 platform.configuration.server.bootloader.modules = [
   'runtime.server.js',
+  'utility.server.js',
   'dev/devtools.server.js',
-  'kernel.server.js',
+  'kernel/kernel.server.js',
   'kernel/preprocess.server.js',
   'kernel/prototype.server.js',
   'kernel/classes.server.js',
-  'kernel/io.server.js',
+  'io/backend/file.server.js',
+  'io/store.server.js',
+  'io/io.server.js',
+  'io/cache.server.js',
   'http/http.server.js'
 ];
 
-//N: Contains kernel configuration (server-side).
+//O: Contains kernel configuration (server-side).
 platform.configuration.server.kernel = {};
 
 //O: Contains Javascript preprocessor modules, as array, to be loaded to augment code.
 //H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. "http://cdn.example.com/...").
 platform.configuration.server.kernel.preprocessors = [
 ];
+
+//O: Contains web server configuration.
+platform.configuration.server.http = {};
+
+//O: Contains HTTP and TLS port configurations.
+//H: Multiple ports are supported through piped name, e.g. '8080\8081' activate both ports with same configuration.
+platform.configuration.server.http.ports = {
+    '8080': {
+      //V: Define standard unsecure HTTP server on specified ports.
+      'secure': false
+    },
+    '8443': {
+      //V: Defines secure HTTPS server on specified ports.
+      'secure': true,
+      //V: Defines ciphers suite for TLS stack.
+      'ciphers': 'HIGH !aNULL !eNULL !MEDIUM !LOW !3DES !MD5 !EXP !PSK !SRP !DSS',
+      //V: Enable or disable specific secure protocol versions (SSLv2 is deprecated by default).
+      'protocols': {
+        'SSLv3': false,
+        'TLSv10': true,
+        'TLSv11': true,
+        'TLSv12': true
+      },
+      //V: Specifies the absolute path to pfx file containing PEM certificate and private key.
+      'pfx': null,
+      //V: Specifies the passphrase to unwrap the private key in pfx file.
+      'passphrase': null,
+      //V: Specifies the absolute path to PEM certificate file.
+      'cert': null,
+      //V: Specifies the absolute path to certificate private key file.
+      'key': null
+    }
+};
+
+//T: support multiple backends by configuration
+/*
+//O: Contains IO and store configuration.
+platform.configuration.server.io = {};
+
+platform.configuration.server.io.store = platform.configuration.server.io.store || {};
+
+platform.configuration.server.io.store.backends = {
+  'core':{
+    'class': '',
+    'params': [],
+    'priority': 0
+  }
+};
+*/

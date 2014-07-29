@@ -4,7 +4,7 @@
   "description": "Live Javascript Virtualized Environment",
   "author": "Marco Minetti <marco.minetti@novetica.org>",
   "contributors": [],
-  "bin":{
+  "bin": {
     "ljve": "./main.js"
   },
   "repository": {
@@ -19,18 +19,22 @@
     "ljve.io"
   ],
   "dependencies": {
-  	"mocha": "*",
+    "mocha": "*",
     "chai": "*",
     "blanket": "*",
     "coveralls": "*",
     "mocha-lcov-reporter": "*",
     "yargs": "*",
-    "cli-color":"*",
+    "cli-color": "*",
     "ws": "*",
     "xmlhttprequest": "*",
     "webworker-threads": "*",
-    "ncp": "*",
-    "underscore": "*"
+    "fs-extra": "*",
+    "minimatch": "*",
+    "underscore": "*",
+    "memwatch": "*",
+    "chokidar": "*",
+    "universal-analytics": "*"
   },
   "scripts": {
     "preinstall": "git submodule update -i -r; cd external/devtools/agent; npm install; cd ../../..; cd external/devtools/inspector; npm install; cd ../../..; cd external/devtools/console; npm install; cd ../../..; cd external/devtools/profiler; npm install; cd ../../..;",
@@ -43,4 +47,3 @@
   "analyze": true,
   "license": "AGPLv3"
 }
-
