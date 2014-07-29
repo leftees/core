@@ -21,13 +21,19 @@
 
 //N: Provides development tools classes and objects.
 platform.development = platform.development || {};
-
 platform.development.tools = platform.development.tools || {};
 
+//F: Starts the specified tool.
+//A: name: Specifies the name to be started.
+//A: [port]: Specifies the port argument to be passed to the tool (varies by tool).
+//A: [internal_port]: Specifies the internal port argument to be passed to the tool (varies by tool).
+//R: None.
+//H: Throws exception if tool is already running.
 platform.development.tools.__start__ = function(name,port,internal_port){
   if (platform.development.tools.__is_running__(name) === false) {
     //T: support custom ports (both for frontend)
     if (platform.development.tools[name].hasOwnProperty('__agent__') === true) {
+      //T: support spawned process close detection
       //C: activating node-webkit-agent for console
       platform.development.tools[name].__agent__ = new (global.require(platform.runtime.path.core + '/external/devtools/agent/index'))();
       platform.development.tools[name].__agent__.start(port, '0.0.0.0', internal_port, false);
@@ -39,10 +45,17 @@ platform.development.tools.__start__ = function(name,port,internal_port){
   }
 };
 
+//F: Checks whether the tool is running.
+//A: name: Specifies the name to be checked.
+//R: Returns true if the specified  tool is running.
 platform.development.tools.__is_running__ = function(name){
   return (platform.development.tools[name].__process__ !== undefined && (platform.development.tools[name].hasOwnProperty('__agent__') === false || (platform.development.tools[name].hasOwnProperty('__agent__') === true && platform.development.tools[name].__agent__ !== undefined)));
 };
 
+//F: Stops the specified tool.
+//A: name: Specifies the name to be stopped.
+//R: None.
+//H: Throws exception if tool is not running.
 platform.development.tools.__stop__ = function(name){
   if (platform.development.tools.__is_running__(name) === true) {
     if (platform.development.tools[name].hasOwnProperty('__agent__') === true) {
@@ -52,27 +65,67 @@ platform.development.tools.__stop__ = function(name){
     platform.development.tools[name].__process__.kill();
     platform.development.tools[name].__process__ = undefined;
   } else {
-    throw new Exception('profiler tool is not running');
+    throw new Exception('%s tool is not running', name);
   }
 };
 
+//O: Provides support for node-inspector.
 platform.development.tools.inspector = {};
+
+//V: Checks whether the tool is running.
+platform.development.tools.inspector.running = false;
+
 platform.development.tools.inspector.__process__ = undefined;
+
+//F: Starts the specified tool.
+//R: None.
+//H: Throws exception if tool is already running.
 platform.development.tools.inspector.start = platform.development.tools.__start__.bind(null,'inspector');
+
+//F: Stops the specified tool.
+//R: None.
+//H: Throws exception if tool is not running.
 platform.development.tools.inspector.stop = platform.development.tools.__stop__.bind(null,'inspector');
 
+//O: Provides support for node-webkit-agent console frontend.
 platform.development.tools.console = {};
+
+//V: Checks whether the tool is running.
+platform.development.tools.console.running = false;
+
 platform.development.tools.console.__process__ = undefined;
 platform.development.tools.console.__agent__ = undefined;
+
+//F: Starts the specified tool.
+//R: None.
+//H: Throws exception if tool is already running.
 platform.development.tools.console.start = platform.development.tools.__start__.bind(null,'console',9999,3333);
+
+//F: Stops the specified tool.
+//R: None.
+//H: Throws exception if tool is not running.
 platform.development.tools.console.stop = platform.development.tools.__stop__.bind(null,'console');
 
+//O: Provides support for node-webkit-agent profiler frontend.
 platform.development.tools.profiler = {};
+
+//V: Checks whether the tool is running.
+platform.development.tools.profiler.running = false;
+
 platform.development.tools.profiler.__process__ = undefined;
 platform.development.tools.profiler.__agent__ = undefined;
+
+//F: Starts the specified tool.
+//R: None.
+//H: Throws exception if tool is already running.
 platform.development.tools.profiler.start = platform.development.tools.__start__.bind(null,'profiler',9998,3332);
+
+//F: Stops the specified tool.
+//R: None.
+//H: Throws exception if tool is not running,
 platform.development.tools.profiler.stop = platform.development.tools.__stop__.bind(null,'profiler');
 
+//C: defining running property for each supported tool.
 ['inspector','console','profiler'].forEach(function(name){
   Object.defineProperty(platform.development.tools[name],'running',{ get: platform.development.tools.__is_running__.bind(null,name), set: function(){}});
 });
@@ -106,4 +159,31 @@ if (platform.runtime.development === true) {
   //T: add autostart support in configuration
   platform.development.tools.console.start();
   platform.development.tools.profiler.start();
+}
+
+//T: add autostart support in configuration
+platform.development.tools.memory = {};
+platform.development.tools.memory.__memwatch__ = require('memwatch');
+platform.development.tools.memory.__heapdiff__ = null;
+platform.development.tools.memory.start = function(){
+  platform.development.tools.memory.__heapdiff__ = new platform.development.tools.memory.__memwatch__.HeapDiff();
+};
+platform.development.tools.memory.stop = function(){
+  var heapdiff = platform.development.tools.memory.__heapdiff__;
+  platform.development.tools.memory.__heapdiff__ = null;
+  return heapdiff.end();
+};
+platform.development.tools.memory.collect = function(){
+  return platform.development.tools.memory.__memwatch__.gc();
+};
+
+//C: starting memory watcher (only if debug is enabled)
+//T: add platform event for memory leak/stats
+if (platform.runtime.debugging === true) {
+  platform.development.tools.memory.__memwatch__.on('leak', function (info) {
+    console.warn(info);
+  });
+  platform.development.tools.memory.__memwatch__.on('stats', function (stats) {
+    console.debug(stats);
+  });
 }
