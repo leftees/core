@@ -28,6 +28,7 @@ bootstrap.regexs = {};
 bootstrap.regexs.serverJS = /\.server\.js$/;
 
 //C: creating and enforcing global platform namespace
+global.platform = {};
 Object.defineProperty(global,"platform",{
   configurable: false,
   enumerable : true,
@@ -69,6 +70,7 @@ bootstrap.post = function(){
   bootstrap.loadModules(platform.configuration.server.bootloader.modules,'/core/');
 
   //T: switch to PXE (pre execution environment)
+  //T: PXE test http ports to prevent EADDRINUSE exception later
 };
 
 //C: defining function to resolve relative paths against app or custom root
