@@ -45,4 +45,15 @@ tmp
 .npmignore
 
 # External submodules
-external
+external/devtools/agent/.git
+external/devtools/agent/.gitignore
+external/devtools/agent/.npmignore
+external/devtools/console/.git
+external/devtools/console/.gitignore
+external/devtools/console/.npmignore
+external/devtools/inspector/.git
+external/devtools/inspector/.gitignore
+external/devtools/inspector/.npmignore
+external/devtools/profiler/.git
+external/devtools/profiler/.gitignore
+external/devtools/profiler/.npmignore

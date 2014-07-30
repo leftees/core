@@ -3,7 +3,7 @@
 Code Status  
 [![Build Status](https://travis-ci.org/marcominetti/ljve.io.svg?branch=master)](https://travis-ci.org/marcominetti/ljve.io)  
 [![Dependency Status](https://david-dm.org/marcominetti/ljve.io.svg)](https://david-dm.org/marcominetti/ljve.io)  
-![Comments Status](stats/comments.badge.png)  
+![Comments Status](https://raw.githubusercontent.com/marcominetti/ljve.io/master/stats/comments.badge.png)  
 [![Coverage Status](https://coveralls.io/repos/marcominetti/ljve.io/badge.png?branch=master)](https://coveralls.io/r/marcominetti/ljve.io?branch=master)  
 [![Code Climate](https://codeclimate.com/github/marcominetti/ljve.io.png)](https://codeclimate.com/github/marcominetti/ljve.io)  
 
@@ -46,7 +46,7 @@ The following tools have been used to develop the ljve.io project:
 
 
 ## License
-![AGPLv3](LICENSE.AGPL.PNG)
+![AGPLv3](https://raw.githubusercontent.com/marcominetti/ljve.io/master/LICENSE.AGPL.PNG)
 
 ljve.io - Live Javascript Virtualized Environment  
 Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>  

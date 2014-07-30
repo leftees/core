@@ -36,13 +36,11 @@
     "chokidar": "*",
     "esprima": "*",
     "universal-analytics": "*",
-    "sloc": "*",
-    "webkit-devtools-agent": "https://github.com/marcominetti/node-webkit-agent/tarball/master",
-    "webkit-devtools-agent-frontend-console": "https://github.com/marcominetti/webkit-devtools-agent-frontend-console/tarball/master",
-    "webkit-devtools-agent-frontend-inspector": "https://github.com/marcominetti/webkit-devtools-agent-frontend-inspector/tarball/master",
-    "webkit-devtools-agent-frontend-profiler": "https://github.com/marcominetti/webkit-devtools-agent-frontend-profiler/tarball/master"
+    "sloc": "*"
   },
   "scripts": {
+    "clean": "rm -rf build; rm -rf node_modules; cd external/devtools/agent; rm -rf build; rm -rf node_modules; cd ../../..; cd external/devtools/inspector; rm -rf build; rm -rf node_modules; cd ../../..; cd external/devtools/console; rm -rf build; rm -rf node_modules; cd ../../..; cd external/devtools/profiler; rm -rf build; rm -rf node_modules; cd ../../..;",
+    "preinstall": "if [ -d \".git\" ]; then git submodule update -i -r; fi; cd external/devtools/agent; npm install; cd ../../..; cd external/devtools/inspector; npm install; cd ../../..; cd external/devtools/console; npm install; cd ../../..; cd external/devtools/profiler; npm install; cd ../../..;",
     "postinstall": "NODE_ENV=development node main.js coverage | sed 1d > stats/coverage.html; wget `node_modules/.bin/sloc --format json core | node tools/sloc.js` -O stats/comments.badge.png; wget https://codeclimate.com/github/marcominetti/ljve.io.png -O stats/climate.badge.png; wget https://coveralls.io/repos/marcominetti/ljve.io/badge.png?branch=master -O stats/coverage.badge.png;",
     "test": "if [ -f \".travis.yml\" ]; then NODE_ENV=test node main.js coverage | sed 1d | ./node_modules/coveralls/bin/coveralls.js; else NODE_ENV=development node main.js test; fi;"
   },
