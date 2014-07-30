@@ -180,9 +180,47 @@ platform.development.tools.memory.stop = function(){
   return heapdiff.end();
 };
 
-//F: Forces V8 runtime garbage collection.
+//F: Demands a V8 runtime garbage collection.
 platform.development.tools.memory.collect = function(){
   return platform.development.tools.memory.__memwatch__.gc();
+};
+
+//O: Stores memory data for trend analysis.
+platform.development.tools.memory.__previous__ = {};
+platform.development.tools.memory.__previous__.heap = 0;
+platform.development.tools.memory.__previous__.rss = 0;
+
+var humanSize = function (bytes) {
+  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  if (bytes == 0) return 'n/a';
+  var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+  return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+};
+
+//F: Prints V8 runtime memory usage.
+platform.development.tools.memory.log = function(){
+  //C: extracting memory usage data
+  var memory = process.memoryUsage();
+
+  //C: calculating memory usage trend
+  var trend_heap = Math.floor((memory.heapTotal-platform.development.tools.memory.__previous__.heap)/platform.development.tools.memory.__previous__.heap*10000)/100;
+  var trend_rss = Math.floor((memory.rss-platform.development.tools.memory.__previous__.rss)/platform.development.tools.memory.__previous__.rss*10000)/100;
+  if (trend_heap === Infinity) {
+    trend_heap = 'n/a';
+  } else {
+    trend_heap = ((trend_heap > 0) ? '+' + trend_heap : trend_heap) + '%';
+  }
+  if (trend_rss === Infinity) {
+    trend_rss = 'n/a';
+  } else {
+    trend_rss = ((trend_rss > 0) ? '+' + trend_rss : trend_rss) + '%';
+  }
+
+  //C: storing memory data for further trend analysis
+  platform.development.tools.memory.__previous__.heap = memory.heapTotal;
+  platform.development.tools.memory.__previous__.rss = memory.rss;
+
+  console.debug('memory status: %s heap (%s), %s ram (%s)',humanSize(memory.heapTotal), trend_heap,humanSize(memory.rss),trend_rss);
 };
 
 //C: starting memory watcher (only if debug is enabled)
@@ -194,6 +232,6 @@ if (platform.runtime.debugging === true) {
   });
   //C: attaching to memwatch stats event
   platform.development.tools.memory.__memwatch__.on('stats', function (stats) {
-    console.debug('memory status: %s bytes, %s gc, %s leak',stats.current_base,stats.heap_compactions,stats.usage_trend);
+    platform.development.tools.memory.log();
   });
 }
