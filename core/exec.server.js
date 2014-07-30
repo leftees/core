@@ -73,17 +73,11 @@ if (global.development === true && global.debugging === false){
   //C: spawning a nested debug-enabled node process
   var node_debug = require('child_process').spawn(process.argv[0],execArgv);
 
-  //C: attaching on child stderr data event to enable console proxy
-  node_debug.stdout.on('data', function (data) {
-    //C: logging string but no last \n char (cli colors preserved)
-    console.log(data.toString('utf8',0,data.length-1));
-  });
+  //C: attaching child stdout to process stdoud
+  node_debug.stdout.pipe(process.stdout);
 
-  //C: attaching on child stderr data event to enable console proxy
-  node_debug.stderr.on('data', function (data) {
-    //C: logging string but no last \n char (cli colors preserved)
-    console.log(data.toString('utf8',0,data.length-1));
-  });
+  //C: attaching child stderr to process stderr
+  node_debug.stderr.pipe(process.stderr);
 
   //C: attaching on child close event to exit main
   node_debug.on('close', function (code,signal) {

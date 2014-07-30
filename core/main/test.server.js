@@ -37,16 +37,16 @@ global.main.commands.test = function(coverage) {
 
   //C: initializing coverage stuff if required
   if(coverage === true){
-    global.mocha.addFile('./test/coverage.js');
+    global.mocha.addFile(global.main.path.core + '/test/coverage.js');
   }
 
   //C: queueing test files
   //T: automatically load test files from test folder
-  global.mocha.addFile('./test/bootstrap.js');
-  global.mocha.addFile('./test/kernel.js');
-  global.mocha.addFile('./test/classes.js');
+  global.mocha.addFile(global.main.path.core + '/test/bootstrap.js');
+  global.mocha.addFile(global.main.path.core + '/test/kernel.js');
+  global.mocha.addFile(global.main.path.core + '/test/classes.js');
 
-  global.mocha.addFile('./test/devtools.js');
+  global.mocha.addFile(global.main.path.core + '/test/devtools.js');
 
   //C: executing tests
   global.mocha.run(function(failures){
