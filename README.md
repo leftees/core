@@ -37,6 +37,9 @@ You can find project documentation here as PDF.
 
 The following tools have been used to develop the ljve.io project:
 
+  * [WebStorm](http://www.jetbrains.com/webstorm/)  
+  JetBrains WebStorm is one of the smartest and most complete IDE for JavaScript development with Node.js support.
+
   * [Nodeclipse](http://www.nodeclipse.org)  
   Nodeclipse is a free open-source solution that provides a cross-platform Node.js IDE through Eclipse.
 
