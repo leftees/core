@@ -1,9 +1,14 @@
 # ljve.io
 
 [![Build Status](http://img.shields.io/travis/marcominetti/ljve.io.png?style=flat)](https://travis-ci.org/marcominetti/ljve.io)  
+[![Deps Status](http://img.shields.io/david/marcominetti/ljve.io.svg?style=flat)](https://david-dm.org/marcominetti/ljve.io)  
+[![Package Status](http://img.shields.io/npm/v/ljve.svg?style=flat)](https://www.npmjs.org/package/ljve)  
+[![License Status](http://img.shields.io/npm/l/ljve.svg?style=flat)](http://opensource.org/licenses/AGPLv3)  
+
 ![Comment Coverage](stats/comments.badge.png)  
 [![Test Coverage](http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
 [![Code Climate](http://img.shields.io/codeclimate/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
+
 
 
 
@@ -39,8 +44,7 @@ The following tools have been used to develop the ljve.io project:
 
 
 
-## License
-![AGPLv3](https://raw.githubusercontent.com/marcominetti/ljve.io/master/LICENSE.AGPL.PNG)
+## License ![AGPLv3](https://raw.githubusercontent.com/marcominetti/ljve.io/master/LICENSE.AGPL.PNG)
 
 ljve.io - Live Javascript Virtualized Environment  
 Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>  
