@@ -1,15 +1,9 @@
 # ljve.io
 
-Code Status  
-[![Build Status](https://travis-ci.org/marcominetti/ljve.io.svg?branch=master)](https://travis-ci.org/marcominetti/ljve.io)  
-[![Dependency Status](https://david-dm.org/marcominetti/ljve.io.svg)](https://david-dm.org/marcominetti/ljve.io)  
+[![Build Status](http://img.shields.io/travis/marcominetti/ljve.io.png?style=flat)](https://travis-ci.org/marcominetti/ljve.io)  
 ![Comment Coverage](stats/comments.badge.png)  
-[![Test Coverage](https://codeclimate.com/github/marcominetti/ljve.io/coverage.png)](https://codeclimate.com/github/marcominetti/ljve.io)  
-[![Code Climate](https://codeclimate.com/github/marcominetti/ljve.io.png)](https://codeclimate.com/github/marcominetti/ljve.io)  
-
-Milestone Status  
-[![Stories in Ready](https://badge.waffle.io/marcominetti/ljve.io.png?label=in%20progress&title=working)](https://waffle.io/marcominetti/ljve.io)  
-[![Stories in Ready](https://badge.waffle.io/marcominetti/ljve.io.png?label=ready&title=backlog)](https://waffle.io/marcominetti/ljve.io)  
+[![Test Coverage](http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
+[![Code Climate](http://img.shields.io/codeclimate/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
 
 
 

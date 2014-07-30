@@ -35,6 +35,6 @@ stdin.on('end', function () {
   var coverage = Math.floor((result.summary.single + result.summary.mixed) / result.summary.source*100);
   var color = (coverage > 40) ? 'green' : (coverage < 10) ? 'red' : 'yellow';
 
-  var url = 'http://img.shields.io/badge/comments-' + coverage + '%-' + color + '.png';
+  var url = 'http://img.shields.io/badge/comments-' + coverage + '%-' + color + '.png?style=flat';
   stdout.write(url);
 });
