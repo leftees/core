@@ -35,11 +35,11 @@ platform.development.tools.__start__ = function(name,port,internal_port){
     if (platform.development.tools[name].hasOwnProperty('__agent__') === true) {
       //T: support spawned process close detection
       //C: activating node-webkit-agent for console
-      platform.development.tools[name].__agent__ = new (global.require(platform.runtime.path.core + '/external/devtools/agent/index'))();
+      platform.development.tools[name].__agent__ = new (global.require(platform.runtime.path.core + '/node_modules/webkit-devtools-agent/index'))();
       platform.development.tools[name].__agent__.start(port, '0.0.0.0', internal_port, false);
     }
     //C: executing console frontend in a separate process
-    platform.development.tools[name].__process__ = require('child_process').spawn('node', [platform.runtime.path.core + '/external/devtools/' + name + '/main.js', port]);
+    platform.development.tools[name].__process__ = require('child_process').spawn('node', [platform.runtime.path.core + '/node_modules/webkit-devtools-agent-frontend-' + name + '/main.js', port]);
   } else {
     throw new Exception('%s tool is already running',name);
   }
