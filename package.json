@@ -44,7 +44,7 @@
   },
   "scripts": {
     "postinstall": "if [ -d \".git\" ]; then NODE_ENV=development node main.js coverage | sed 1d > stats/coverage.html; wget `node_modules/.bin/sloc --format json core | node tools/sloc.js` -O stats/comments.badge.png; wget https://codeclimate.com/github/marcominetti/ljve.io.png -O stats/climate.badge.png; wget https://codeclimate.com/github/marcominetti/ljve.io/coverage.png -O stats/coverage.badge.png; fi;",
-    "test": "if [ -f \".travis.yml\" ]; then NODE_ENV=test node main.js coverage | sed 1d | CODECLIMATE_REPO_TOKEN=e0cf2f4af8c73634b29d8342a180ae402252479a3bc4f6c1dcf6f31b184525f3 ./node_modules/.bin/codeclimate; else NODE_ENV=development node main.js test; fi;"
+    "test": "if [ -f \".travis.yml\" ]; then NODE_ENV=test node main.js coverage | CODECLIMATE_REPO_TOKEN=e0cf2f4af8c73634b29d8342a180ae402252479a3bc4f6c1dcf6f31b184525f3 ./node_modules/.bin/codeclimate; else NODE_ENV=development node main.js test; fi;"
   },
   "gypfile": false,
   "preferGlobal": true,
