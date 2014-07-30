@@ -1,15 +1,12 @@
 # ljve.io
 
-[![Release Status](http://img.shields.io/github/release/marcominetti/ljve.io.svg?style=flat)](https://github.com/marcominetti/ljve.io/releases)  
-[![License Status](http://img.shields.io/npm/l/ljve.svg?style=flat)](http://opensource.org/licenses/AGPLv3)  
-
+[![Build Status](http://img.shields.io/travis/marcominetti/ljve.io.png?style=flat)](https://travis-ci.org/marcominetti/ljve.io)   
 ![Comment Coverage](stats/comments.badge.png)  
 [![Test Coverage](http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
 [![Code Climate](http://img.shields.io/codeclimate/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
 
-[![Build Status](http://img.shields.io/travis/marcominetti/ljve.io.png?style=flat)](https://travis-ci.org/marcominetti/ljve.io)  
-[![Deps Status](http://img.shields.io/david/marcominetti/ljve.io.svg?style=flat)](https://david-dm.org/marcominetti/ljve.io)  
-[![Package Status](http://img.shields.io/npm/v/ljve.svg?style=flat)](https://www.npmjs.org/package/ljve)  
+[![Release Status](http://img.shields.io/github/release/marcominetti/ljve.io.png?style=flat)](https://github.com/marcominetti/ljve.io/releases)  
+[![Package Status](http://img.shields.io/npm/v/ljve.svg?style=flat)](https://www.npmjs.org/package/ljve) 
 
 
 
