@@ -5,7 +5,6 @@
 [![Test Coverage](http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
 [![Code Climate](http://img.shields.io/codeclimate/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
 
-[![Release Status](http://img.shields.io/github/release/marcominetti/ljve.io.png?style=flat)](https://github.com/marcominetti/ljve.io/releases)  
 [![Package Status](http://img.shields.io/npm/v/ljve.svg?style=flat)](https://www.npmjs.org/package/ljve) 
 
 
