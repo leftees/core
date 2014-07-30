@@ -35,15 +35,6 @@ stdin.on('end', function () {
   var coverage = Math.floor((result.summary.single + result.summary.mixed) / result.summary.source*100);
   var color = (coverage > 40) ? 'green' : (coverage < 10) ? 'red' : 'yellow';
 
-  var wget = require('wget');
-  var src = 'http://img.shields.io/badge/comments-' + coverage + '%-' + color + '.png';
-  var output = 'stats/comments.badge.png';
-  var download = wget.download(src, output);
-  download.on('error', function(err) {
-    console.error(err);
-  });
-  download.on('end', function(output) {
-  });
-  download.on('progress', function(progress) {
-  });
+  var url = 'http://img.shields.io/badge/comments-' + coverage + '%-' + color + '.png';
+  stdout.write(url);
 });
