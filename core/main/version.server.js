@@ -23,7 +23,6 @@
 global.main.commands.version = function(){
   //C: printing logo
   global.main.commands.logo();
-  console.log();
   //C: printing version
   global.main.commands.version.print();
 };

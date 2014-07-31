@@ -38,10 +38,8 @@ global.main.commands.run = function(){
 
   //C: printing logo
   global.main.commands.logo();
-  console.log();
   //C: printing version
   global.main.commands.version.print();
-  console.log();
 
   //C: loading ljve application server
   var bootstrap = global.require(global.main.path.core + '/core/bootstrap.server.js');
