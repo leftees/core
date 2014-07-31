@@ -163,8 +163,8 @@ var filesystem_backend = function(root) {
   this.set = {};
 
   //F: Sets data from string to file (overwrites contents).
-  //A: data: Specifies the data to be written, as string.
   //A: path: Specifies the target file path.
+  //A: data: Specifies the data to be written, as string.
   //A: [callback(err)]: Callback for async support. If missing, the function operates synchronously.
   //H: Implementation is based on native.fs.outputFile (fs-extra) with UTF-8 encoding.
   this.set.string = function(path,data,callback){
@@ -179,8 +179,8 @@ var filesystem_backend = function(root) {
   };
 
   //F: Sets data from bytes (Buffer) to file (overwrites contents).
-  //A: data: Specifies the data to be written, as bytes (Buffer).
   //A: path: Specifies the target file path.
+  //A: data: Specifies the data to be written, as bytes (Buffer).
   //A: [callback(err)]: Callback for async support. If missing, the function operates synchronously.
   //H: Implementation is based on native.fs.outputFile (fs-extra) with no encoding.
   this.set.bytes = function(path,data,callback){
@@ -194,7 +194,7 @@ var filesystem_backend = function(root) {
     }
   };
 
-  //F: Gets write stream for file.
+  //F: Sets write stream for file (overwrites contents).
   //A: path: Specifies the target file path.
   //A: [options]: Specifies options to be passed to fs.createWriteStream.
   //A: [callback(err,stream)]: Callback for async support. If missing, the function operates synchronously.
