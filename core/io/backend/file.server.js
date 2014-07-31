@@ -31,6 +31,10 @@ var filesystem_backend = function(root) {
     base = native.path.sep + base;
   }
 
+  //V: Stores the name of the backend (set by platform.io.store.register).
+  this.name = null;
+
+  //V: Stores the root path for this backend.
   //T: choose to protect from external change
   this.base = base;
 
@@ -325,6 +329,7 @@ var filesystem_backend = function(root) {
     }
     return result;
   };
+
 };
 
 //C: registering 'core.io.store.file' to global classes
