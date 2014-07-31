@@ -19,6 +19,9 @@
 
  */
 
+//N: Provides IO helper with abstract filesystem and packaged module support.
+platform.io = platform.io || {};
+
 //N: Provides managed cache IO support.
 platform.io.cache = platform.io.cache || {};
 
