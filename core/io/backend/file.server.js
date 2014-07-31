@@ -37,12 +37,12 @@ var filesystem_backend = function(root) {
   //F: Checks whether path exist (file or directory).
   //A: path: Specifies the target path.
   //A: [callback(err,exists)]: Callback for async support. If missing, the function operates syncronously.
-  //R: Returns true or false for sync mode.
+  //R: Returns true or false.
   //H: Implementation is based on native.fs.exists.
   this.exist = function(path, callback) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
-    //C: detecting whether operate asynchronously or synchronously
+    //C: detecting if operate asynchronously or synchronously
     if (callback === undefined || callback === null) {
       return native.fs.existsSync(fullpath);
     } else {
@@ -53,12 +53,12 @@ var filesystem_backend = function(root) {
   //F: Gets info for path (file or directory).
   //A: path: Specifies the target path.
   //A: [callback(err,stats)]: Callback for async support. If missing, the function operates synchronously.
-  //R: Returns fs.Stats class for sync mode.
+  //R: Returns fs.Stats class.
   //H: Implementation is based on native.fs.stat.
   this.info = function(path,callback){
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
-    //C: detecting whether operate asynchronously or synchronously
+    //C: detecting if operate asynchronously or synchronously
     if (callback === undefined || callback === null) {
       return native.fs.statSync(fullpath);
     } else {
@@ -72,12 +72,12 @@ var filesystem_backend = function(root) {
   //F: Gets whole data as string from file.
   //A: path: Specifies the target file path.
   //A: [callback(err,data)]: Callback for async support. If missing, the function operates synchronously.
-  //R: Returns data as string for sync mode.
+  //R: Returns data as string.
   //H: Implementation is based on native.fs.readFile with UTF-8 encoding.
   this.get.string = function(path,callback){
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
-    //C: detecting whether operate asynchronously or synchronously
+    //C: detecting if operate asynchronously or synchronously
     if (callback === undefined || callback === null) {
       return native.fs.readFileSync(fullpath,'utf8');
     } else {
@@ -88,12 +88,12 @@ var filesystem_backend = function(root) {
   //F: Gets whole data as bytes (Buffer) from file.
   //A: path: Specifies the target file path.
   //A: [callback(err,data)]: Callback for async support. If missing, the function operates synchronously.
-  //R: Returns data as bytes (Buffer) for sync mode.
+  //R: Returns data as bytes (Buffer).
   //H: Implementation is based on native.fs.readFile with no encoding.
   this.get.bytes = function(path,callback){
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
-    //C: detecting whether operate asynchronously or synchronously
+    //C: detecting if operate asynchronously or synchronously
     if (callback === undefined || callback === null) {
       return native.fs.readFileSync(fullpath,null);
     } else {
@@ -104,21 +104,28 @@ var filesystem_backend = function(root) {
   //F: Gets read stream for file.
   //A: path: Specifies the target file path.
   //A: [options]: Specifies options to be passed to fs.createReadStream.
-  //A: [callback(err,stream)]: Callback for async support (invoked on stream 'open' event). If missing, the function operates synchronously.
-  //R: Returns read stream for sync mode.
+  //A: [callback(err,stream)]: Callback for async support. If missing, the function operates synchronously.
+  //R: Returns read stream.
   //H: Implementation is based on native.fs.createReadStream.
   this.get.stream = function(path,options,callback){
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
-    //C: creating stream
-    var newstream = native.fs.createReadStream(fullpath,options);
-    //C: detecting whether operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
-      return newstream;
-    } else {
-      //T: add error propagation
-      newstream.on('open',callback.bind(null,null,newstream));
-      return;
+    //C: creating stream and handling errors
+    try {
+      var newstream = native.fs.createReadStream(fullpath,options);
+      //C: detecting if operate asynchronously or synchronously
+      if (callback === undefined || callback === null) {
+        return newstream;
+      } else {
+        callback(null,newstream);
+      }
+    } catch (err){
+      //C: detecting if operate asynchronously or synchronously
+      if (callback === undefined || callback === null) {
+        throw err;
+      } else {
+        callback(err);
+      }
     }
   };
 
@@ -132,7 +139,7 @@ var filesystem_backend = function(root) {
     var directory = (path.charAt(path.length-1) === native.path.sep);
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
-    //C: detecting whether operate asynchronously or synchronously
+    //C: detecting if operate asynchronously or synchronously
     if (callback === undefined || callback === null) {
       if (directory === true) {
         return native.fs.ensureDirSync(fullpath);
@@ -159,7 +166,7 @@ var filesystem_backend = function(root) {
   this.set.string = function(path,data,callback){
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
-    //C: detecting whether operate asynchronously or synchronously
+    //C: detecting if operate asynchronously or synchronously
     if (callback === undefined || callback === null) {
       return native.fs.outputFileSync(fullpath,data,'utf8');
     } else {
@@ -175,7 +182,7 @@ var filesystem_backend = function(root) {
   this.set.bytes = function(path,data,callback){
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
-    //C: detecting whether operate asynchronously or synchronously
+    //C: detecting if operate asynchronously or synchronously
     if (callback === undefined || callback === null) {
       return native.fs.outputFileSync(fullpath,data,null);
     } else {
@@ -186,20 +193,27 @@ var filesystem_backend = function(root) {
   //F: Gets write stream for file.
   //A: path: Specifies the target file path.
   //A: [options]: Specifies options to be passed to fs.createWriteStream.
-  //A: [callback(err,stream)]: Callback for async support (invoked on stream 'open' event). If missing, the function operates synchronously.
+  //A: [callback(err,stream)]: Callback for async support. If missing, the function operates synchronously.
   //H: Implementation is based on native.fs.createWriteStream.
   this.set.stream = function(path,options,callback){
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
-    //C: creating stream
-    var newstream = native.fs.createWriteStream(fullpath,options);
-    //C: detecting whether operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
-      return newstream;
-    } else {
-      //T: add error propagation
-      newstream.on('open',callback.bind(null,null,newstream));
-      return;
+    //C: creating stream and handling errors
+    try {
+      var newstream = native.fs.createWriteStream(fullpath,options);
+      //C: detecting if operate asynchronously or synchronously
+      if (callback === undefined || callback === null) {
+        return newstream;
+      } else {
+        callback(null,newstream);
+      }
+    } catch (err){
+      //C: detecting if operate asynchronously or synchronously
+      if (callback === undefined || callback === null) {
+        throw err;
+      } else {
+        callback(err);
+      }
     }
   };
 
@@ -210,7 +224,7 @@ var filesystem_backend = function(root) {
   this.delete = function(path,callback){
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
-    //C: detecting whether operate asynchronously or synchronously
+    //C: detecting if operate asynchronously or synchronously
     if (callback === undefined || callback === null) {
       return native.fs.removeSync(fullpath);
     } else {
@@ -227,7 +241,7 @@ var filesystem_backend = function(root) {
     //C: mapping paths to base root of current instance
     var oldfullpath = native.path.join(base,oldpath);
     var newfullpath = native.path.join(base,newpath);
-    //C: detecting whether operate asynchronously or synchronously
+    //C: detecting if operate asynchronously or synchronously
     if (callback === undefined || callback === null) {
       return native.fs.renameSync(oldfullpath,newfullpath);
     } else {
@@ -242,7 +256,7 @@ var filesystem_backend = function(root) {
   //A: [filter]: Specifies filter, as string or strings array, to match results (based on minimatch). Default is null.
   //A: [callback(err,result)]: Callback for async support (currently fake implementation). If missing, the function operates synchronously.
   //H: Implementation is based on synchronous native.fs.readdirSync, callback is invoked if specified.
-  //R: Returns results as array of strings for sync mode.
+  //R: Returns results as array of strings.
   this.list = function(path,deep,filter,callback){
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
