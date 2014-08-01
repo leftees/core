@@ -165,5 +165,26 @@ describe('devtools', function() {
 
   });
 
+  describe('memory',function() {
+
+    it('should exists', function () {
+      should.exist(platform.development.tools.memory);
+    });
+
+    it('collect should succeed', function () {
+      (function(){
+        platform.development.tools.memory.collect();
+      }).should.not.throw();
+    });
+
+    it('heap diff should succeed', function () {
+      (function(){
+        platform.development.tools.memory.start();
+        platform.development.tools.memory.stop();
+      }).should.not.throw();
+    });
+
+  });
+
 });
 
