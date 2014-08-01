@@ -50,6 +50,6 @@ platform.utility.recursiveCall = function (leafCallback,endCallback,root) {
   } while (pendingObjects.length);
   //C: executing CompleteFunction if not null
   if (endCallback !== undefined && endCallback !== null) {
-    endCallback(argumentsArray);
+    endCallback.apply(null,argumentsArray);
   }
 };
