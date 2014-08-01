@@ -69,6 +69,10 @@ describe('devtools', function() {
         should.exist(platform.development.tools.inspector.__process__);
       });
 
+      after(function(){
+        platform.development.tools.inspector.stop();
+      });
+
     }
 
   });
@@ -117,6 +121,10 @@ describe('devtools', function() {
       should.exist(platform.development.tools.console.__process__);
     });
 
+    after(function(){
+      platform.development.tools.console.stop();
+    });
+
   });
 
   describe('profiler',function(){
@@ -161,6 +169,10 @@ describe('devtools', function() {
       }).should.not.throw();
       should.exist(platform.development.tools.profiler.__agent__);
       should.exist(platform.development.tools.profiler.__process__);
+    });
+
+    after(function(){
+      platform.development.tools.profiler.stop();
     });
 
   });

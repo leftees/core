@@ -27,6 +27,10 @@ describe('io', function() {
 
     describe('file', function () {
 
+      before(function(){
+        native.fs.removeSync(platform.runtime.path.app + '/tmp/test');
+      });
+
       it('should be registered as core.io.store.file', function () {
         platform.classes.exist('core.io.store.file').should.equal(true);
       });
@@ -86,11 +90,12 @@ describe('io', function() {
         });
 
         it('get data read stream for missing file should fail', function (done) {
-            backend.get.stream('file.txt').on('error', function (err, result) {
-              if (err) {
-                done();
-              }
-            });
+          this.timeout(5000);
+          backend.get.stream('file.txt').on('error', function (err) {
+            if (err) {
+              done();
+            }
+          });
         });
 
         it('rename missing file should fail', function () {
@@ -216,23 +221,32 @@ describe('io', function() {
         });
 
         it('get data write stream for file should succeed and content should be successfully written', function (done) {
+          this.timeout(5000);
           var wstream = backend.set.stream('/dir/file.stream.txt');
           wstream.on('open', function () {
-            wstream.write('test€')
-            wstream.end()
+            wstream.write('test€');
+            wstream.end();
             if (backend.info('/dir/file.stream.txt').size === 7) {
               done();
             }
           });
+          wstream.on('error', function (err) {
+            done(err);
+          });
         });
 
         it('get data read stream for file should succeed and content should be correct', function (done) {
+          this.timeout(5000);
           var rstream = backend.get.stream('/dir/file.stream.txt');
           rstream.on('readable', function () {
             var rbuffer = rstream.read();
+            rstream.close();
             if (rbuffer.toString() === 'test€') {
               done();
             }
+          });
+          rstream.on('error', function (err) {
+            done(err);
           });
         });
 
@@ -313,11 +327,12 @@ describe('io', function() {
         });
 
         it('get data read stream for missing file should fail', function (done) {
+          this.timeout(5000);
           backend.get.stream('file.txt',null ,function (err, result) {
             if (err) {
               done();
             } else {
-              result.on('error', function (err, result) {
+              result.on('error', function (err) {
                 if (err) {
                   done();
                 }
@@ -489,26 +504,35 @@ describe('io', function() {
         });
 
         it('get data write stream for file should succeed and content should be successfully written', function (done) {
+          this.timeout(5000);
           backend.set.stream('/dir/file.stream.txt',null,function(err,wstream){
             wstream.on('open', function () {
-              wstream.write('test€')
-              wstream.end()
+              wstream.write('test€');
+              wstream.end();
               if (backend.info('/dir/file.stream.txt').size === 7) {
                 done();
               }
+            });
+            wstream.on('error', function (err) {
+              done(err);
             });
           });
         });
 
         it('get data read stream for file should succeed and content should be correct', function (done) {
+          this.timeout(5000);
           var rstream = backend.get.stream('/dir/file.stream.txt',null,function(err,rstream){
             rstream.on('readable', function () {
               var rbuffer = rstream.read();
+              rstream.close();
               if (rbuffer.toString() === 'test€') {
                 done();
               } else {
                 done(new Error());
               }
+            });
+            rstream.on('error', function (err) {
+              done(err);
             });
           });
         });
@@ -552,6 +576,10 @@ describe('io', function() {
           backend.delete('/');
         });
 
+      });
+
+      after(function () {
+        backend.delete('/');
       });
 
     });
