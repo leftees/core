@@ -40,13 +40,11 @@ global.main.commands.test = function(coverage) {
     global.mocha.addFile(global.main.path.core + '/test/coverage.js');
   }
 
-  //C: queueing test files
-  //T: automatically load test files from test folder
-  global.mocha.addFile(global.main.path.core + '/test/bootstrap.js');
-  global.mocha.addFile(global.main.path.core + '/test/kernel.js');
-  global.mocha.addFile(global.main.path.core + '/test/classes.js');
-
-  global.mocha.addFile(global.main.path.core + '/test/devtools.js');
+  //C: queueing test files as specified in /test/series file
+  var series = native.fs.readFileSync(global.main.path.core + '/test/series', 'utf8').split('\n');
+  series.forEach(function(script){
+    global.mocha.addFile(global.main.path.core + '/test/scripts/' + script);
+  });
 
   //C: executing tests
   global.mocha.run(function(failures){
