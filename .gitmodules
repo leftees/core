@@ -10,3 +10,6 @@
 [submodule "external/devtools/agent"]
 	path = external/devtools/agent
 	url = https://github.com/marcominetti/node-webkit-agent.git
+[submodule "wiki"]
+	path = wiki
+	url = https://github.com/marcominetti/ljve.io.wiki.git
