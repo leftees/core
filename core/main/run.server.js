@@ -20,9 +20,9 @@
  */
 
 //C: defining run CLI command
-global.main.commands.run = function(){
+global.main.commands.run = function(base){
   //C: processing arguments
-  var root = native.args.root;
+  var root = base || native.args.root;
   //C: checking whether root folder is valid
   if (root !== undefined && typeof root === 'string'){
     //C: normalizing root (removing last separators)
