@@ -76,7 +76,7 @@ bootstrap.post = function(){
 //C: defining function to resolve relative paths against app or custom root
 bootstrap.mapPath = function(path,root) {
   var normalized_path = path;
-  //C: adding leading slash
+  //C: sanitizing empty path
   if (normalized_path === '') {
     normalized_path = '/';
   }
@@ -87,10 +87,6 @@ bootstrap.mapPath = function(path,root) {
   }*/
   //C: normalizing through natives
   normalized_path = native.path.normalize(normalized_path);
-  //C: adding leading slash
-  if (normalized_path.charAt(0) !== native.path.sep) {
-    normalized_path = native.path.sep + normalized_path;
-  }
   //C: returning path joined to custom or app root
   return  native.path.join(root||global.main.path.app, normalized_path);
 };
