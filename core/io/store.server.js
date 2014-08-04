@@ -39,7 +39,7 @@ platform.io.store.__backends__ = {};
 //H: Priority '0' and name 'app' are reserved for runtime backends.
 platform.io.store.register = function(name,backend,priority){
   //C: checking whether a backend with same name has been registered
-  if (platform.classes.exist(name) === false) {
+  if (platform.io.store.exist(name) === false) {
     //C: sanitizing priority
     var newpriority = priority;
     if (typeof newpriority !== 'number'){
@@ -137,7 +137,7 @@ platform.io.store.getByPriority = function(priority){
   var newpriority = priority;
   if (typeof newpriority !== 'number'){
     return null;
-  } else if (newpriority < 0 && newpriority >= platform.io.store.__priorities__.length) {
+  } else if (newpriority < 0 || newpriority >= platform.io.store.__priorities__.length) {
     return null;
   }
   //C: getting name by priority
