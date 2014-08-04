@@ -127,13 +127,18 @@ platform.io.get.stream = function(path,options){
       return backend.get.stream(path,options);
     }
   }
-  throw new Exception('resource \'%s\' does not exist',path);
+  var stream = require('stream').Writable();
+  setTimeout(function(){
+    stream.emit('error',new Exception('resource \'%s\' does not exist',path));
+  });
+  return stream;
+
 };
 
-//F: Creates a file or directory if the path doesn't exist through the 'app' backend.
+//F: Creates a file or directory if the path doesn't exist through the first backend.
 //A: path: Specifies the target path (directory if it ends with '/').
 platform.io.create = function(path){
-  //C: getting 'app' backend
+  //C: getting first backend
   var backend = platform.io.store.getByPriority(0);
   return backend.create(path);
 };
@@ -141,57 +146,57 @@ platform.io.create = function(path){
 //O: Provides set implementations.
 platform.io.set = {};
 
-//F: Sets data from string to file through the 'app' backend (overwrites contents).
+//F: Sets data from string to file through the first backend (overwrites contents).
 //A: path: Specifies the target file path.
 //A: data: Specifies the data to be written, as string.
 platform.io.set.string = function(path,data){
-  //C: getting 'app' backend
+  //C: getting first backend
   var backend = platform.io.store.getByPriority(0);
   return backend.set.string(path,data);
 };
 
-//F: Sets data from bytes (Buffer) to file through the 'app' backend (overwrites contents).
+//F: Sets data from bytes (Buffer) to file through the first backend (overwrites contents).
 //A: path: Specifies the target file path.
 //A: data: Specifies the data to be written, as bytes (Buffer).
 platform.io.set.bytes = function(path,data){
-  //C: getting 'app' backend
+  //C: getting first backend
   var backend = platform.io.store.getByPriority(0);
   return backend.set.bytes(path,data);
 };
 
-//F: Sets write stream for file through the 'app' backend (overwrites contents).
+//F: Sets write stream for file through the first backend (overwrites contents).
 //A: path: Specifies the target file path.
 //A: [options]: Specifies options to be passed to fs.createWriteStream.
 platform.io.set.stream = function(path,options){
-  //C: getting 'app' backend
+  //C: getting first backend
   var backend = platform.io.store.getByPriority(0);
   return backend.set.stream(path,options);
 };
 
-//F: Deletes a path through the 'app' backend (file or directory).
+//F: Deletes a path through the first backend (file or directory).
 //A: path: Specifies the target path.
 platform.io.delete = function(path){
-  //C: getting 'app' backend
+  //C: getting first backend
   var backend = platform.io.store.getByPriority(0);
   return backend.delete(path);
 };
 
-//F: Renames a path (file or directory) through the 'app' backend.
+//F: Renames a path (file or directory) through the first backend.
 //A: oldpath: Specifies the old target path.
 //A: newpath: Specifies the new target path.
 platform.io.rename = function(oldpath,newpath){
-  //C: getting 'app' backend
+  //C: getting first backend
   var backend = platform.io.store.getByPriority(0);
   return backend.rename(oldpath,newpath);
 };
 
-//F: Finds all files in a path through the 'app' backend.
+//F: Finds all files in a path through the first backend.
 //A: path: Specifies the target path.
 //A: [deep]: Specifies if search should be recursive. Default is false.
 //A: [filter]: Specifies filter, as string or strings array, to match results (based on minimatch). Default is null.
 //R: Returns results as array of strings.
 platform.io.list = function(path,deep,filter){
-  //C: getting 'app' backend
+  //C: getting first backend
   var backend = platform.io.store.getByPriority(0);
   return backend.list(path,deep,filter);
 };
