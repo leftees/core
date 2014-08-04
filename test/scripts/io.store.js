@@ -36,17 +36,17 @@ describe('io', function() {
       should.exist(platform.io.store);
     });
 
-    it('register \'app\' store should fail', function () {
+    /*it('register \'app\' store should fail', function () {
       (function(){
        platform.io.store.register('app',backend,1);
       }).should.throw();
-    });
+    });*/
 
-    it('register store with 0 priority should fail', function () {
+    /*it('register store with 0 priority should fail', function () {
       (function(){
         platform.io.store.register('tmp',backend,0);
       }).should.throw();
-    });
+    });*/
 
     it('exist for missing store should succeed', function () {
       var result = platform.io.store.exist('donotexist');
@@ -156,11 +156,11 @@ describe('io', function() {
       }).should.throw();
     });
 
-    it('setPriority for \'app\' store should fail', function () {
+    /*it('setPriority for \'app\' store should fail', function () {
       (function(){
         platform.io.store.setPriority('app',6);
       }).should.throw();
-    });
+    });*/
 
     it('setPriority to wrong priority should succeed', function () {
       var result;
@@ -207,11 +207,11 @@ describe('io', function() {
       }).should.not.throw();
     });
 
-    it('unregister \'app\' store should fail', function () {
+    /*it('unregister \'app\' store should fail', function () {
       (function(){
         platform.io.store.unregister('app');
       }).should.throw();
-    });
+    });*/
 
     after(function(){
       platform.io.delete('/tmp/test');

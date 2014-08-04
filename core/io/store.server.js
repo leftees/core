@@ -47,9 +47,9 @@ platform.io.store.register = function(name,backend,priority){
     } else if (newpriority < 0) {
       newpriority = -1;
     //C: preserving reserved backends
-    } else if ((newpriority === 0 && name !== 'app') || (newpriority !== 0 && name === 'app')) {
+    } /*else if ((newpriority === 0 && name !== 'app') || (newpriority !== 0 && name === 'app')) {
       throw new Exception('store \'app\' with priority \'0\' cannot be modified');
-    }
+    }*/
 
     //T: check if every method is implemented (interface?)
     //C: storing backend instance and extending it with name
@@ -73,7 +73,7 @@ platform.io.store.register = function(name,backend,priority){
 //H: Backend with name 'app' is reserved and can't be unregistered.
 platform.io.store.unregister = function(name){
   //C: checking if backend exists and is not reserved
-  if (platform.io.store.exist(name) === true && name !== 'app') {
+  if (platform.io.store.exist(name) === true /*&& name !== 'app'*/) {
     //C: removing backend from priority array
     var oldindex = platform.io.store.__priorities__.indexOf(name);
     if (oldindex > -1) {
@@ -82,7 +82,7 @@ platform.io.store.unregister = function(name){
     //C: deleting backend object
     return delete platform.io.store.__backends__[name];
   } else {
-    throw new Exception('store \'%s\' oes not exist',name);
+    throw new Exception('store \'%s\' does not exist',name);
   }
 };
 
@@ -175,16 +175,16 @@ platform.io.store.setPriority = function(name,priority){
     } else if (newpriority < 0) {
       newpriority = -1;
     //C: preserving reserved backends
-    } else if (newpriority === 0 || name === 'app') {
+    } /*else if (newpriority === 0 || name === 'app') {
       throw new Exception('store \'app\' with priority \'0\' cannot be modified');
-    }
+    }*/
     //C: unsetting old priority
     var oldindex = platform.io.store.__priorities__.indexOf(name);
-    if (oldindex > 0) {
+    if (oldindex > -1) {
       platform.io.store.__priorities__.splice(oldindex, 1);
     }
     //C: setting new priority (if any)
-    if (newpriority > 0) {
+    if (newpriority > -1) {
       platform.io.store.__priorities__.splice(newpriority, 0, name);
     }
   } else {
