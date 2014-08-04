@@ -35,3 +35,9 @@ global.main.commands.version.print = function(){
     process.version.replace(/^v/,'')
   );
 };
+
+//C: defining version CLI command manual
+global.main.commands.version.man = function() {
+  console.log('\
+  Print application and runtime version.');
+};

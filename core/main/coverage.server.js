@@ -24,3 +24,9 @@ global.main.commands.coverage = function() {
   //C: simply executing test with proper coverage argument
   global.main.commands.test(true);
 };
+
+//C: defining coverage CLI command manual
+global.main.commands.coverage.man = function() {
+  console.log('\
+  Execute tests and export coverage data to stdout.');
+};

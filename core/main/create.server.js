@@ -46,3 +46,23 @@ global.main.commands.create = function(root, template){
   native.fs.copySync(source, target);
   console.info('created app in \'%s\'', target);
 };
+
+//C: defining create CLI command manual
+global.main.commands.create.man = function() {
+  console.log('\
+  Create an application root path from template skeleton.\n\
+  \n\
+    --root=/var/www/example\n\
+    Define the target path where the server will copy new application folder and files.\n\
+    \n\
+    --template=default\n\
+    Specify the template to be used as boilerplate for new application root path.\n\
+    If this argument is missing, the \'default\' template will be used.\n\
+    \n\
+    Templates:\n\
+      ');
+  var templates = native.fs.readdirSync(native.path.join(global.main.path.core,'core/skel/'));
+  templates.forEach(function(template){
+    console.log('      %s', template);
+  });
+};

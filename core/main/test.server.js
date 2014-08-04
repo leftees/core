@@ -64,3 +64,9 @@ global.main.commands.test = function(coverage) {
   });
 
 };
+
+//C: defining test CLI command manual
+global.main.commands.test.man = function() {
+  console.log('\
+  Execute tests and print progress to stdout.');
+};

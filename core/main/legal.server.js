@@ -39,3 +39,9 @@ GNU Affero General Public License for more details.\n\
 You should have received a copy of the GNU Affero General Public License\n\
 along with this program.  If not, see <http://www.gnu.org/licenses/>.')
 };
+
+//C: defining legal CLI command manual
+global.main.commands.legal.man = function() {
+  console.log('\
+  Print copyright and license.');
+};

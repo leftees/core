@@ -49,3 +49,14 @@ global.main.commands.run = function(base){
   //C: deleting global.main namespace (not required)
   delete global.main;
 };
+
+//C: defining run CLI command manual
+global.main.commands.run.man = function() {
+  console.log('\
+  Start application server.\n\
+  \n\
+    --root=/var/www\n\
+    Define the root path where the server will find application folder and files.\n\
+    If this argument is missing, the current working directory will be used.\
+  ');
+};
