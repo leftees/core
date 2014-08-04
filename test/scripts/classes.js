@@ -142,7 +142,7 @@ describe('kernel', function() {
       result.member2().should.equal('2');
     });
 
-    it('with corret tree and constructor args should succeed', function () {
+    it('with correct tree and constructor args should succeed', function () {
       var result = platform.kernel.new('test',['3','4'],global.doexist);
       result.should.be.an.instanceOf(doexist.test);
       result.member1.should.equal('3');

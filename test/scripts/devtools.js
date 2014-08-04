@@ -190,6 +190,7 @@ describe('devtools', function() {
     });
 
     it('heap diff should succeed', function () {
+      this.timeout(10000);
       (function(){
         platform.development.tools.memory.start();
         platform.development.tools.memory.stop();

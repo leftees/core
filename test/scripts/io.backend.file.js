@@ -331,12 +331,6 @@ describe('io', function() {
           backend.get.stream('file.txt',null ,function (err, result) {
             if (err) {
               done();
-            } else {
-              result.on('error', function (err) {
-                if (err) {
-                  done();
-                }
-              });
             }
           });
         });
@@ -521,7 +515,7 @@ describe('io', function() {
 
         it('get data read stream for file should succeed and content should be correct', function (done) {
           this.timeout(5000);
-          var rstream = backend.get.stream('/dir/file.stream.txt',null,function(err,rstream){
+          backend.get.stream('/dir/file.stream.txt',null,function(err,rstream){
             rstream.on('readable', function () {
               var rbuffer = rstream.read();
               rstream.close();
