@@ -3,3 +3,4 @@ devtools.js
 kernel.js
 classes.js
 io.backend.file.js
+io.cache.js
