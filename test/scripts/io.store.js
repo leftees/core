@@ -213,6 +213,10 @@ describe('io', function() {
       }).should.throw();
     });
 
+    after(function(){
+      platform.io.delete('/tmp/test');
+    });
+
   });
 
 });
