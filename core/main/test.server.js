@@ -40,10 +40,15 @@ global.main.commands.test = function(coverage) {
     global.mocha.addFile(global.main.path.core + '/test/coverage.js');
   }
 
+
+  var js_line_comment = /^\/\/.*/;
+
   //C: queueing test files as specified in /test/series file
   var series = native.fs.readFileSync(global.main.path.core + '/test/series', 'utf8').split('\n');
   series.forEach(function(script){
-    global.mocha.addFile(global.main.path.core + '/test/scripts/' + script);
+    if (js_line_comment.test(script) === false) {
+      global.mocha.addFile(global.main.path.core + '/test/scripts/' + script);
+    }
   });
 
   //C: executing tests
