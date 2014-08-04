@@ -84,6 +84,11 @@ platform.io.cache.was = function(path, tag){
   var filename = native.path.basename(path);
   var filepath = native.path.dirname(path);
 
+  //C: checking whether parent folder exists
+  if (backend.exist(filepath) === false) {
+    return false;
+  }
+
   //C: searching cached versions of the file
   return (backend.list(filepath, false, filename + cachetag + '.*').length > 0);
 };
@@ -219,15 +224,17 @@ platform.io.cache.get.stream = function(path, tag, decompress, callback){
   }
 
   //C: getting stream from cache
-  backend.get.stream(path + cachetag + '.' + cachetime,null,function(err,stream) {
+  backend.get.stream(path + cachetag + '.' + cachetime,null,function(err,streamBase) {
     if (err) {
       callback(err);
     } else {
       //C: decompressing data if requested and invoking callback with result
       if (decompress === true) {
-        callback(null,stream.pipe(native.zlib.createGunzip()));
-      } else {
+        var stream = streamBase.pipe(native.zlib.createGunzip());
         callback(null,stream);
+      }
+      else {
+        callback(null,streamBase);
       }
     }
   });
@@ -262,6 +269,12 @@ platform.io.cache.got.string = function(path, tag, decompress, callback){
   //C: getting file name and path
   var filename = native.path.basename(path);
   var filepath = native.path.dirname(path);
+
+  //C: checking whether parent folder exists
+  if (backend.exist(filepath) === false) {
+    callback(new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag));
+    return;
+  }
 
   //C: searching for any cached version of the file
   var candidates = backend.list(filepath, false, filename + cachetag + '.*');
@@ -317,6 +330,12 @@ platform.io.cache.got.bytes = function(path, tag, decompress, callback){
   var filename = native.path.basename(path);
   var filepath = native.path.dirname(path);
 
+  //C: checking whether parent folder exists
+  if (backend.exist(filepath) === false) {
+    callback(new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag));
+    return;
+  }
+
   //C: searching for any cached version of the file
   var candidates = backend.list(filepath, false, filename + cachetag + '.*');
   //C: checking whether there is no cached version of the file
@@ -371,6 +390,12 @@ platform.io.cache.got.stream = function(path, tag, decompress, callback){
   var filename = native.path.basename(path);
   var filepath = native.path.dirname(path);
 
+  //C: checking whether parent folder exists
+  if (backend.exist(filepath) === false) {
+    callback(new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag));
+    return;
+  }
+
   //C: searching for any cached version of the file
   var candidates = backend.list(filepath, false, filename + cachetag + '.*');
   //C: checking whether there is no cached version of the file
@@ -382,15 +407,16 @@ platform.io.cache.got.stream = function(path, tag, decompress, callback){
   var candidate = candidates[0];
 
   //C: getting stream from cache
-  backend.get.stream(filepath + native.path.sep + candidate,null,function(err,stream) {
+  backend.get.stream(filepath + native.path.sep + candidate,null,function(err,streamBase) {
     if (err) {
       callback(err);
     } else {
       //C: decompressing data if requested and invoking callback with result
       if (decompress === true) {
-        callback(null,stream.pipe(native.zlib.createGunzip()));
-      } else {
+        var stream = streamBase.pipe(native.zlib.createGunzip());
         callback(null,stream);
+      } else {
+        callback(null,streamBase);
       }
     }
   });
@@ -477,6 +503,13 @@ platform.io.cache.set.bytes = function(path, tag, data, callback){
     cachetime = platform.io.info(path).mtime.getTime();
   } catch(err) {
     cachetime = 0;
+  }
+
+  //C: removing previous cached data
+  if (platform.io.cache.unset(path, tag) === false) {
+    console.debug('caching \'%s\'', path);
+  } else {
+    console.debug('recaching \'%s\'', path);
   }
 
   //C: compressing bytes to cache
