@@ -2,6 +2,7 @@ bootstrap.js
 devtools.js
 kernel.js
 classes.js
-io.backend.file.js
 io.store.js
+io.js
+io.backend.file.js
 io.cache.js
