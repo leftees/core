@@ -111,12 +111,29 @@ var filesystem_backend = function(root) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: creating stream
-    var newstream = native.fs.createReadStream(fullpath,options);
-    //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
-      return newstream;
-    } else {
-      callback(null,newstream);
+    try {
+      var newstream = native.fs.createReadStream(fullpath, options);
+      //C: detecting if operate asynchronously or synchronously
+      if (callback === undefined || callback === null) {
+        return newstream;
+      } else {
+        newstream.on('error', function (err) {
+          callback(err);
+        });
+        newstream.on('readable', function () {
+          newstream.removeAllListeners('error');
+          newstream.removeAllListeners('readable');
+          callback (null, newstream);
+          newstream.emit('readable');
+        });
+      }
+    } catch (err) {
+      //C: detecting if operate asynchronously or synchronously
+      if (callback === undefined || callback === null) {
+        throw err;
+      } else {
+        callback(err);
+      }
     }
   };
 
@@ -190,12 +207,29 @@ var filesystem_backend = function(root) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: creating stream
-    var newstream = native.fs.createWriteStream(fullpath,options);
-    //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
-      return newstream;
-    } else {
-      callback(null,newstream);
+    try {
+      var newstream = native.fs.createWriteStream(fullpath,options);
+      //C: detecting if operate asynchronously or synchronously
+      if (callback === undefined || callback === null) {
+        return newstream;
+      } else {
+        newstream.on('error', function (err) {
+          callback(err);
+        });
+        newstream.on('open', function () {
+          newstream.removeAllListeners('error');
+          newstream.removeAllListeners('open');
+          callback (null, newstream);
+          newstream.emit('open');
+        });
+      }
+    } catch (err) {
+      //C: detecting if operate asynchronously or synchronously
+      if (callback === undefined || callback === null) {
+        throw err;
+      } else {
+        callback(err);
+      }
     }
   };
 
