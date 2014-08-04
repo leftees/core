@@ -20,11 +20,11 @@
  */
 
 //C: defining create CLI command
-global.main.commands.create = function(){
-  var skel, target, ncp;
+global.main.commands.create = function(root, template){
+  var skeleton, target, source;
   global.main.commands.logo();
-  //C: checking required arguments exists
-  target = native.args.root;
+  //C: checking target argument exist
+  target = root||native.args.root;
   if (target === undefined){
     throw new Exception('target root folder not specified, please use the --root argument to define target directory');
   }
@@ -32,17 +32,17 @@ global.main.commands.create = function(){
   if (native.fs.existsSync(target) === true) {
     throw new Exception('folder \'%s\' already exists',target);
   }
+  //C: checking template argument exist
+  skeleton = template||native.args.template;
+  if (skeleton === undefined){
+    skeleton = 'default';
+  }
   //C: checking whether skeleton folder exists
-  //T: support skeleton templates (--template=helloworld)
-  skel = native.path.join(global.main.path.core,'core/skel/default');
-  if (native.fs.existsSync(skel) === false){
-    throw new Exception('skeleton folder not found, please check ljve is correctly installed');
+  source = native.path.join(global.main.path.core,'core/skel/' + skeleton);
+  if (native.fs.existsSync(source) === false){
+    throw new Exception('skeleton template \'%s\' not found, please check ljve is correctly installed', skeleton);
   }
   //C: copying skel folder to new root folder
-  native.fs.copy(skel, target, function (err) {
-    if (err) {
-      throw new Exception(err.message, err);
-    }
-    console.info('created app in \'%s\'', target);
-  });
+  native.fs.copySync(source, target);
+  console.info('created app in \'%s\'', target);
 };

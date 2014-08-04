@@ -22,22 +22,13 @@
 describe('bootstrap', function() {
 
   before(function () {
-    global.main.commands.run(global.main.path.core + '/test/root');
-    console.log();
+    global.main.commands.run(global.main.path.app + '/tmp/test-root');
   });
 
   describe('platform', function(){
 
     it('should exists', function(){
       should.exist(platform);
-    });
-
-  });
-
-  describe('root', function(){
-
-    it('should be internal', function(){
-      platform.runtime.path.app.should.equal(platform.runtime.path.core + '/test/root');
     });
 
   });

@@ -40,10 +40,10 @@ global.main.commands.test = function(coverage) {
     global.mocha.addFile(global.main.path.core + '/test/coverage.js');
   }
 
-
-  var js_line_comment = /^\/\/.*/;
+  global.mocha.addFile(global.main.path.core + '/test/bootstrap.js');
 
   //C: queueing test files as specified in /test/series file
+  var js_line_comment = /^\/\/.*/;
   var series = native.fs.readFileSync(global.main.path.core + '/test/series', 'utf8').split('\n');
   series.forEach(function(script){
     if (js_line_comment.test(script) === false) {
@@ -51,8 +51,14 @@ global.main.commands.test = function(coverage) {
     }
   });
 
+  //C: creating temporary root for tests
+  var root = global.main.path.app + '/tmp/test-root';
+  global.main.commands.create(root,'test');
+
   //C: executing tests
   global.mocha.run(function(failures){
+    //C: deleting temporary root
+    native.fs.removeSync(root);
     //C: terminating process with number of failures as exit code
     process.exit(failures);
   });
