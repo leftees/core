@@ -21,10 +21,8 @@
 
 describe('classes', function() {
 
-  describe('namespace', function () {
-    it('should exists', function () {
-      should.exist(platform.classes);
-    });
+  it('namespace should exists', function () {
+    should.exist(platform.classes);
   });
 
   it('register new class should succeed', function () {

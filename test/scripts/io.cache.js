@@ -29,10 +29,8 @@ describe('io', function() {
       platform.io.cache.__backend__.create('/');
     });
 
-    describe('namespace', function () {
-      it('should exists', function () {
-        should.exist(platform.io.cache);
-      });
+    it('namespace should exists', function () {
+      should.exist(platform.io.cache);
     });
 
     it('backend should exist', function () {

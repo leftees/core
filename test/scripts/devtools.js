@@ -21,11 +21,9 @@
 
 describe('devtools', function() {
 
-  describe('namespace', function () {
-    it('should exists', function () {
-      should.exist(platform.development);
-      should.exist(platform.development.tools);
-    });
+  it('namespace should exists', function () {
+    should.exist(platform.development);
+    should.exist(platform.development.tools);
   });
 
   describe('inspector',function(){

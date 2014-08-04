@@ -21,10 +21,8 @@
 
 describe('kernel', function() {
 
-  describe('namespace', function(){
-    it('should exists', function(){
-      should.exist(platform.kernel);
-    });
+  it('namespace should exists', function(){
+    should.exist(platform.kernel);
   });
 
   describe('set', function() {
