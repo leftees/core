@@ -1,6 +1,6 @@
 {
   "name": "ljve",
-  "version": "0.4.20140730+porting",
+  "version": "0.4.20140804+porting",
   "description": "Live Javascript Virtualized Environment",
   "author": "Marco Minetti <marco.minetti@novetica.org>",
   "contributors": [],
