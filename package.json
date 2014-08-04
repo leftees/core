@@ -45,7 +45,7 @@
   "scripts": {
     "preinstall": "if [ -d \".git\" ]; then git submodule foreach git pull origin master; fi;",
     "postinstall": "if [ -d \".git\" ]; then NODE_ENV=development node main.js coverage > stats/coverage.html; wget `node_modules/sloc/bin/sloc --format json core | node tools/sloc.js` -O stats/comments.badge.png; wget http://img.shields.io/codeclimate/github/marcominetti/ljve.io.png?style=flat -O stats/climate.badge.png; wget http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat -O stats/coverage.badge.png; wget http://img.shields.io/travis/marcominetti/ljve.io.png?style=flat -O stats/build.badge.png; fi;",
-    "test": "NODE_ENV=test node main.js test; if [ -f \".travis.yml\" ]; then NODE_ENV=test node main.js coverage | CODECLIMATE_REPO_TOKEN=e0cf2f4af8c73634b29d8342a180ae402252479a3bc4f6c1dcf6f31b184525f3 node_modules/codeclimate-test-reporter/bin/codeclimate.js; fi;"
+    "test": "if [ -f \".travis.yml\" ]; then NODE_ENV=test node main.js coverage | CODECLIMATE_REPO_TOKEN=e0cf2f4af8c73634b29d8342a180ae402252479a3bc4f6c1dcf6f31b184525f3 node_modules/codeclimate-test-reporter/bin/codeclimate.js; fi; NODE_ENV=test node main.js test;"
   },
   "gypfile": false,
   "preferGlobal": true,
