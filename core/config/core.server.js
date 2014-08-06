@@ -40,15 +40,14 @@ platform.configuration.server.bootloader = {};
 platform.configuration.server.bootloader.preload = [
   'runtime.server.js',
   'utility.server.js',
-  'dev/devtools.server.js',
   'kernel/kernel.server.js',
-  'kernel/preprocess.server.js',
   'kernel/prototype.server.js',
   'kernel/classes.server.js',
   'io/backend/file.server.js',
   'io/store.server.js',
   'io/io.server.js',
   'io/cache.server.js',
+  'kernel/preprocess.server.js'
 ];
 
 //O: Contains Javascript core modules, as array, to be inject after bootstrap to load application server (these are augmented).
@@ -58,14 +57,16 @@ platform.configuration.server.bootloader.modules = [
   'utility.server.js',
   'dev/devtools.server.js',
   'kernel/kernel.server.js',
-  'kernel/preprocess.server.js',
   'kernel/prototype.server.js',
   'kernel/classes.server.js',
   'io/backend/file.server.js',
   'io/store.server.js',
   'io/io.server.js',
   'io/cache.server.js',
-  'http/http.server.js'
+  'kernel/preprocess.server.js',
+  'http/http.server.js',
+  'http/context.server.js',
+  'engine/engine.server.js'
 ];
 
 //O: Contains kernel configuration (server-side).

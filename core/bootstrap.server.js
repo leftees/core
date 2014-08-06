@@ -24,7 +24,6 @@ var bootstrap = {};
 
 //C: defining reusable regular exceptions
 bootstrap.regexs = {};
-//bootstrap.regexs.webURI = /^http[s]{0,1}:\/\//;
 bootstrap.regexs.serverJS = /\.server\.js$/;
 
 //C: creating and enforcing global platform namespace
@@ -41,14 +40,21 @@ bootstrap.post = function(){
   console.log('initializing');
   //T: implement power-on-self-test
 
-  //T: creating default folders
+  //C: creating default folders
+  [ '/build', '/cache', '/core', '/lib', '/logs', '/modules', '/tmp' ].forEach(function(folder) {
+    if (native.fs.existsSync(native.path.join(global.main.path.app, folder)) === false) {
+      native.fs.ensureDirSync(native.path.join(global.main.path.app, folder));
+    }
+  });
 
   //C: loading core configuration from core root
   console.log('loading core configuration');
   bootstrap.loadFolder(global.main.path.core,'/core/config/');
 
-  //C: loading core configuration overrides from app root
-  bootstrap.loadFolder(global.main.path.app,'/core/config/');
+  if(global.main.path.core !== global.main.path.app) {
+    //C: loading core configuration overrides from app root
+    bootstrap.loadFolder(global.main.path.app, '/core/config/');
+  }
 
   //C: loading app configuration overrides from app root
   console.log('loading app configuration');
@@ -62,11 +68,11 @@ bootstrap.post = function(){
   console.log('loading core kernel preprocessors');
   bootstrap.loadModules(platform.configuration.server.kernel.preprocessors,'/core/kernel/preprocessors/server/');
 
-  //T: switching to code-augmentation enabled bootstrap.load
-  //bootstrap.load = platform.kernel.load;
+  //C: switching to code-augmentation enabled bootstrap.load
+  bootstrap.load = platform.kernel.load;
 
   //C: loading preload module
-  console.log('loading bootstrap modules');
+  console.log('loading core modules');
   bootstrap.loadModules(platform.configuration.server.bootloader.modules,'/core/');
 
   //T: switch to PXE (pre execution environment)
@@ -92,72 +98,50 @@ bootstrap.mapPath = function(path,root) {
 };
 
 //C: defining function to get data from uri with path resolution
-bootstrap.get = function(uri,load) {
+bootstrap.get = function(file,load) {
   //T: define a resource class for delayed io/data loading
   var result = {};
   //T: implement support for remote resources (requires io/caching)
-  //C: testing whether uri is an HTTP/HTTPS URL
-  /*if (bootstrap.regexs.webURI.test(uri) === true) {
-       //C: creating result with .uri and delayed .data properties
-      result.uri = uri;
-      result.__data = undefined;
-      Object.defineProperty(result,'data',{ get: function(){
-        //C: loading data if empty
-        if (this.__data === undefined){
-          try {
-            //C: instancing and sending HTTP request
-            var GetRequest = new XMLHttpRequest();
-            GetRequest.open('GET',this.uri,false);
-            GetRequest.send();
-            this.__data = GetRequest.responseText;
-          } catch(e) {
-            throw new Exception("resource \'%s\' not found", uri, e);
-          }
+  //C: trying to resolve file against app, core and system root paths
+  var uri;
+  if (native.fs.existsSync(bootstrap.mapPath(file, global.main.path.app)) === true) {
+    uri = bootstrap.mapPath(file, global.main.path.app);
+  } else if (native.fs.existsSync(bootstrap.mapPath(file, global.main.path.core)) === true) {
+    uri = bootstrap.mapPath(file, global.main.path.core);
+  } else if (native.fs.existsSync(file) === true) {
+    uri = file;
+  }
+  if (uri !== undefined) {
+    //C: creating result with .uri and delayed .data properties
+    result.uri = uri;
+    result.file = file;
+    result.__data__ = undefined;
+    Object.defineProperty(result, 'data', { get: function () {
+      //C: loading data if empty
+      if (this.__data__ === undefined) {
+        try {
+          //C: getting data from filesystem
+          this.__data__ = native.fs.readFileSync(this.uri, { encoding: 'utf-8' });
+        } catch (e) {
+          throw new Exception("file \'%s\' not found", this.uri, e);
         }
-        return this.__data;
-      }, set: function(){} });
-      return result;
-  } else {*/
-    //C: trying to resolve file against app, core and system root paths
-    var file;
-    if (native.fs.existsSync(bootstrap.mapPath(uri,global.main.path.app)) === true) {
-      file = bootstrap.mapPath(uri,global.main.path.app);
-    } else if (native.fs.existsSync(bootstrap.mapPath(uri,global.main.path.core)) === true) {
-      file = bootstrap.mapPath(uri,global.main.path.core);
-    } else if (native.fs.existsSync(uri) === true) {
-      file = uri;
-    }
-    if (file !== undefined) {
-      //C: creating result with .uri and delayed .data properties
-      result.uri = file;
-      result.__data = undefined;
-      Object.defineProperty(result,'data',{ get: function(){
-        //C: loading data if empty
-        if (this.__data === undefined){
-          try {
-            //C: getting data from filesystem
-            this.__data = native.fs.readFileSync(this.uri, { encoding: 'utf-8' });
-          } catch(e) {
-            throw new Exception("file \'%s\' not found", this.uri, e);
-          }
-        }
-        return this.__data;
-      }, set: function(){} });
-      return result;
-    } else {
-      throw new Exception("file \'%s\' not found", uri);
-    }
-  //}
+      }
+      return this.__data__;
+    }, set: function () {
+    } });
+    return result;
+  } else {
+    throw new Exception("file \'%s\' not found", uri);
+  }
 };
 
 //C: defining early bootstrap .js load function
-bootstrap.load = function(uri){
-  var resource = bootstrap.get(uri);
-  console.debug('loading %s', resource.uri);
+bootstrap.load = function(file){
+  var resource = bootstrap.get(file);
   try {
     global.require(resource.uri);
   } catch (ex) {
-    throw new Exception("error loading \'%s\': %s", uri, ex.message, ex);
+    throw new Exception("error loading \'%s\': %s", resource.uri, ex.message, ex);
   }
 };
 
@@ -176,9 +160,7 @@ bootstrap.loadModules = function(modules,path){
   modules.forEach(function(file){
     if (bootstrap.regexs.serverJS.test(file) === true) {
       bootstrap.load(path + file);
-    } /*else if(bootstrap.regexs.webURI.test(file) === true) {
-      bootstrap.load(file);
-    }*/
+    }
   });
 };
 

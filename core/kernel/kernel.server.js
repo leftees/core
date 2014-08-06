@@ -207,13 +207,3 @@ platform.kernel.inject = function (code,file,module,preprocess) {
   }
   return global.eval.call(global,preprocessed_code);
 };
-
-//F: Injects Javascript code to current environment.
-//A: file: Specifies the file name containing code to be injected.
-//A: [module]: Specifies name of the module that is injecting code
-//A: [preprocess]: Specifies whether the code should be augmented before injection. Default is true.
-//R: Returns the return value from injected code.
-//H: This function will resolve paths, augment code if requested, cache and inject into current environment.
-platform.kernel.load = function(file,module,preprocess) {
-  //T: implement kernel load function (requires io/cache helper)
-};
