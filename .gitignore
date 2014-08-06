@@ -33,3 +33,7 @@ node_modules
 # Nodeclipse project data
 .settings
 .project
+
+# Temporary runtime files
+cache
+tmp
