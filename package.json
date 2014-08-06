@@ -34,6 +34,8 @@
     "underscore": "*",
     "memwatch": "*",
     "chokidar": "*",
+    "multiparty": "*",
+    "body": "*",
     "esprima": "*",
     "universal-analytics": "*",
     "sloc": "*",
