@@ -24,6 +24,27 @@ platform.io = platform.io || {};
 
 //T: implement iterator instead of forEach-ing list()
 
+//F: Maps the path against the absolute filesystem.
+//A: path: Specifies the target path.
+//A: [root]: Specifies the relative root. If missing, the path is mapped against the application root.
+//R: Returns the absolute path.
+platform.io.map = function(path,root) {
+  var normalized_path = path;
+  //C: sanitizing empty path
+  if (normalized_path === '') {
+    normalized_path = '/';
+  }
+  //T: check if really neede on windows platforms
+  //C: fixing separator (is it useful?)
+  /*if (native.path.sep === '\\') {
+   normalized_path = normalized_path.replace('/', '\\');
+   }*/
+  //C: normalizing through natives
+  normalized_path = native.path.normalize(normalized_path);
+  //C: returning path joined to custom or app root
+  return  native.path.join(root||platform.runtime.path.app, normalized_path);
+};
+
 //F: Resolves the path throughout the overlay abstract filesystem.
 //A: path: Specifies the target path.
 //R: Returns the first valid absolute overlay path.

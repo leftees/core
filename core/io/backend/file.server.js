@@ -19,7 +19,7 @@
 
  */
 
-//F: Constructor for filesystem-based IO store backend
+//F: Constructor for filesystem-based IO store backend.
 var filesystem_backend = function(root) {
 
   //C: storing filesystem root for this backend

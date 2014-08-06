@@ -34,6 +34,19 @@ describe('io', function() {
     should.exist(platform.io);
   });
 
+  it('map should succeed', function () {
+    var result = platform.io.map('');
+    result.should.equal(platform.runtime.path.app + '/');
+    result = platform.io.map('/file.txt');
+    result.should.equal(platform.runtime.path.app + '/file.txt');
+    result = platform.io.map('/dir/');
+    result.should.equal(platform.runtime.path.app + '/dir/');
+    result = platform.io.map('/file.txt', platform.runtime.path.core);
+    result.should.equal(platform.runtime.path.core + '/file.txt');
+    result = platform.io.map('/dir/', platform.runtime.path.core);
+    result.should.equal(platform.runtime.path.core + '/dir/');
+  });
+
   describe('sync', function () {
 
     it('check for missing file should succeed', function () {
