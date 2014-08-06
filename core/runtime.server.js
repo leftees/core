@@ -41,12 +41,12 @@ platform.runtime.env.os.platform = process.platform;
 platform.runtime.env.os.arch = process.arch;
 
 //C: moving global environment to runtime.env namespace
-platform.runtime.debugging = global.debugging;
-platform.runtime.development = global.development;
-platform.runtime.testing = global.testing;
+platform.runtime.debugging = platform.runtime.debugging||global.debugging;
+platform.runtime.development = platform.runtime.development||global.development;
+platform.runtime.testing = platform.runtime.testing||global.testing;
 delete global.debugging;
 delete global.development;
 delete global.testing;
 
 //C: moving global environment to runtime.env namespace
-platform.runtime.path = global.main.path;
+platform.runtime.path = platform.runtime.path||global.main.path;
