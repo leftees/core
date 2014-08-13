@@ -20,7 +20,7 @@
  */
 
 //C: defining local bootstrap namespace
-var bootstrap = {};
+global.bootstrap = {};
 
 //C: defining reusable regular exceptions
 bootstrap.regexs = {};
@@ -41,7 +41,8 @@ bootstrap.post = function(){
   //T: implement power-on-self-test
 
   //C: creating default folders
-  [ '/build', '/cache', '/core', '/lib', '/logs', '/modules', '/tmp' ].forEach(function(folder) {
+  //T: default folders should be created after platform.io stores loading for first store
+  [ '/build', '/cache', '/core', '/data', '/lib', '/log', '/module', '/tmp' ].forEach(function(folder) {
     if (native.fs.existsSync(native.path.join(global.main.path.app, folder)) === false) {
       native.fs.ensureDirSync(native.path.join(global.main.path.app, folder));
     }
@@ -111,7 +112,7 @@ bootstrap.get = function(file,load) {
   } else if (native.fs.existsSync(file) === true) {
     uri = file;
   }
-  if (uri !== undefined) {
+  if (uri != null) {
     //C: creating result with .uri and delayed .data properties
     result.uri = uri;
     result.file = file;
@@ -139,7 +140,11 @@ bootstrap.get = function(file,load) {
 bootstrap.load = function(file){
   var resource = bootstrap.get(file);
   try {
-    global.require(resource.uri);
+    /*if (global.testing === true) {
+      global.require(resource.uri);
+    } else {*/
+      global.require.main._compile('\n'+resource.data,'app://'+file);
+    //}
   } catch (ex) {
     throw new Exception("error loading \'%s\': %s", resource.uri, ex.message, ex);
   }
@@ -163,6 +168,3 @@ bootstrap.loadModules = function(modules,path){
     }
   });
 };
-
-//C: exporting bootstrap object
-module.exports = exports = bootstrap;
