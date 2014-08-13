@@ -44,9 +44,9 @@ platform.runtime.env.os.arch = process.arch;
 platform.runtime.debugging = platform.runtime.debugging||global.debugging;
 platform.runtime.development = platform.runtime.development||global.development;
 platform.runtime.testing = platform.runtime.testing||global.testing;
-delete global.debugging;
-delete global.development;
-delete global.testing;
+//delete global.debugging;
+//delete global.development;
+//delete global.testing;
 
 //C: moving global environment to runtime.env namespace
 platform.runtime.path = platform.runtime.path||global.main.path;
