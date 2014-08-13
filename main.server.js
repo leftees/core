@@ -23,5 +23,7 @@
 //C: exporting global require against server root (needed later)
 global.require = require;
 
+global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/polyfill.server.js', { encoding: 'utf-8' }),'app:///core/polyfill.server.js');
+
 //C: starting executable stub
-require('./core/exec.server.js');
+global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/exec.server.js', { encoding: 'utf-8' }),'app:///core/exec.server.js');

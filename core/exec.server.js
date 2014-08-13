@@ -25,7 +25,7 @@ global.main = {};
 //C: storing root paths
 global.main.path = {};
 global.main.path.app = process.cwd();
-global.main.path.core = __dirname.replace(/\/core$/g,'');
+global.main.path.core = require('path').dirname(require.main.filename);
 
 //C: detecting node debugger enabled (through node arguments)
 global.debugging = false;
@@ -105,12 +105,20 @@ if (global.development === true && global.debugging === false){
 
   //C: loading ljve application server executable module
   try {
-    global.require(global.main.path.core + '/core/main.server.js');
+    global.require.main._compile('\n'+require('fs').readFileSync(global.main.path.core + '/core/main.server.js', { encoding: 'utf-8' }),'app:///core/main.server.js');
   } catch (err) {
     console.error(err.message);
   }
 
 }
+
+//C: attaching on main process fail events
+['uncaughtException'].forEach(function(e) {
+  process.on(e, function(err) {
+    console.error(err);
+    //T: implement graceful shutdown
+  });
+});
 
 //C: attaching on main process kill events to force exit
 ['exit', 'SIGTERM', 'SIGINT'].forEach(function(e) {
