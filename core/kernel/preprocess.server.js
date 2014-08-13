@@ -45,7 +45,7 @@ platform.kernel.load = function(file,module,preprocess) {
   }
   var preprocessed_code;
   var code = platform.io.get.string(file);
-  if (preprocess === true && platform.kernel.preprocess !== undefined && typeof platform.kernel.preprocess === 'function') {
+  if (preprocess === true && platform.kernel.preprocess != null && typeof platform.kernel.preprocess === 'function') {
     preprocessed_code = platform.kernel.preprocess(code,file,module);
   } else {
     preprocessed_code = code;
@@ -59,7 +59,11 @@ platform.kernel.load = function(file,module,preprocess) {
   }
   //C: loading file through require
   console.debug('loading %s', file);
-  return global.require(native.path.join(platform.kernel.__backend__.base,file));
+  if (global.testing === true) {
+    return global.require(native.path.join(platform.kernel.__backend__.base,file));
+  } else {
+    return global.require.main._compile('\n'+preprocessed_code,'app://'+file);
+  }
 };
 
 //C: registering 'build' store as new filesystem backend with app root path + /build/

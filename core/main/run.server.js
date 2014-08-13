@@ -24,7 +24,7 @@ global.main.commands.run = function(base){
   //C: processing arguments
   var root = base || native.args.root;
   //C: checking whether root folder is valid
-  if (root !== undefined && typeof root === 'string'){
+  if (root != null && typeof root === 'string'){
     //C: normalizing root (removing last separators)
     //T: support windows directory separator
     root = root.replace(/\/*$/,'');
@@ -42,7 +42,7 @@ global.main.commands.run = function(base){
   global.main.commands.version.print();
 
   //C: loading ljve application server
-  var bootstrap = global.require(global.main.path.core + '/core/bootstrap.server.js');
+  global.require.main._compile('\n'+require('fs').readFileSync(global.main.path.core + '/core/bootstrap.server.js', { encoding: 'utf-8' }),'app:///core/bootstrap.server.js');
   //C: power-on-self-test, initializing application server
   bootstrap.post();
 
