@@ -23,6 +23,7 @@
 global.native = {};
 
 //C: loading native modules and node-specific ones
+native.domain = require('domain');
 native.fs = require('fs-extra');
 native.path = require('path');
 native.util = require('util');
@@ -30,12 +31,30 @@ native.url = require('url');
 native.querystring = require('querystring');
 native.http = require('http');
 native.https = require('https');
+native.httpauth ={};
+native.httpauth.basic = require('http-auth').basic;
+native.httpauth.digest = require('http-auth').digest;
+native.crypto = require('crypto');
 native.websocket = {};
 native.websocket.server = require('ws').Server;
 native.args = require('yargs').argv;
 native.cli = {};
 native.cli.color = require('cli-color');
 native.zlib = require('zlib');
+native.body = {};
+native.body.text = require('body');
+native.body.json = require('body/json');
+native.body.form = require('body/form');
+native.body.multipart = require('multiparty').Form;
+native.dom = {};
+native.dom.html = require('jsdom');
+native.dom.html.defaultDocumentFeatures = {
+  FetchExternalResources: false,
+  ProcessExternalResources: false
+};
+native.dom.html = native.dom.html.jsdom;
+native.dom.xml = require('libxmljs').parseXml;
+native.moment = require('moment');
 
 //C: injecting core HTML5 classes implementation (we like a mirrored environment)
 //T: test W3C compliance for Worker
@@ -51,7 +70,7 @@ global.Exception = function(message){
   //C: getting message argument
   var formatted_message = message;
   //C: sanitizing message to 'unknown' if missing
-  if (formatted_message === null || formatted_message === undefined) {
+  if (formatted_message == null) {
     formatted_message = 'unknown';
   }
   //C: getting formatted message from arguments (emulating behavior of console.log)
@@ -80,14 +99,44 @@ native.console = {};
 ['log', 'warn', 'info', 'error', 'dir'].forEach(function (level) {
   native.console[level] = console[level];
 });
+
 //C: adding emulation for console.debug
 native.console.debug = native.console.log;
+
+var humanElapsed = function (elapsed) {
+  var labels = ['ms', 's', 'm', 'h', 'd'];
+  var sizes = [1000, 60, 60, 24 ];
+  var data = [];
+  sizes.forEach(function(value){
+    data.push(elapsed % value);
+    elapsed = parseInt(elapsed/value);
+  });
+  var pos = 0;
+  data.forEach(function(value,index){
+    if(value > 0){
+      pos = index;
+    }
+  });
+  var result = data[pos];
+  if (pos > 0) {
+    result += '.' + parseInt(data[pos-1]/sizes[pos-1]*10);
+  }
+  result += labels[pos];
+  return result;
+};
 
 //C: defining centralized print with level and color support (xterm int code as second argument)
 console.print = function (level,color,args) {
   var formatted_message = native.util.format.apply(native.util, args);
+  /*var now = Date.now();
+  var elapsed = now - console.print.__lasttime__;
+  console.print.__lasttime__ = now;
+  if (global.hasOwnProperty('platform') === true){
+    formatted_message = '[' + native.moment(now).format('YYYY-MM-DD HH:mm:ss.SSS') + '] [+' + humanElapsed(elapsed) + '] [' + level + '] ' + formatted_message;
+  }*/
   return native.console[level](native.cli.color.xterm(color)(formatted_message));
 };
+console.print.__lasttime__ = null;
 
 //C: replacing console.log with coloured implementation
 console.log = function () {
@@ -136,7 +185,7 @@ if (native.fs.existsSync(native.path.join(global.main.path.core,'/core/main')) =
   //C: loading every .js files available in /core/main folder
   exec_files.forEach(function (file) {
     if (js_file_check.test(file) === true) {
-      global.require(global.main.path.core + '/core/main/' + file);
+      global.require.main._compile('\n' + native.fs.readFileSync(global.main.path.core + '/core/main/' + file, { encoding: 'utf-8' }), 'app:///core/main/' + file);
     }
   });
 }
@@ -144,7 +193,7 @@ if (native.fs.existsSync(native.path.join(global.main.path.core,'/core/main')) =
 //C: detecting CLI command requested by user
 var target_command = global.main.commands[native.args._[0]];
 //C: checking whether command doesn't exist or it's not executable
-if (!(target_command !== undefined && typeof target_command === 'function')){
+if (!(target_command != null && typeof target_command === 'function')){
   if (global.testing === false) {
     //C: selecting unknown command by default (hopefully overridden by loaded modular commands)
     target_command = global.main.commands.unknown;
