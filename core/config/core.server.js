@@ -24,9 +24,9 @@ platform.configuration = {};
 
 //O: Contains general application info.
 platform.configuration.application = {
-  "name": "Novetica Ljve",
-  "version": "0.4",
-  "domain": "localhost"
+  'name': 'Novetica Ljve',
+  'version': '0.4',
+  'domain': 'localhost'
 };
 
 //O: Contains server configuration.
@@ -36,7 +36,7 @@ platform.configuration.server = {};
 platform.configuration.server.bootloader = {};
 
 //O: Contains Javascript core modules, as array, to be inject during bootstrap (these are not augmented).
-//H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. "http://cdn.example.com/...").
+//H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. 'http://cdn.example.com/...').
 platform.configuration.server.bootloader.preload = [
   'runtime.server.js',
   'utility.server.js',
@@ -51,7 +51,7 @@ platform.configuration.server.bootloader.preload = [
 ];
 
 //O: Contains Javascript core modules, as array, to be inject after bootstrap to load application server (these are augmented).
-//H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. "http://cdn.example.com/...").
+//H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. 'http://cdn.example.com/...').
 platform.configuration.server.bootloader.modules = [
   'runtime.server.js',
   'utility.server.js',
@@ -64,16 +64,17 @@ platform.configuration.server.bootloader.modules = [
   'io/io.server.js',
   'io/cache.server.js',
   'kernel/preprocess.server.js',
-  'http/http.server.js',
+  'session.server.js',
   'http/context.server.js',
-  'engine/engine.server.js'
+  'engine/engine.server.js',
+  'http/http.server.js'
 ];
 
 //O: Contains kernel configuration (server-side).
 platform.configuration.server.kernel = {};
 
 //O: Contains Javascript preprocessor modules, as array, to be loaded to augment code.
-//H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. "http://cdn.example.com/...").
+//H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. 'http://cdn.example.com/...').
 platform.configuration.server.kernel.preprocessors = [
 ];
 
@@ -86,12 +87,20 @@ platform.configuration.server.http.ports = {
     //V: Define port to be configured.
     '8080': {
       //V: Define standard unsecure HTTP server on specified ports.
-      'secure': false
+      'secure': false,
+      'debug': true,
+      'limit': 5000000,
+      'auth': false, //'basic',
+      'realm': null //'private',
     },
     //V: Define port to be configured.
     '8443': {
       //V: Defines secure HTTPS server on specified ports.
       'secure': true,
+      'debug': true,
+      'limit': 5000000,
+      'auth': false, //'digest',
+      'realm': null, //'private',
       //V: Defines ciphers suite for TLS stack.
       'ciphers': 'HIGH !aNULL !eNULL !MEDIUM !LOW !3DES !MD5 !EXP !PSK !SRP !DSS',
       //V: Enable or disable specific secure protocol versions (SSLv2 is deprecated by default).
@@ -110,6 +119,142 @@ platform.configuration.server.http.ports = {
       //V: Specifies the absolute path to certificate private key file.
       'key': null
     }
+};
+
+platform.configuration.server.http.default = {};
+
+//T: allow port-specific max length configuration
+platform.configuration.server.http.default.limit = 5000000;
+
+//T: improve with support for match multiple rules
+platform.configuration.server.http.default.auth = {};
+platform.configuration.server.http.default.auth.url = {};
+platform.configuration.server.http.default.auth.url.invalid = /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//;
+
+platform.configuration.server.http.default.redirect = {
+  'myredirectbystring': {
+   //C: filters are applied to full path cleaned by querystring
+   'filter': '/facebook',
+   'with': 'http://example.com/a/'
+   },
+   'myredirectbyregexp': {
+   'filter': /^\/twitter(.*)/,
+   'with': 'http://example.com/$1/'
+   }
+};
+
+platform.configuration.server.http.default.mimetypes = {
+  '.json': 'application/json',
+  '.jsa': 'application/json',
+  '.jtl': 'application/x-jtl',
+  '.htl': 'application/x-htl',
+  '.dml': 'application/x-dml',
+  '.html': 'text/html',
+  '.htm': 'text/html',
+  '.shtml': 'text/html',
+  '.css': 'text/css',
+  '.xml': 'text/xml',
+  '.gif': 'image/gif',
+  '.jpeg': 'image/jpeg',
+  '.jpg': 'image/jpeg',
+  '.js': 'application/x-javascript',
+  '.atom': 'application/atom+xml',
+  '.rss': 'application/rss+xml',
+  '.mml': 'text/mathml',
+  '.txt': 'text/plain',
+  '.jad': 'text/vnd.sun.j2me.app-descriptor',
+  '.wml': 'text/vnd.wap.wml',
+  '.htc': 'text/x-component',
+  '.png': 'image/png',
+  '.tif': 'image/tiff',
+  '.tiff': 'image/tiff',
+  '.wbmp': 'image/vnd.wap.wbmp',
+  '.ico': 'image/x-icon',
+  '.jng': 'image/x-jng',
+  '.bmp': 'image/x-ms-bmp',
+  '.svg': 'image/svg+xml',
+  '.svgz': 'image/svg+xml',
+  '.webp': 'image/webp',
+  '.jar': 'application/java-archive',
+  '.war': 'application/java-archive',
+  '.ear': 'application/java-archive',
+  '.hqx': 'application/mac-binhex40',
+  '.doc': 'application/msword',
+  '.pdf': 'application/pdf',
+  '.ps': 'application/postscript',
+  '.eps': 'application/postscript',
+  '.ai': 'application/postscript',
+  '.rtf': 'application/rtf',
+  '.xls': 'application/vnd.ms-excel',
+  '.ppt': 'application/vnd.ms-powerpoint',
+  '.wmlc': 'application/vnd.wap.wmlc',
+  '.kml': 'application/vnd.google-earth.kml+xml',
+  '.kmz': 'application/vnd.google-earth.kmz',
+  '.7z': 'application/x-7z-compressed',
+  '.cco': 'application/x-cocoa',
+  '.jardiff': 'application/x-java-archive-diff',
+  '.jnlp': 'application/x-java-jnlp-file',
+  '.run': 'application/x-makeself',
+  '.pl': 'application/x-perl',
+  '.pm': 'application/x-perl',
+  '.prc': 'application/x-pilot',
+  '.pdb': 'application/x-pilot',
+  '.rar': 'application/x-rar-compressed',
+  '.rpm': 'application/x-redhat-package-manager',
+  '.sea': 'application/x-sea',
+  '.swf': 'application/x-shockwave-flash',
+  '.sit': 'application/x-stuffit',
+  '.tcl': 'application/x-tcl',
+  '.tk': 'application/x-tcl',
+  '.der': 'application/x-x509-ca-cert',
+  '.pem': 'application/x-x509-ca-cert',
+  '.crt': 'application/x-x509-ca-cert',
+  '.xpi': 'application/x-xpinstall',
+  '.xhtml': 'application/xhtml+xml',
+  '.zip': 'application/zip',
+  '.bin': 'application/octet-stream',
+  '.exe': 'application/octet-stream',
+  '.dll': 'application/octet-stream',
+  '.deb': 'application/octet-stream',
+  '.dmg': 'application/octet-stream',
+  '.eot': 'application/octet-stream',
+  '.iso': 'application/octet-stream',
+  '.img': 'application/octet-stream',
+  '.msi': 'application/octet-stream',
+  '.msp': 'application/octet-stream',
+  '.msm': 'application/octet-stream',
+  '.mid': 'audio/midi',
+  '.midi': 'audio/midi',
+  '.kar': 'audio/midi',
+  '.mp3': 'audio/mpeg',
+  '.ogg': 'audio/ogg',
+  '.m4a': 'audio/x-m4a',
+  '.ra': 'audio/x-realaudio',
+  '.3gpp': 'video/3gpp',
+  '.3gp': 'video/3gpp',
+  '.mp4': 'video/mp4',
+  '.mpeg': 'video/mpeg',
+  '.mpg': 'video/mpeg',
+  '.mov': 'video/quicktime',
+  '.webm': 'video/webm',
+  '.flv': 'video/x-flv',
+  '.m4v': 'video/x-m4v',
+  '.mng': 'video/x-mng',
+  '.asx': 'video/x-ms-asf',
+  '.asf': 'video/x-ms-asf',
+  '.wmv': 'video/x-ms-wmv',
+  '.avi': 'video/x-msvideo'
+}
+
+platform.configuration.server.debugging = {};
+platform.configuration.server.debugging.http = true;
+platform.configuration.server.debugging.websocket = true;
+platform.configuration.server.debugging.memory = true;
+
+platform.configuration.server.memory = {};
+platform.configuration.server.memory.gc = {
+  'force': true,
+  'interval': 15000
 };
 
 //T: support multiple backends by configuration
