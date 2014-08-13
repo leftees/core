@@ -280,7 +280,7 @@ var filesystem_backend = function(root) {
     //C: checking whether search path exists
     if (native.fs.existsSync(fullpath) === false) {
       //T: throw real ENOENT error
-      if (callback !== undefined && callback !== null) {
+      if (callback != null) {
         callback(new Error());
       } else {
         throw Error();
@@ -289,7 +289,7 @@ var filesystem_backend = function(root) {
     }
     //C: initializing minimatch class for filter
     var minimatch;
-    if (filter !== undefined && filter !== null) {
+    if (filter != null) {
       minimatch = require("minimatch");
     }
     //C: creating empty result array
@@ -314,7 +314,7 @@ var filesystem_backend = function(root) {
           }
         } else {
           //C: applies filters if any
-          if (filter !== undefined && filter !== null) {
+          if (filter != null) {
             //C: detecting array of filters
             if (filter.constructor === Array){
               //C: applying filters
@@ -342,12 +342,12 @@ var filesystem_backend = function(root) {
       return pending;
     },function(result){
       //C: fake support for async callback
-      if (callback !== undefined && callback !== null) {
+      if (callback != null) {
         callback(null,result);
       }
     },fullpath,result);
     //C: fake support for async callback
-    if (callback !== undefined && callback !== null) {
+    if (callback != null) {
       return;
     }
     return result;

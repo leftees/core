@@ -33,7 +33,7 @@ platform.kernel.get = function(name,root,divisor) {
   var subname;
   var tree;
   var count;
-  if (target === undefined || target === null){
+  if (target == null){
     target = global;
   }
 
@@ -41,7 +41,7 @@ platform.kernel.get = function(name,root,divisor) {
   tree = name.split (divisor||'.');
   for (count = 0; count < tree.length; count++) {
     subname = tree [count];
-    if (target [subname] === undefined) {
+    if (target [subname] == null) {
       throw new Exception('unable to get \'%s\': member \'%s\' does not exist',name,subname);
     }
     target = target [subname];
@@ -62,7 +62,7 @@ platform.kernel.set = function(name,value,create,root,divisor) {
   var subname;
   var tree;
   var count;
-  if (target === undefined || target === null){
+  if (target == null){
     target = global;
   }
 
@@ -70,7 +70,7 @@ platform.kernel.set = function(name,value,create,root,divisor) {
   tree = name.split (divisor||'.');
   for (count = 0; count < tree.length-1; count++) {
     subname = tree [count];
-    if (target [subname] === undefined) {
+    if (target [subname] == null) {
       if (create === false) {
         throw new Exception('unable to set \'%s\': member \'%s\' does not exist',name,subname);
       } else {
@@ -96,7 +96,7 @@ platform.kernel.unset = function(name,root,divisor) {
   var subname;
   var tree;
   var count;
-  if (target === undefined || target === null){
+  if (target == null){
     target = global;
   }
 
@@ -104,13 +104,13 @@ platform.kernel.unset = function(name,root,divisor) {
   tree = name.split (divisor||'.');
   for (count = 0; count < tree.length-1; count++) {
     subname = tree [count];
-    if (target [subname] === undefined) {
+    if (target [subname] == null) {
       throw new Exception('unable to unset \'%s\': member \'%s\' does not exist',name,subname);
     }
     target = target [subname];
   }
   subname = tree [tree.length-1];
-  if (target [subname] !== undefined) {
+  if (target [subname] != null) {
     //T: clean augmented data if any
     return (delete target [subname]);
   }
@@ -130,7 +130,7 @@ platform.kernel.invoke = function(name,args,scope,root,divisor) {
   var subname;
   var tree;
   var count;
-  if (target === undefined || target === null){
+  if (target == null){
     target = global;
   }
 
@@ -138,7 +138,7 @@ platform.kernel.invoke = function(name,args,scope,root,divisor) {
   tree = name.split (divisor||'.');
   for (count = 0; count < tree.length; count++) {
     subname = tree [count];
-    if (target [subname] === undefined) {
+    if (target [subname] == null) {
       throw new Exception('unable to invoke \'%s\': member \'%s\' does not exist',name,subname);
     }
     target = target [subname];
@@ -166,7 +166,7 @@ platform.kernel.new = function (name,args,root,divisor) {
   var new_instance;
 
   //C: looking for registered class names if no root has been specified
-  if (target === undefined || target === null) {
+  if (target == null) {
     if (platform.classes.exist(name) === true) {
       target = platform.classes.get(name);
       new_instance = Object.create(target.prototype);
@@ -181,7 +181,7 @@ platform.kernel.new = function (name,args,root,divisor) {
   tree = name.split (divisor||'.');
   for (count = 0; count < tree.length; count++) {
     subname = tree [count];
-    if (target [subname] === undefined) {
+    if (target [subname] == null) {
       throw new Exception('unable to instance class \'%s\': member \'%s\' does not exist',name,subname);
     }
     target = target [subname];
@@ -200,7 +200,7 @@ platform.kernel.new = function (name,args,root,divisor) {
 //H: Temporary implementation uses the global.eval function, it will be replaced with global.require to support debuggers.
 platform.kernel.inject = function (code,file,module,preprocess) {
   var preprocessed_code;
-  if (preprocess === true && platform.kernel.preprocess !== undefined && typeof platform.kernel.preprocess === 'function') {
+  if (preprocess === true && platform.kernel.preprocess != null && typeof platform.kernel.preprocess === 'function') {
     preprocessed_code = platform.kernel.preprocess(code,file,module);
   } else {
     preprocessed_code = code;
