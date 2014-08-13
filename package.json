@@ -5,7 +5,7 @@
   "author": "Marco Minetti <marco.minetti@novetica.org>",
   "contributors": [],
   "bin": {
-    "ljve": "./main.js"
+    "ljve": "./main.server.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,7 @@
     "ws": "*",
     "xmlhttprequest": "*",
     "webworker-threads": "*",
+    "graceful-fs": "*",
     "fs-extra": "*",
     "minimatch": "*",
     "underscore": "*",
@@ -36,7 +37,12 @@
     "chokidar": "*",
     "multiparty": "*",
     "body": "*",
+    "jsdom": "*",
+    "libxmljs": "*",
     "esprima": "*",
+    "moment": "*",
+    "node-uuid": "*",
+    "http-auth": "*",
     "universal-analytics": "*",
     "sloc": "*",
     "webkit-devtools-agent": "https://github.com/marcominetti/node-webkit-agent/tarball/master",
@@ -46,8 +52,8 @@
   },
   "scripts": {
     "preinstall": "if [ -d \".git\" ]; then git submodule foreach git pull origin master; fi;",
-    "postinstall": "if [ -d \".git\" ]; then NODE_ENV=development node main.js coverage > stats/coverage.html; wget `node_modules/sloc/bin/sloc --format json core | node tools/sloc.js` -O stats/comments.badge.png; wget http://img.shields.io/codeclimate/github/marcominetti/ljve.io.png?style=flat -O stats/climate.badge.png; wget http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat -O stats/coverage.badge.png; wget http://img.shields.io/travis/marcominetti/ljve.io.png?style=flat -O stats/build.badge.png; fi;",
-    "test": "if [ -f \".travis.yml\" ]; then NODE_ENV=test node main.js coverage | CODECLIMATE_REPO_TOKEN=e0cf2f4af8c73634b29d8342a180ae402252479a3bc4f6c1dcf6f31b184525f3 node_modules/codeclimate-test-reporter/bin/codeclimate.js; fi; NODE_ENV=test node main.js test;"
+    "postinstall": "if [ -d \".git\" ]; then CWD=$(pwd)/tmp/test-root; NODE_ENV=test node main.server.js coverage --reporter=html-cov | sed \"s|$CWD/build/|$CWD/|g\" | sed \"s|$CWD/|/|g\" > project/stats/coverage.html; rm -rf tmp/test-root; wget `node_modules/sloc/bin/sloc --format json core | node project/tools/sloc.js` -O project/stats/comments.badge.png; wget http://img.shields.io/codeclimate/github/marcominetti/ljve.io.png?style=flat -O project/stats/climate.badge.png; wget http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat -O project/stats/coverage.badge.png; wget http://img.shields.io/travis/marcominetti/ljve.io.png?style=flat -O project/stats/build.badge.png; fi;",
+    "test": "if [ -f \".travis.yml\" ]; then CWD=$(pwd)/tmp/test-root; NODE_ENV=test node main.server.js coverage --reporter=mocha-lcov-reporter | sed \"s|SF:$CWD/build/|SF:$CWD/|g\" > project/stats/coverage.lcov; cp -r tmp/test-root/build/* tmp/test-root/; cat project/stats/coverage.lcov | CODECLIMATE_REPO_TOKEN=e0cf2f4af8c73634b29d8342a180ae402252479a3bc4f6c1dcf6f31b184525f3 node_modules/codeclimate-test-reporter/bin/codeclimate.js; rm -rf tmp/test-root; else NODE_ENV=test node main.server.js test; fi;"
   },
   "gypfile": false,
   "preferGlobal": true,

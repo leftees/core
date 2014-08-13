@@ -32,11 +32,16 @@ global.main.commands.test = function(coverage) {
   var mocha = require('mocha');
   global.mocha = new mocha({
     'ui': 'bdd',
-    'reporter': ((coverage === true) ? ((global.testing === true) ? 'mocha-lcov-reporter' : 'html-cov') : 'list')
+    'reporter': native.args.reporter || ((coverage === true) ? 'html-cov' : 'list')
   });
 
   //C: initializing coverage stuff if required
   if(coverage === true){
+    //C: preventing console logging that could corrupt coverage output stream
+    ['log', 'warn', 'info', 'error', 'debug', 'dir'].forEach(function (level) {
+      native.console[level] = function(){};
+    });
+
     global.mocha.addFile(global.main.path.core + '/test/coverage.js');
   }
 
@@ -51,14 +56,18 @@ global.main.commands.test = function(coverage) {
     }
   });
 
-  //C: creating temporary root for tests
   var root = global.main.path.app + '/tmp/test-root';
+  //C: deleting temporary root
+  native.fs.removeSync(root);
+  //C: creating temporary root for tests
   global.main.commands.create(root,'test');
 
   //C: executing tests
   global.mocha.run(function(failures){
-    //C: deleting temporary root
-    native.fs.removeSync(root);
+    if(!coverage){
+      //C: deleting temporary root
+      native.fs.removeSync(root);
+    }
     //C: terminating process with number of failures as exit code
     process.exit(failures);
   });

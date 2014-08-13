@@ -19,11 +19,6 @@
 
  */
 
-//C: preventing console logging that could corrupt coverage output stream
-['log', 'warn', 'info', 'error', 'debug', 'dir'].forEach(function (level) {
-  native.console[level] = function(){};
-});
-
 //C: loading blanket coverage tool with shortname disable if running in testing environment (assuming CI)
 require('blanket')({
   "pattern": [ "core", "app" ],
