@@ -25,15 +25,80 @@ platform.engine = platform.engine || {};
 //O: Provides process implementations.
 platform.engine.process = {};
 
+platform.engine.process.auth = {};
+
+platform.engine.process.auth.url = function(url){
+  if (platform.configuration.server.http.default.auth.url.invalid.test(url) === true) {
+    return false;
+  }
+  return true;
+};
+
+platform.engine.process.auth.basic = function(realm,username,password,callback){
+  callback(password === 'password');
+};
+
+platform.engine.process.auth.digest = function(realm,username,callback){
+  var md5 = native.crypto.createHash('md5');
+  md5.update(username + ':' + realm + ':' + 'password');
+  var digest = md5.digest('hex');
+  callback(digest);
+};
+
 //F: Processes an HTTP request.
-//A: context: Specifies the context object to be processed.
-platform.engine.process.http = function (context) {
+platform.engine.process.http = function (request, response, server) {
+  var secure = server.secure;
+  var debug = server.debug;
+  var port = server.port;
+  var count = request.id;
+  var remoteAddress = request.client.address;
+  var remotePort = request.client.port;
+
+  //T: handler
+
+  //T: is session valid
+  var session = null;
+
+  //T: get identity
+  var identity = null;
+
+  platform.server.http.context.create(request, response, server, session, identity, function(err,context){
+    native.domain.active.__context__ = context;
+    platform.engine.process.call();
+  });
+
+  //T: check if exists
+
+  //T: check if protected
+
+  //T: check if restful
+
+  //T: process file
+
+
+};
+
+platform.engine.process.call = function(){
+  context.response.end();
+};
+
+platform.engine.process.restful = function(){
+  context.response.end();
+};
+
+platform.engine.process.file = function(){
   context.response.end();
 };
 
 //F: Processes a new WebSocket.
-//A: headers: Specifies the request object to be processed.
+//A: request: Specifies the request object to be processed.
 //A: websocket: Specifies the socket object to be processed.
-platform.engine.process.websocket = function (headers, websocket) {
-  websocket.close();
+platform.engine.process.websocket = function (request, server, websocket) {
+  var secure = server.secure;
+  var debug = server.debug;
+  var port = server.port;
+  var count = request.id;
+  var remoteAddress = request.client.address;
+  var remotePort = request.client.port;
+  //websocket.close();
 };

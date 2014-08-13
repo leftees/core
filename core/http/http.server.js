@@ -33,7 +33,7 @@ platform.server.http.__agents__ = platform.server.http.__agents__ || {};
 //R: None.
 platform.server.http.start = function(port){
   //T: support unix socket too
-  if (port !== undefined && port !== null){
+  if (port != null){
     if (platform.server.http.__agents__.hasOwnProperty(port) === true) {
       platform.server.http.__agents__[port].http.listen(parseInt(port));
     } else {
@@ -51,7 +51,7 @@ platform.server.http.start = function(port){
 //R: None.
 platform.server.http.stop = function(port){
   //T: support unix socket too
-  if (port !== undefined && port !== null){
+  if (port != null){
     if (platform.server.http.__agents__.hasOwnProperty(port) === true) {
       platform.server.http.__agents__[port].http.close();
     } else {
@@ -70,9 +70,9 @@ platform.server.http.init = function() {
     var config = platform.configuration.server.http.ports[portlist];
     var ports = portlist.split('|');
     ports.forEach(function (port) {
-      var agentHttp, agentWebSocket;
+      var agentHttp, agentWebSocket, options;
       if (config.secure === true) {
-        var options = {};
+        options = {};
         if (config.pfx == null && config.cert == null) {
           options.pfx = null;
           options.passphrase = null;
@@ -101,52 +101,123 @@ platform.server.http.init = function() {
             options.secureOptions |= SSL_OP_NO[protocol];
           }
         });
-        agentHttp = native.https.createServer(options);
-        agentHttp.secure = true;
-      } else {
-        agentHttp = native.http.createServer();
-        agentHttp.secure = false;
       }
-      agentWebSocket = new native.websocket.server({ noServer: true });
+      config.debug = (config.debug == null || config.debug === true);
+      var protocol = (config.secure === true) ? 'https' : 'http';
+
+      //T: implement http auth internally (dismiss http-auth module)
+      if (config.auth === 'basic' || config.auth === 'digest') {
+        agentHttp = native[protocol].createServer(native.httpauth[config.auth](
+          {
+            'realm': config.realm
+          },
+          platform.engine.process.auth[config.auth].bind(null,config.realm)
+        ),options);
+      } else {
+        agentHttp = native[protocol].createServer(options);
+      }
+      agentHttp.secure = config.secure;
+      agentHttp.debug = config.debug;
+      agentHttp.limit = config.limit || platform.configuration.server.http.default.limit;
+      agentHttp.auth = config.auth;
+      agentHttp.realm = config.realm;
       agentHttp.port = port;
+      agentHttp.count = 0;
       agentHttp.on('request',function (request, response) {
         var secure = this.secure;
         var port = this.port;
-        var remoteAddress = request.socket.remoteAddress;
-        var remotePort = request.socket.remotePort;
-        console.debug('[http' + ((secure) ? 's' : '')  + ':%s] processing client request %s:%s',port,remoteAddress,remotePort);
-        response.on('finish',function(){
-          console.debug('[http' + ((secure) ? 's' : '')  + ':%s] finished client request %s:%s',port,remoteAddress,remotePort);
-        });
-        response.on('close',function(){
-          console.debug('[http' + ((secure) ? 's' : '')  + ':%s] closed client request %s:%s',port,remoteAddress,remotePort);
-        });
+        var debug = this.debug;
+        if (this.count === Number.MAX_VALUE) {
+          this.count = 0;
+        }
+        var count = request.id = ++this.count;
+        request.limit = this.limit;
+        request.client = {};
+        var remoteAddress = request.client.address = request.socket.remoteAddress || request.socket._peername.address;
+        var remotePort = request.client.port = request.socket.remotePort || request.socket._peername.port;
+
+        //T: redirect
+
+        if (platform.engine.process.auth.url(request.url) === false) {
+          if (debug === true && platform.configuration.server.debugging.http === true) {
+            console.warn('[http' + ((secure) ? 's' : '') + ':%s] rejected client request #%s from %s:%s: url \'%s\' not allowed', port, count, remoteAddress, remotePort, request.url);
+          }
+          response.statusCode = 404;
+          //T: return json, html or text depending on acceptable content type
+          response.end ("404 File not found");
+          return;
+        }
+
         //T: complete port of multihost support from 0.3.x branch
-        platform.engine.process.http(new platform.server.http.context(request, response, this));
+        if (debug === true && platform.configuration.server.debugging.http === true) {
+          console.debug('[http' + ((secure) ? 's' : '') + ':%s] creating context request #%s from %s:%s', port, count, remoteAddress, remotePort);
+        }
+        var domain = native.domain.create();
+
+        if (debug === true && platform.configuration.server.debugging.http === true) {
+          domain.on('error', function (err) {
+            console.warn('[http' + ((secure) ? 's' : '') + ':%s] exception in request #%s from %s:%s: %s', port, count, remoteAddress, remotePort, err);
+          });
+          domain.on('dispose', function () {
+            console.debug('[http' + ((secure) ? 's' : '') + ':%s] disposing context request #%s from %s:%s', port, count, remoteAddress, remotePort);
+          });
+        }
+
+        request.on('end', function () {
+          if (debug === true && platform.configuration.server.debugging.http === true) {
+            console.debug('[http' + ((secure) ? 's' : '') + ':%s] finished client request #%s from %s:%s', port, count, remoteAddress, remotePort);
+          }
+          domain.dispose();
+        });
+        request.on('close', function () {
+          if (debug === true && platform.configuration.server.debugging.http === true) {
+            console.debug('[http' + ((secure) ? 's' : '') + ':%s] closed client request #%s from %s:%s', port, count, remoteAddress, remotePort);
+          }
+          domain.dispose();
+        });
+
+        if (debug === true && platform.configuration.server.debugging.http === true) {
+          console.debug('[http' + ((secure) ? 's' : '') + ':%s] processing client request #%s from %s:%s', port, count, remoteAddress, remotePort);
+        }
+        domain.run(function(){
+          platform.engine.process.http(request, response, this);
+        });
       });
+      agentWebSocket = new native.websocket.server({ noServer: true });
       agentHttp.on('upgrade', function(request, socket, upgradeHead) {
         var secure = this.secure;
         var port = this.port;
-        var remoteAddress = request.socket.remoteAddress;
-        var remotePort = request.socket.remotePort;
+        var debug = this.debug;
+        request.client = {};
+        var remoteAddress = request.client.address = request.socket.remoteAddress || request.socket._peername.address;
+        var remotePort = request.client.port = request.socket.remotePort || request.socket._peername.port;
 
-        console.debug('[http' + ((secure) ? 's' : '')  + ':%s] upgrading client request %s:%s',port,remoteAddress,remotePort);
+        if (debug === true && platform.configuration.server.debugging.http === true) {
+          console.debug('[http' + ((secure) ? 's' : '') + ':%s] upgrading client request %s:%s', port, remoteAddress, remotePort);
+        }
 
         var head = new Buffer(upgradeHead.length);
         upgradeHead.copy(head);
+
+        var server = this;
         agentWebSocket.handleUpgrade(request, socket, head, function(websocket) {
-          console.debug('[ws' + ((secure) ? 's' : '')  + ':%s] accepting new socket %s:%s',port,remoteAddress,remotePort);
+          if (debug === true && platform.configuration.server.debugging.websocket === true) {
+            console.debug('[ws' + ((secure) ? 's' : '') + ':%s] accepting new socket %s:%s', port, remoteAddress, remotePort);
+          }
 
           //T: complete port of multihost support from 0.3.x branch
-          platform.engine.process.websocket(request.headers, websocket);
+          platform.engine.process.websocket(request, server, websocket);
         });
       });
-      agentHttp.on('connection',function (socket) {
-        console.debug('[http' + ((this.secure) ? 's' : '')  + ':%s] accepting new client %s:%s',this.port,socket.remoteAddress,socket.remotePort);
-      });
-      agentHttp.on('clientError',function (exception, socket) {
-        console.error(exception.message,exception);
-      });
+      if (agentHttp.debug === true && platform.configuration.server.debugging.http === true) {
+        agentHttp.on('connection', function (socket) {
+          console.debug('[http' + ((this.secure) ? 's' : '') + ':%s] accepting new client %s:%s', this.port, socket.remoteAddress, socket.remotePort);
+        });
+        agentHttp.on('clientError',function (exception, socket) {
+          console.warn('[http' + ((this.secure) ? 's' : '') + ':%s] exception new client %s:%s: %s', this.port, socket.remoteAddress, socket.remotePort, exception.message);
+          console.warn(exception);
+        });
+      }
       agentHttp.on('close',function () {
         console.debug('closed server for port %s',this);
       });
