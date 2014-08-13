@@ -60,6 +60,10 @@ platform.classes.get = function(name){
   }
 };
 
+platform.classes.list = function(){
+  return Object.keys(platform.classes.__store__);
+};
+
 //F: Checks whether a class is registered in current environment.
 //A: name: Specifies name of new class to check.
 //R: Returns true if class is registered.
@@ -72,5 +76,5 @@ platform.classes.exist = function(name){
 //A: name: Specifies name of class to compare.
 //R: Returns true if object is an instance of specified class.
 platform.classes.instanceOf = function(object,name){
-  return (object !== undefined && platform.classes.__store__.hasOwnProperty(name) === true && platform.classes.__store__[name] === object.constructor);
+  return (object != null && platform.classes.__store__.hasOwnProperty(name) === true && platform.classes.__store__[name] === object.constructor);
 };
