@@ -64,7 +64,6 @@ platform.configuration.server.bootloader.modules = [
   'io/io.server.js',
   'io/cache.server.js',
   'kernel/preprocess.server.js',
-  'session.server.js',
   'http/context.server.js',
   'engine/engine.server.js',
   'http/http.server.js'
