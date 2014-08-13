@@ -133,17 +133,16 @@ platform.development.tools.profiler.stop = platform.development.tools.__stop__.b
 //C: attaching exit events to kill node-inspector
 ['exit','SIGINT','SIGTERM','uncaughtException'].forEach(function (e) {
   process.on(e, function () {
-    try {
+    if (platform.development.tools.inspector.running === true) {
       platform.development.tools.inspector.stop();
-    } finally {
     }
-    try {
+
+    if (platform.development.tools.console.running) {
       platform.development.tools.console.stop();
-    } finally {
     }
-    try {
+
+    if (platform.development.tools.profiler.running) {
       platform.development.tools.profiler.stop();
-    } finally {
     }
   });
 });

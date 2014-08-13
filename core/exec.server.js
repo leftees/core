@@ -121,7 +121,7 @@ if (global.development === true && global.debugging === false){
 });
 
 //C: attaching on main process kill events to force exit
-['exit', 'SIGTERM', 'SIGINT'].forEach(function(e) {
+['SIGTERM', 'SIGINT'].forEach(function(e) {
   process.on(e, function() {
     //T: implement graceful shutdown
     process.exit();
