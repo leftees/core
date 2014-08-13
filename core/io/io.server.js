@@ -259,3 +259,6 @@ platform.io.listAll = function(path,deep,filter){
   }
   return result;
 };
+
+platform.io.store.register('system',platform.kernel.new('core.io.store.file',[ '/' ]),-1);
+platform.io.system = platform.io.store.getByName('system');
