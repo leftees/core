@@ -125,56 +125,6 @@ describe('devtools', function() {
 
   });
 
-  describe('profiler',function(){
-    it('should exists', function () {
-      should.exist(platform.development.tools.profiler);
-    });
-
-    it('should be running if development mode is enabled', function () {
-      if (platform.runtime.development === true) {
-        should.exist(platform.development.tools.profiler.__agent__);
-        should.exist(platform.development.tools.profiler.__process__);
-      } else {
-        should.not.exist(platform.development.tools.profiler.__agent__);
-        should.not.exist(platform.development.tools.profiler.__process__);
-        platform.development.tools.profiler.start();
-      }
-    });
-
-    it('start when running should fail', function () {
-      (function(){
-        platform.development.tools.profiler.start();
-      }).should.throw();
-    });
-
-    it('stop when running should succeed', function () {
-      (function(){
-        platform.development.tools.profiler.stop();
-      }).should.not.throw();
-      should.not.exist(platform.development.tools.profiler.__agent__);
-      should.not.exist(platform.development.tools.profiler.__process__);
-    });
-
-    it('stop when not running should fail', function () {
-      (function(){
-        platform.development.tools.profiler.stop();
-      }).should.throw();
-    });
-
-    it('start when not running should succeed', function () {
-      (function(){
-        platform.development.tools.profiler.start();
-      }).should.not.throw();
-      should.exist(platform.development.tools.profiler.__agent__);
-      should.exist(platform.development.tools.profiler.__process__);
-    });
-
-    after(function(){
-      platform.development.tools.profiler.stop();
-    });
-
-  });
-
   describe('memory',function() {
 
     it('should exists', function () {

@@ -35,11 +35,11 @@ platform.development.tools.__start__ = function(name,port,internal_port){
     if (platform.development.tools[name].hasOwnProperty('__agent__') === true) {
       //T: support spawned process close detection
       //C: activating node-webkit-agent for console
-      platform.development.tools[name].__agent__ = new (global.require(platform.runtime.path.core + '/node_modules/webkit-devtools-agent/index'))();
+      platform.development.tools[name].__agent__ = new (global.require(platform.runtime.path.core + platform.development.tools[name].__agent_path__))();
       platform.development.tools[name].__agent__.start(port, '0.0.0.0', internal_port, false);
     }
     //C: executing console frontend in a separate process
-    platform.development.tools[name].__process__ = require('child_process').spawn('node', [platform.runtime.path.core + '/node_modules/webkit-devtools-agent-frontend-' + name + '/main.js', port]);
+    platform.development.tools[name].__process__ = require('child_process').spawn('node', [platform.runtime.path.core + platform.development.tools[name].__process_path__, port,internal_port]);
   } else {
     throw new Exception('%s tool is already running',name);
   }
@@ -76,16 +76,18 @@ platform.development.tools.inspector = {};
 platform.development.tools.inspector.running = false;
 
 platform.development.tools.inspector.__process__ = undefined;
+platform.development.tools.inspector.__process_path__ = '/node_modules/node-inspector/bin/inspector.js';
 
 //F: Starts the specified tool.
 //R: None.
 //H: Throws exception if tool is already running.
-platform.development.tools.inspector.start = platform.development.tools.__start__.bind(null,'inspector');
+platform.development.tools.inspector.start = platform.development.tools.__start__.bind(null,'inspector',9091,5858);
 
 //F: Stops the specified tool.
 //R: None.
 //H: Throws exception if tool is not running.
 platform.development.tools.inspector.stop = platform.development.tools.__stop__.bind(null,'inspector');
+
 
 //O: Provides support for node-webkit-agent console frontend.
 platform.development.tools.console = {};
@@ -94,7 +96,9 @@ platform.development.tools.console = {};
 platform.development.tools.console.running = false;
 
 platform.development.tools.console.__process__ = undefined;
+platform.development.tools.console.__process_path__ = '/node_modules/webkit-devtools-frontend-console/main.js';
 platform.development.tools.console.__agent__ = undefined;
+platform.development.tools.console.__agent_path__ = '/node_modules/webkit-devtools-agent/index';
 
 //F: Starts the specified tool.
 //R: None.
@@ -106,27 +110,8 @@ platform.development.tools.console.start = platform.development.tools.__start__.
 //H: Throws exception if tool is not running.
 platform.development.tools.console.stop = platform.development.tools.__stop__.bind(null,'console');
 
-//O: Provides support for node-webkit-agent profiler frontend.
-platform.development.tools.profiler = {};
-
-//V: Checks whether the tool is running.
-platform.development.tools.profiler.running = false;
-
-platform.development.tools.profiler.__process__ = undefined;
-platform.development.tools.profiler.__agent__ = undefined;
-
-//F: Starts the specified tool.
-//R: None.
-//H: Throws exception if tool is already running.
-platform.development.tools.profiler.start = platform.development.tools.__start__.bind(null,'profiler',9998,3332);
-
-//F: Stops the specified tool.
-//R: None.
-//H: Throws exception if tool is not running,
-platform.development.tools.profiler.stop = platform.development.tools.__stop__.bind(null,'profiler');
-
 //C: defining running property for each supported tool.
-['inspector','console','profiler'].forEach(function(name){
+['inspector' ,'console'].forEach(function(name){
   Object.defineProperty(platform.development.tools[name],'running',{ get: platform.development.tools.__is_running__.bind(null,name), set: function(){}});
 });
 
@@ -140,10 +125,6 @@ platform.development.tools.profiler.stop = platform.development.tools.__stop__.b
     if (platform.development.tools.console.running) {
       platform.development.tools.console.stop();
     }
-
-    if (platform.development.tools.profiler.running) {
-      platform.development.tools.profiler.stop();
-    }
   });
 });
 
@@ -153,11 +134,11 @@ if (platform.runtime.debugging === true) {
   platform.development.tools.inspector.start();
 }
 
+
 //C: starting development tools (only if development is enabled - NODE_ENV=development)
 if (platform.runtime.development === true) {
   //T: add autostart support in configuration
   platform.development.tools.console.start();
-  platform.development.tools.profiler.start();
 }
 
 //T: add autostart support in configuration

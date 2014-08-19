@@ -13,3 +13,6 @@
 [submodule "wiki"]
 	path = wiki
 	url = https://github.com/marcominetti/ljve.io.wiki.git
+[submodule "external/node-inspector"]
+	path = external/node-inspector
+	url = https://github.com/marcominetti/node-inspector.git

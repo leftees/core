@@ -100,13 +100,8 @@ platform.io.cache.get = {};
 //A: path: Specifies the target path.
 //A: [tag]: Specifies a custom tag for different cache variants.
 //A: [decompress]: Specifies whether decompress the cached data. Default is false.
-//A: callback(err,data): Callback for async support.
+//A: [callback(err,data)]: Callback for async support.
 platform.io.cache.get.string = function(path, tag, decompress, callback){
-  //C: checking callback existence
-  if (typeof callback !== 'function') {
-    throw new Exception('callback is required');
-  }
-
   //C: get cache backend
   var backend = platform.io.cache.__backend__;
 
@@ -127,34 +122,55 @@ platform.io.cache.get.string = function(path, tag, decompress, callback){
     cachetime = 0;
   }
 
-  //C: getting bytes from cache
-  backend.get.bytes(path + cachetag + '.' + cachetime,function(err,buffer){
-    if (err){
-      callback(err);
+  //C: getting file name and path
+  var filepath = native.path.dirname(path);
+
+  var error = null;
+
+  //C: checking whether parent folder exists
+  if (backend.exist(path + cachetag + '.' + cachetime) === false) {
+    error = new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag);
+    if (callback == null) {
+      throw error;
     } else {
-      //C: decompressing data if requested and invoking callback with result
-      if (decompress === true) {
-        native.zlib.gunzip(buffer, function (err, result) {
-          callback(null,result.toString('utf8'));
-        });
-      } else {
-        callback(null,buffer.toString('utf8'));
-      }
+      callback(error);
+      return;
     }
-  });
+  }
+
+  //C: detecting if operate asynchronously or synchronously
+  if (callback == null) {
+    //C: decompressing data if requested and returning result
+    if (decompress === true) {
+      return native.zlib.gunzipSync(backend.get.bytes(path + cachetag + '.' + cachetime)).toString('utf8');
+    } else {
+      return backend.get.bytes(path + cachetag + '.' + cachetime).toString('utf8');
+    }
+  } else {
+    //C: getting bytes from cache
+    backend.get.bytes(path + cachetag + '.' + cachetime, function (err, buffer) {
+      if (err) {
+        callback(err);
+      } else {
+        //C: decompressing data if requested and invoking callback with result
+        if (decompress === true) {
+          native.zlib.gunzip(buffer, function (err, result) {
+            callback(null, result.toString('utf8'));
+          });
+        } else {
+          callback(null, buffer.toString('utf8'));
+        }
+      }
+    });
+  }
 };
 
 //F: Gets latest cached data, as bytes (Buffer), for a file.
 //A: path: Specifies the target path.
 //A: [tag]: Specifies a custom tag for different cache variants.
 //A: [decompress]: Specifies whether decompress the cached data. Default is false.
-//A: callback(err,data): Callback for async support.
+//A: [callback(err,data)]: Callback for async support.
 platform.io.cache.get.bytes = function(path, tag, decompress, callback){
-  //C: checking callback existence
-  if (typeof callback !== 'function') {
-    throw new Exception('callback is required');
-  }
-
   //C: get cache backend
   var backend = platform.io.cache.__backend__;
 
@@ -175,34 +191,55 @@ platform.io.cache.get.bytes = function(path, tag, decompress, callback){
     cachetime = 0;
   }
 
-  //C: getting bytes from cache
-  backend.get.bytes(path + cachetag + '.' + cachetime,function(err,buffer) {
-    if (err) {
-      callback(err);
+  //C: getting file name and path
+  var filepath = native.path.dirname(path);
+
+  var error = null;
+
+  //C: checking whether parent folder exists
+  if (backend.exist(path + cachetag + '.' + cachetime) === false) {
+    error = new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag);
+    if (callback == null) {
+      throw error;
     } else {
-      //C: decompressing data if requested and invoking callback with result
-      if (decompress === true) {
-        native.zlib.gunzip(buffer, function (err, result) {
-          callback(null,result);
-        });
-      } else {
-        callback(null,buffer);
-      }
+      callback(error);
+      return;
     }
-  });
+  }
+
+  //C: detecting if operate asynchronously or synchronously
+  if (callback == null) {
+    //C: decompressing data if requested and returning result
+    if (decompress === true) {
+      return native.zlib.gunzipSync(backend.get.bytes(path + cachetag + '.' + cachetime));
+    } else {
+      return backend.get.bytes(path + cachetag + '.' + cachetime);
+    }
+  } else {
+    //C: getting bytes from cache
+    backend.get.bytes(path + cachetag + '.' + cachetime, function (err, buffer) {
+      if (err) {
+        callback(err);
+      } else {
+        //C: decompressing data if requested and invoking callback with result
+        if (decompress === true) {
+          native.zlib.gunzip(buffer, function (err, result) {
+            callback(null, result);
+          });
+        } else {
+          callback(null, buffer);
+        }
+      }
+    });
+  }
 };
 
 //F: Gets read stream from latest cached data for a file.
 //A: path: Specifies the target path.
 //A: [tag]: Specifies a custom tag for different cache variants.
 //A: [decompress]: Specifies whether decompress the cached data. Default is false.
-//A: callback(err,stream): Callback for async support.
+//A: [callback(err,stream)]: Callback for async support.
 platform.io.cache.get.stream = function(path, tag, decompress, callback){
-  //C: checking callback existence
-  if (typeof callback !== 'function') {
-    throw new Exception('callback is required');
-  }
-
   //C: get cache backend
   var backend = platform.io.cache.__backend__;
 
@@ -223,21 +260,47 @@ platform.io.cache.get.stream = function(path, tag, decompress, callback){
     cachetime = 0;
   }
 
-  //C: getting stream from cache
-  backend.get.stream(path + cachetag + '.' + cachetime,null,function(err,streamBase) {
-    if (err) {
-      callback(err);
+  //C: getting file name and path
+  var filepath = native.path.dirname(path);
+
+  var error = null;
+
+  //C: checking whether parent folder exists
+  if (backend.exist(path + cachetag + '.' + cachetime) === false) {
+    error = new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag);
+    if (callback == null) {
+      throw error;
     } else {
-      //C: decompressing data if requested and invoking callback with result
-      if (decompress === true) {
-        var stream = streamBase.pipe(native.zlib.createGunzip());
-        callback(null,stream);
-      }
-      else {
-        callback(null,streamBase);
-      }
+      callback(error);
+      return;
     }
-  });
+  }
+
+  //C: detecting if operate asynchronously or synchronously
+  if (callback == null) {
+    //C: decompressing data if requested and returning result
+    if (decompress === true) {
+      return backend.get.stream(path + cachetag + '.' + cachetime).pipe(native.zlib.createGunzip());
+    } else {
+      return backend.get.stream(path + cachetag + '.' + cachetime);
+    }
+  } else {
+    //C: getting stream from cache
+    backend.get.stream(path + cachetag + '.' + cachetime, null, function (err, streamBase) {
+      if (err) {
+        callback(err);
+      } else {
+        //C: decompressing data if requested and invoking callback with result
+        if (decompress === true) {
+          var stream = streamBase.pipe(native.zlib.createGunzip());
+          callback(null, stream);
+        }
+        else {
+          callback(null, streamBase);
+        }
+      }
+    });
+  }
 };
 
 //O: Provides got implementations.
@@ -247,13 +310,8 @@ platform.io.cache.got = {};
 //A: path: Specifies the target path.
 //A: [tag]: Specifies a custom tag for different cache variants.
 //A: [decompress]: Specifies whether decompress the cached data. Default is false.
-//A: callback(err,data): Callback for async support.
+//A: [callback(err,data)]: Callback for async support.
 platform.io.cache.got.string = function(path, tag, decompress, callback){
-  //C: checking callback existence
-  if (typeof callback !== 'function') {
-    throw new Exception('callback is required');
-  }
-
   //C: get cache backend
   var backend = platform.io.cache.__backend__;
 
@@ -270,50 +328,67 @@ platform.io.cache.got.string = function(path, tag, decompress, callback){
   var filename = native.path.basename(path);
   var filepath = native.path.dirname(path);
 
+  var error = null;
+
   //C: checking whether parent folder exists
   if (backend.exist(filepath) === false) {
-    callback(new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag));
-    return;
+    error = new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag);
+    if (callback == null) {
+      throw error;
+    } else {
+      callback(error);
+      return;
+    }
   }
 
   //C: searching for any cached version of the file
   var candidates = backend.list(filepath, false, filename + cachetag + '.*');
   //C: checking whether there is no cached version of the file
   if (candidates.length === 0) {
-    callback(new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag));
-    return;
+    error = new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag);
+    if (callback == null) {
+      throw error;
+    } else {
+      callback(error);
+      return;
+    }
   }
   //C: taking the first found (assuming only one version will be available)
   var candidate = candidates[0];
 
-  //C: getting bytes from cache
-  backend.get.bytes(filepath + native.path.sep + candidate,function(err,buffer){
-    if (err){
-      callback(err);
+  //C: detecting if operate asynchronously or synchronously
+  if (callback == null) {
+    //C: decompressing data if requested and returning result
+    if (decompress === true) {
+      return native.zlib.gunzipSync(backend.get.bytes(filepath + native.path.sep + candidate)).toString('utf8');
     } else {
-      //C: decompressing data if requested and invoking callback with result
-      if (decompress === true) {
-        native.zlib.gunzip(buffer, function (err, result) {
-          callback(null,result.toString('utf8'));
-        });
-      } else {
-        callback(null,buffer.toString('utf8'));
-      }
+      return backend.get.bytes(filepath + native.path.sep + candidate).toString('utf8');
     }
-  });
+  } else {
+    //C: getting bytes from cache
+    backend.get.bytes(filepath + native.path.sep + candidate, function (err, buffer) {
+      if (err) {
+        callback(err);
+      } else {
+        //C: decompressing data if requested and invoking callback with result
+        if (decompress === true) {
+          native.zlib.gunzip(buffer, function (err, result) {
+            callback(null, result.toString('utf8'));
+          });
+        } else {
+          callback(null, buffer.toString('utf8'));
+        }
+      }
+    });
+  }
 };
 
 //F: Gets previously cached data, as bytes (Buffer), for a file.
 //A: path: Specifies the target path.
 //A: [tag]: Specifies a custom tag for different cache variants.
 //A: [decompress]: Specifies whether decompress the cached data. Default is false.
-//A: callback(err,data): Callback for async support.
+//A: [callback(err,data)]: Callback for async support.
 platform.io.cache.got.bytes = function(path, tag, decompress, callback){
-  //C: checking callback existence
-  if (typeof callback !== 'function') {
-    throw new Exception('callback is required');
-  }
-
   //C: get cache backend
   var backend = platform.io.cache.__backend__;
 
@@ -330,50 +405,67 @@ platform.io.cache.got.bytes = function(path, tag, decompress, callback){
   var filename = native.path.basename(path);
   var filepath = native.path.dirname(path);
 
+  var error = null;
+
   //C: checking whether parent folder exists
   if (backend.exist(filepath) === false) {
-    callback(new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag));
-    return;
+    error = new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag);
+    if (callback == null) {
+      throw error;
+    } else {
+      callback(error);
+      return;
+    }
   }
 
   //C: searching for any cached version of the file
   var candidates = backend.list(filepath, false, filename + cachetag + '.*');
   //C: checking whether there is no cached version of the file
   if (candidates.length === 0) {
-    callback(new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag));
-    return;
+    error = new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag);
+    if (callback == null) {
+      throw error;
+    } else {
+      callback(error);
+      return;
+    }
   }
   //C: taking the first found (assuming only one version will be available)
   var candidate = candidates[0];
 
-  //C: getting bytes from cache
-  backend.get.bytes(filepath + native.path.sep + candidate,function(err,buffer) {
-    if (err) {
-      callback(err);
+  //C: detecting if operate asynchronously or synchronously
+  if (callback == null) {
+    //C: decompressing data if requested and returning result
+    if (decompress === true) {
+      return native.zlib.gunzipSync(backend.get.bytes(filepath + native.path.sep + candidate));
     } else {
-      //C: decompressing data if requested and invoking callback with result
-      if (decompress === true) {
-        native.zlib.gunzip(buffer, function (err, result) {
-          callback(null,result);
-        });
-      } else {
-        callback(null,buffer);
-      }
+      return backend.get.bytes(filepath + native.path.sep + candidate);
     }
-  });
+  } else {
+    //C: getting bytes from cache
+    backend.get.bytes(filepath + native.path.sep + candidate, function (err, buffer) {
+      if (err) {
+        callback(err);
+      } else {
+        //C: decompressing data if requested and invoking callback with result
+        if (decompress === true) {
+          native.zlib.gunzip(buffer, function (err, result) {
+            callback(null, result);
+          });
+        } else {
+          callback(null, buffer);
+        }
+      }
+    });
+  }
 };
 
 //F: Gets read stream from previously cached data for a file.
 //A: path: Specifies the target path.
 //A: [tag]: Specifies a custom tag for different cache variants.
 //A: [decompress]: Specifies whether decompress the cached data. Default is false.
-//A: callback(err,stream): Callback for async support.
+//A: [callback(err,stream)]: Callback for async support.
 platform.io.cache.got.stream = function(path, tag, decompress, callback){
-  //C: checking callback existence
-  if (typeof callback !== 'function') {
-    throw new Exception('callback is required');
-  }
-
   //C: get cache backend
   var backend = platform.io.cache.__backend__;
 
@@ -390,36 +482,58 @@ platform.io.cache.got.stream = function(path, tag, decompress, callback){
   var filename = native.path.basename(path);
   var filepath = native.path.dirname(path);
 
+  var error = null;
+
   //C: checking whether parent folder exists
   if (backend.exist(filepath) === false) {
-    callback(new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag));
-    return;
+    error = new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag);
+    if (callback == null) {
+      throw error;
+    } else {
+      callback(error);
+      return;
+    }
   }
 
   //C: searching for any cached version of the file
   var candidates = backend.list(filepath, false, filename + cachetag + '.*');
   //C: checking whether there is no cached version of the file
   if (candidates.length === 0) {
-    callback(new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag));
-    return;
+    error = new Exception('resource \'%s\' not cached' + (cachetag === '') ? '' : ' with tag \'%s\'',path,tag);
+    if (callback == null) {
+      throw error;
+    } else {
+      callback(error);
+      return;
+    }
   }
   //C: taking the first found (assuming only one version will be available)
   var candidate = candidates[0];
 
-  //C: getting stream from cache
-  backend.get.stream(filepath + native.path.sep + candidate,null,function(err,streamBase) {
-    if (err) {
-      callback(err);
+  //C: detecting if operate asynchronously or synchronously
+  if (callback == null) {
+    //C: decompressing data if requested and returning result
+    if (decompress === true) {
+      return backend.get.stream(filepath + native.path.sep + candidate).pipe(native.zlib.createGunzip());
     } else {
-      //C: decompressing data if requested and invoking callback with result
-      if (decompress === true) {
-        var stream = streamBase.pipe(native.zlib.createGunzip());
-        callback(null,stream);
-      } else {
-        callback(null,streamBase);
-      }
+      return backend.get.stream(filepath + native.path.sep + candidate);
     }
-  });
+  } else {
+    //C: getting stream from cache
+    backend.get.stream(filepath + native.path.sep + candidate, null, function (err, streamBase) {
+      if (err) {
+        callback(err);
+      } else {
+        //C: decompressing data if requested and invoking callback with result
+        if (decompress === true) {
+          var stream = streamBase.pipe(native.zlib.createGunzip());
+          callback(null, stream);
+        } else {
+          callback(null, streamBase);
+        }
+      }
+    });
+  }
 };
 
 //O: Provides set implementations.
@@ -431,11 +545,6 @@ platform.io.cache.set = {};
 //A: data: Specifies the data to be cached.
 //A: callback(err): Callback for async support.
 platform.io.cache.set.string = function(path, tag, data, callback){
-  //C: checking callback existence
-  if (typeof callback !== 'function') {
-    throw new Exception('callback is required');
-  }
-
   //C: get cache backend
   var backend = platform.io.cache.__backend__;
 
@@ -463,15 +572,20 @@ platform.io.cache.set.string = function(path, tag, data, callback){
     console.debug('recaching \'%s\'', path);
   }
 
-  //C: compressing bytes to cache
-  native.zlib.gzip(new Buffer(data, 'utf8'),function(err,result){
-    if (err) {
-      callback(err);
-    } else {
-      backend.set.bytes(path + cachetag + '.' + cachetime, result, callback);
-    }
-  });
-
+  //C: detecting if operate asynchronously or synchronously
+  if (callback == null) {
+    //C: compressing data and writing to cache
+    backend.set.bytes(path + cachetag + '.' + cachetime, native.zlib.gzipSync(data));
+  } else {
+    //C: compressing bytes to cache
+    native.zlib.gzip(new Buffer(data, 'utf8'), function (err, result) {
+      if (err) {
+        callback(err);
+      } else {
+        backend.set.bytes(path + cachetag + '.' + cachetime, result, callback);
+      }
+    });
+  }
 };
 
 //F: Sets latest cached data, as bytes (Buffer), for a file.
@@ -480,11 +594,6 @@ platform.io.cache.set.string = function(path, tag, data, callback){
 //A: data: Specifies the data to be cached.
 //A: callback(err): Callback for async support.
 platform.io.cache.set.bytes = function(path, tag, data, callback){
-  //C: checking callback existence
-  if (typeof callback !== 'function') {
-    throw new Exception('callback is required');
-  }
-
   //C: get cache backend
   var backend = platform.io.cache.__backend__;
 
@@ -512,15 +621,20 @@ platform.io.cache.set.bytes = function(path, tag, data, callback){
     console.debug('recaching \'%s\'', path);
   }
 
-  //C: compressing bytes to cache
-  native.zlib.gzip(data,function(err,result){
-    if (err) {
-      callback(err);
-    } else {
-      backend.set.bytes(path + cachetag + '.' + cachetime, result, callback);
-    }
-  });
-
+  //C: detecting if operate asynchronously or synchronously
+  if (callback == null) {
+    //C: compressing data and writing to cache
+    backend.set.bytes(path + cachetag + '.' + cachetime, native.zlib.gzipSync(data));
+  } else {
+    //C: compressing bytes to cache
+    native.zlib.gzip(data, function (err, result) {
+      if (err) {
+        callback(err);
+      } else {
+        backend.set.bytes(path + cachetag + '.' + cachetime, result, callback);
+      }
+    });
+  }
 };
 
 //F: Gets write stream to latest cached data for a file.
@@ -528,11 +642,6 @@ platform.io.cache.set.bytes = function(path, tag, data, callback){
 //A: [tag]: Specifies a custom tag for different cache variants.
 //A: callback(err,stream): Callback for async support.
 platform.io.cache.set.stream = function(path, tag, callback){
-  //C: checking callback existence
-  if (typeof callback !== 'function') {
-    throw new Exception('callback is required');
-  }
-
   //C: get cache backend
   var backend = platform.io.cache.__backend__;
 
@@ -555,16 +664,23 @@ platform.io.cache.set.stream = function(path, tag, callback){
 
   //C: creating gzipped stream for cache
   var stream = native.zlib.createGzip();
-  //C: creating stream in cache
-  backend.set.stream(path + cachetag + '.' + cachetime,null,function(err,streamBase) {
-    if (err) {
-      callback(err);
-    } else {
-      stream.pipe(streamBase);
-      callback (null, stream);
-    }
-  });
-
+  //C: detecting if operate asynchronously or synchronously
+  if (callback == null) {
+    var streamBase = backend.set.stream(path + cachetag + '.' + cachetime);
+    stream.pipe(streamBase);
+    streamBase.on('open',function(){stream.emit('open');});
+    return stream;
+  } else {
+    //C: creating stream in cache
+    backend.set.stream(path + cachetag + '.' + cachetime, null, function (err, streamBase) {
+      if (err) {
+        callback(err);
+      } else {
+        stream.pipe(streamBase);
+        callback(null, stream);
+      }
+    });
+  }
 };
 
 //F: Removes all cached versions of a file.
