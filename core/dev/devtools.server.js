@@ -96,9 +96,9 @@ platform.development.tools.console = {};
 platform.development.tools.console.running = false;
 
 platform.development.tools.console.__process__ = undefined;
-platform.development.tools.console.__process_path__ = '/node_modules/webkit-devtools-frontend-console/main.js';
+platform.development.tools.console.__process_path__ = '/node_modules/node-console/server.js';
 platform.development.tools.console.__agent__ = undefined;
-platform.development.tools.console.__agent_path__ = '/node_modules/webkit-devtools-agent/index';
+platform.development.tools.console.__agent_path__ = '/node_modules/node-console/agent.js';
 
 //F: Starts the specified tool.
 //R: None.

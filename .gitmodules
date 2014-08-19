@@ -1,18 +1,9 @@
-[submodule "external/devtools/inspector"]
-	path = external/devtools/inspector
-	url = https://github.com/marcominetti/webkit-devtools-agent-frontend-inspector.git
-[submodule "external/devtools/console"]
-	path = external/devtools/console
-	url = https://github.com/marcominetti/webkit-devtools-agent-frontend-console.git
-[submodule "external/devtools/profiler"]
-	path = external/devtools/profiler
-	url = https://github.com/marcominetti/webkit-devtools-agent-frontend-profiler.git
-[submodule "external/devtools/agent"]
-	path = external/devtools/agent
-	url = https://github.com/marcominetti/node-webkit-agent.git
 [submodule "wiki"]
 	path = wiki
 	url = https://github.com/marcominetti/ljve.io.wiki.git
 [submodule "external/node-inspector"]
 	path = external/node-inspector
 	url = https://github.com/marcominetti/node-inspector.git
+[submodule "external/node-console"]
+	path = external/node-console
+	url = https://github.com/marcominetti/node-console.git

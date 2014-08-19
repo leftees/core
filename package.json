@@ -33,7 +33,7 @@
     "fs-extra": "*",
     "minimatch": "*",
     "underscore": "*",
-    "memwatch": "https://github.com/deepak1556/node-memwatch/tarball/master",
+    "memwatch": "https://github.com/marcominetti/node-memwatch/tarball/master",
     "chokidar": "*",
     "multiparty": "*",
     "body": "*",
@@ -46,8 +46,7 @@
     "universal-analytics": "*",
     "sloc": "*",
     "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/master",
-    "webkit-devtools-agent": "https://github.com/marcominetti/node-webkit-agent/tarball/master",
-    "webkit-devtools-agent-frontend-console": "https://github.com/marcominetti/webkit-devtools-agent-frontend-console/tarball/master"
+    "node-console": "https://github.com/marcominetti/node-console/tarball/master"
   },
   "scripts": {
     "preinstall": "if [ -d \".git\" ]; then git submodule foreach git pull origin master; fi;",
