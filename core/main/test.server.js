@@ -32,7 +32,7 @@ global.main.commands.test = function(coverage) {
   var mocha = require('mocha');
   global.mocha = new mocha({
     'ui': 'bdd',
-    'reporter': native.args.reporter || ((coverage === true) ? 'html-cov' : 'list')
+    'reporter': native.args.reporter || ((coverage === true) ? 'html-cov' : 'spec')
   });
 
   //C: initializing coverage stuff if required
@@ -64,7 +64,7 @@ global.main.commands.test = function(coverage) {
 
   //C: executing tests
   global.mocha.run(function(failures){
-    if(!coverage){
+    if(!coverage && failures === 0){
       //C: deleting temporary root
       native.fs.removeSync(root);
     }

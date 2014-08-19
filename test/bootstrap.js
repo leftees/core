@@ -19,11 +19,9 @@
 
  */
 
-describe('bootstrap', function() {
+global.main.commands.run(global.main.path.app + '/tmp/test-root');
 
-  before(function () {
-    global.main.commands.run(global.main.path.app + '/tmp/test-root');
-  });
+describe('bootstrap', function() {
 
   describe('platform', function(){
 
