@@ -55,6 +55,7 @@ native.dom.html.defaultDocumentFeatures = {
 native.dom.html = native.dom.html.jsdom;
 native.dom.xml = require('libxmljs').parseXml;
 native.moment = require('moment');
+native.esprima = require('esprima');
 
 //C: injecting core HTML5 classes implementation (we like a mirrored environment)
 //T: test W3C compliance for Worker

@@ -28,7 +28,14 @@ platform.kernel = platform.kernel || {};
 //A: [module]: Specifies name of the module that is augmenting code
 //R: Returns the augmented code.
 platform.kernel.preprocess = function(code, file, module){
-  console.debug('preprocessing %s', file);
+  if (file == null) {
+    console.debug('preprocessing runtime code');
+  } else {
+    console.debug('preprocessing %s', file);
+  }
+  var ast = native.esprima.parse(code,{ 'attachComment': true, 'range': true, 'comment': true });
+  //console.log(ast);
+
   //T: migrate preprocessor stack from 0.3.x branch
   return code;
 };
@@ -43,25 +50,32 @@ platform.kernel.load = function(file,module,preprocess) {
   if (platform.io.exist(file) === false) {
     throw new Exception('resource \'%s\' not found', file);
   }
+  var is_cached = platform.io.cache.is(file, 'built');
   var preprocessed_code;
-  var code = platform.io.get.string(file);
-  if (preprocess === true && platform.kernel.preprocess != null && typeof platform.kernel.preprocess === 'function') {
-    preprocessed_code = platform.kernel.preprocess(code,file,module);
+  //C: checking whether the file has been already preprocessed and cached
+  if (is_cached === false) {
+    var code = platform.io.get.string(file);
+    if ((preprocess == null || preprocess === true) && typeof platform.kernel.preprocess === 'function') {
+      preprocessed_code = platform.kernel.preprocess(code,file,module);
+    } else {
+      preprocessed_code = code;
+    }
+    //C: saving augmented file to be loaded through require (only for testing environment)
+    if (global.testing === true) {
+      platform.kernel.__backend__.set.string(file, preprocessed_code);
+    }
+    //C: caching augmented file
+    //T: replace with sync  set call
+    platform.io.cache.set.string(file, 'built', preprocessed_code);
   } else {
-    preprocessed_code = code;
-  }
-  //C: saving augmented file to be loaded through require
-  platform.kernel.__backend__.set.string(file,preprocessed_code);
-  //C: caching augmented file
-  if (platform.io.cache.is(file, 'build') === false) {
-    platform.io.cache.set.string(file, 'build', preprocessed_code, function () {
-    });
+    preprocessed_code = platform.io.cache.get.string(file, 'built', true);
   }
   //C: loading file through require
-  console.debug('loading %s', file);
   if (global.testing === true) {
+    console.debug('loading %s', file);
     return global.require(native.path.join(platform.kernel.__backend__.base,file));
   } else {
+    console.debug('loading %s' + ((is_cached === false) ? '' : ' from cache'), file);
     return global.require.main._compile('\n'+preprocessed_code,'app://'+file);
   }
 };
