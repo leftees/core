@@ -43,7 +43,7 @@ var filesystem_backend = function(root) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
+    if (callback == null) {
       return native.fs.existsSync(fullpath);
     } else {
       return native.fs.exists(fullpath,callback);
@@ -59,7 +59,7 @@ var filesystem_backend = function(root) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
+    if (callback == null) {
       return native.fs.statSync(fullpath);
     } else {
       return native.fs.stat(fullpath,callback);
@@ -78,7 +78,7 @@ var filesystem_backend = function(root) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
+    if (callback == null) {
       return native.fs.readFileSync(fullpath,'utf8');
     } else {
       return native.fs.readFile(fullpath,'utf8',callback);
@@ -94,7 +94,7 @@ var filesystem_backend = function(root) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
+    if (callback == null) {
       return native.fs.readFileSync(fullpath,null);
     } else {
       return native.fs.readFile(fullpath,null,callback);
@@ -114,7 +114,7 @@ var filesystem_backend = function(root) {
     try {
       var newstream = native.fs.createReadStream(fullpath, options);
       //C: detecting if operate asynchronously or synchronously
-      if (callback === undefined || callback === null) {
+      if (callback == null) {
         return newstream;
       } else {
         newstream.on('error', function (err) {
@@ -129,7 +129,7 @@ var filesystem_backend = function(root) {
       }
     } catch (err) {
       //C: detecting if operate asynchronously or synchronously
-      if (callback === undefined || callback === null) {
+      if (callback == null) {
         throw err;
       } else {
         callback(err);
@@ -148,7 +148,7 @@ var filesystem_backend = function(root) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
+    if (callback == null) {
       if (directory === true) {
         return native.fs.ensureDirSync(fullpath);
       } else {
@@ -175,7 +175,7 @@ var filesystem_backend = function(root) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
+    if (callback == null) {
       return native.fs.outputFileSync(fullpath,data,'utf8');
     } else {
       return native.fs.outputFile(fullpath,data,'utf8',callback);
@@ -191,7 +191,7 @@ var filesystem_backend = function(root) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
+    if (callback == null) {
       return native.fs.outputFileSync(fullpath,data,null);
     } else {
       return native.fs.outputFile(fullpath,data,null,callback);
@@ -210,7 +210,7 @@ var filesystem_backend = function(root) {
     try {
       var newstream = native.fs.createWriteStream(fullpath,options);
       //C: detecting if operate asynchronously or synchronously
-      if (callback === undefined || callback === null) {
+      if (callback == null) {
         return newstream;
       } else {
         newstream.on('error', function (err) {
@@ -225,7 +225,7 @@ var filesystem_backend = function(root) {
       }
     } catch (err) {
       //C: detecting if operate asynchronously or synchronously
-      if (callback === undefined || callback === null) {
+      if (callback == null) {
         throw err;
       } else {
         callback(err);
@@ -241,7 +241,7 @@ var filesystem_backend = function(root) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
+    if (callback == null) {
       return native.fs.removeSync(fullpath);
     } else {
       return native.fs.remove(fullpath,callback);
@@ -258,7 +258,7 @@ var filesystem_backend = function(root) {
     var oldfullpath = native.path.join(base,oldpath);
     var newfullpath = native.path.join(base,newpath);
     //C: detecting if operate asynchronously or synchronously
-    if (callback === undefined || callback === null) {
+    if (callback == null) {
       return native.fs.renameSync(oldfullpath,newfullpath);
     } else {
       return native.fs.rename(oldfullpath,newfullpath,callback);
@@ -295,7 +295,7 @@ var filesystem_backend = function(root) {
     //C: creating empty result array
     var result = [];
     //C: executing recursive call to reduce stack
-    platform.utility.recursiveCall(function(curpath,result){
+    platform.utility.recursiveCallV(function(curpath,result){
       //C: creating empty array for nested levels
       var pending = [];
       //C: listing current path children

@@ -27,7 +27,7 @@ platform.utility = platform.utility || {};
 //A: [endCallback]: Specifies which function to call after the whole tree has been processed.
 //A: rootObject: Specifies the element containing the whole object tree.
 //A: [...]: Unhardcoded pass-through arguments to push when calling CallFunction.
-platform.utility.recursiveCall = function (leafCallback,endCallback,root) {
+platform.utility.recursiveCallH = function (leafCallback,endCallback,root) {
   var pendingObjects = [];
   //C: getting array object from arguments custom object extending Array.prototype
   var argumentsArray = Array.prototype.slice.call(arguments);
@@ -40,16 +40,48 @@ platform.utility.recursiveCall = function (leafCallback,endCallback,root) {
   //C: processing pending queue until is empty
   do {
     //C: calling specified function with current pending object, as first argument, and pass-through arguments (sanitizing returned values to empty array if null)
-    var pendingArray = leafCallback.apply(null,[pendingObjects[0]].concat(argumentsArray)) || [];
-    if (pendingArray.constructor === Array) {
-      //C: extending pending queue
-      pendingObjects = pendingObjects.concat(pendingArray);
-    }
+    var pendingArray = leafCallback.apply(this,[pendingObjects[0]].concat(argumentsArray)) || [];
     //C: cleaning current processed object
     pendingObjects.shift();
+    //C: extending pending queue to vertically traverse
+    if (pendingArray.constructor === Array) {
+      pendingObjects = pendingArray.concat(pendingObjects);
+    }
   } while (pendingObjects.length);
   //C: executing CompleteFunction if not null
   if (endCallback != null) {
-    endCallback.apply(null,argumentsArray);
+    endCallback.apply(this,argumentsArray);
+  }
+};
+
+//F: Processes a function recursively for each element in specified object tree preventing maximum call stack exceed.
+//A: leafCallback: Specifies which function to call for each element in the object tree.
+//A: [endCallback]: Specifies which function to call after the whole tree has been processed.
+//A: rootObject: Specifies the element containing the whole object tree.
+//A: [...]: Unhardcoded pass-through arguments to push when calling CallFunction.
+platform.utility.recursiveCallV = function (leafCallback,endCallback,root) {
+  var pendingObjects = [];
+  //C: getting array object from arguments custom object extending Array.prototype
+  var argumentsArray = Array.prototype.slice.call(arguments);
+  //C: adding root object to pending queue
+  pendingObjects.push(argumentsArray[2]);
+  //C: removing RecursiveCall specific arguments (RootObject, CallFunction, CompleteFunction)
+  argumentsArray.shift();
+  argumentsArray.shift();
+  argumentsArray.shift();
+  //C: processing pending queue until is empty
+  do {
+    //C: calling specified function with current pending object, as first argument, and pass-through arguments (sanitizing returned values to empty array if null)
+    var pendingArray = leafCallback.apply(this,[pendingObjects[0]].concat(argumentsArray)) || [];
+    //C: cleaning current processed object
+    pendingObjects.shift();
+    //C: extending pending queue to vertically traverse
+    if (pendingArray.constructor === Array) {
+      pendingObjects = pendingObjects.concat(pendingArray);
+    }
+  } while (pendingObjects.length);
+  //C: executing CompleteFunction if not null
+  if (endCallback != null) {
+    endCallback.apply(this,argumentsArray);
   }
 };
