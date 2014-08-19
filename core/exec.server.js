@@ -115,6 +115,7 @@ if (global.development === true && global.debugging === false){
 //C: attaching on main process fail events
 ['uncaughtException'].forEach(function(e) {
   process.on(e, function(err) {
+    console.error('uncaught exception:');
     console.error(err);
     //T: implement graceful shutdown
   });
