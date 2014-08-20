@@ -70,7 +70,7 @@ platform.development.tools.__stop__ = function(name){
       platform.development.tools[name].__agent__.stop();
       platform.development.tools[name].__agent__ = undefined;
     }
-    if (typeof platform.development.tools[name].__process__ === 'array'){
+    if (Array.isArray(platform.development.tools[name].__process_path__) === true){
       platform.development.tools[name].__process__.forEach(function(process){
         process.kill();
       });
