@@ -43,6 +43,7 @@ tmp
 .gitmodules
 .travis.yml
 .npmignore
+project
 
 # External submodules
 external
