@@ -39,7 +39,15 @@ platform.development.tools.__start__ = function(name,port,internal_port){
       platform.development.tools[name].__agent__.start(port, '0.0.0.0', internal_port, false);
     }
     //C: executing console frontend in a separate process
-    platform.development.tools[name].__process__ = require('child_process').spawn('node', [platform.runtime.path.core + platform.development.tools[name].__process_path__, port,internal_port]);
+    if (Array.isArray(platform.development.tools[name].__process_path__) === true){
+      platform.development.tools[name].__process__ = [];
+
+      platform.development.tools[name].__process_path__.forEach(function(process_path){
+        platform.development.tools[name].__process__.push(require('child_process').spawn('node', [platform.runtime.path.core + process_path, port, internal_port]));
+      });
+    } else {
+      platform.development.tools[name].__process__ = require('child_process').spawn('node', [platform.runtime.path.core + platform.development.tools[name].__process_path__, port,internal_port]);
+    }
   } else {
     throw new Exception('%s tool is already running',name);
   }
@@ -62,8 +70,15 @@ platform.development.tools.__stop__ = function(name){
       platform.development.tools[name].__agent__.stop();
       platform.development.tools[name].__agent__ = undefined;
     }
-    platform.development.tools[name].__process__.kill();
-    platform.development.tools[name].__process__ = undefined;
+    if (typeof platform.development.tools[name].__process__ === 'array'){
+      platform.development.tools[name].__process__.forEach(function(process){
+        process.kill();
+      });
+      platform.development.tools[name].__process__ = undefined;
+    } else {
+      platform.development.tools[name].__process__.kill();
+      platform.development.tools[name].__process__ = undefined;
+    }
   } else {
     throw new Exception('%s tool is not running', name);
   }
@@ -110,8 +125,30 @@ platform.development.tools.console.start = platform.development.tools.__start__.
 //H: Throws exception if tool is not running.
 platform.development.tools.console.stop = platform.development.tools.__stop__.bind(null,'console');
 
+//O: Provides support for brackets ide.
+platform.development.tools.ide = {};
+
+//V: Checks whether the tool is running.
+platform.development.tools.ide.running = false;
+
+platform.development.tools.ide.__process__ = undefined;
+platform.development.tools.ide.__process_path__ = [
+  '/node_modules/node-brackets/agent.js',
+  '/node_modules/node-brackets/server.js'
+];
+
+//F: Starts the specified tool.
+//R: None.
+//H: Throws exception if tool is already running.
+platform.development.tools.ide.start = platform.development.tools.__start__.bind(null,'ide',9092,9998);
+
+//F: Stops the specified tool.
+//R: None.
+//H: Throws exception if tool is not running.
+platform.development.tools.ide.stop = platform.development.tools.__stop__.bind(null,'ide');
+
 //C: defining running property for each supported tool.
-['inspector' ,'console'].forEach(function(name){
+['inspector' ,'console', 'ide'].forEach(function(name){
   Object.defineProperty(platform.development.tools[name],'running',{ get: platform.development.tools.__is_running__.bind(null,name), set: function(){}});
 });
 
@@ -124,6 +161,10 @@ platform.development.tools.console.stop = platform.development.tools.__stop__.bi
 
     if (platform.development.tools.console.running) {
       platform.development.tools.console.stop();
+    }
+
+    if (platform.development.tools.ide.running) {
+      platform.development.tools.ide.stop();
     }
   });
 });
@@ -139,6 +180,7 @@ if (platform.runtime.debugging === true) {
 if (platform.runtime.development === true) {
   //T: add autostart support in configuration
   platform.development.tools.console.start();
+  platform.development.tools.ide.start();
 }
 
 //T: add autostart support in configuration
