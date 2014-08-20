@@ -1,7 +1,7 @@
 # ljve.io
 
 [![Build Status](http://img.shields.io/travis/marcominetti/ljve.io.png?style=flat)](https://travis-ci.org/marcominetti/ljve.io)   
-![Comment Coverage](project/stats/comments.badge.png)  
+![Comment Coverage](https://raw.githubusercontent.com/marcominetti/ljve.io/master/project/stats/comments.badge.png)  
 [![Test Coverage](http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
 [![Code Climate](http://img.shields.io/codeclimate/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
 
