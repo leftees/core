@@ -46,7 +46,8 @@
     "universal-analytics": "*",
     "sloc": "*",
     "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/master",
-    "node-console": "https://github.com/marcominetti/node-console/tarball/master"
+    "node-console": "https://github.com/marcominetti/node-console/tarball/master",
+    "node-brackets": "https://github.com/marcominetti/node-brackets/tarball/master"
   },
   "scripts": {
     "preinstall": "if [ -d \".git\" ]; then git submodule foreach git pull origin master; fi;",
