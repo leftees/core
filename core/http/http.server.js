@@ -136,9 +136,43 @@ platform.server.http.init = function() {
         var remoteAddress = request.client.address = request.socket.remoteAddress || request.socket._peername.address;
         var remotePort = request.client.port = request.socket.remotePort || request.socket._peername.port;
 
-        //T: redirect
+        var cleaned_url = request.url;
+        var query_marker = cleaned_url.indexOf('?');
+        if(query_marker > -1) {
+          cleaned_url = cleaned_url.substr(0,query_marker);
+        }
 
-        if (platform.engine.process.auth.url(request.url) === false) {
+        for(var redirect in platform.configuration.server.http.default.redirect) {
+          if (platform.configuration.server.http.default.redirect.hasOwnProperty(redirect) === true) {
+            var redirect_data = platform.configuration.server.http.default.redirect[redirect];
+            var redirect_to = null;
+            if (redirect_data.filter != null) {
+              if (typeof redirect_data.filter === 'string') {
+                if (cleaned_url === redirect_data.filter) {
+                  redirect_to = redirect_data.to;
+                }
+              } else if (redirect_data.filter.constructor === RegExp) {
+                if (redirect_data.filter.test(cleaned_url) === true) {
+                  redirect_to = cleaned_url.replace(redirect_data.filter, redirect_data.to);
+                }
+              }
+            }
+            if (redirect_to != null) {
+              if(query_marker > -1) {
+                redirect_to += request.url.substr(query_marker);
+              }
+              if (debug === true && platform.configuration.server.debugging.http === true) {
+                console.warn('[http' + ((secure) ? 's' : '') + ':%s] redirected request #%s from %s:%s: from \'%s\' to \'%s\'', port, count, remoteAddress, remotePort, request.url, redirect_to);
+              }
+              response.statusCode = '302';
+              response.setHeader('Location', redirect_to);
+              response.end();
+              return;
+            }
+          }
+        }
+
+        if (platform.engine.process.auth.url(cleaned_url) === false) {
           if (debug === true && platform.configuration.server.debugging.http === true) {
             console.warn('[http' + ((secure) ? 's' : '') + ':%s] rejected client request #%s from %s:%s: url \'%s\' not allowed', port, count, remoteAddress, remotePort, request.url);
           }

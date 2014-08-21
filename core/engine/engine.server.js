@@ -28,7 +28,7 @@ platform.engine.process = {};
 platform.engine.process.auth = {};
 
 platform.engine.process.auth.url = function(url){
-  if (platform.configuration.server.http.default.auth.url.invalid.test(url) === true) {
+  if (platform.configuration.server.http.default.reject.url.test(url) === true) {
     return false;
   }
   return true;
