@@ -567,9 +567,13 @@ platform.io.cache.set.string = function(path, tag, data, callback){
 
   //C: removing previous cached data
   if (platform.io.cache.unset(path, tag) === false) {
-    console.debug('caching \'%s\'', path);
+    if(platform.configuration.server.debugging.cache === true) {
+      console.debug('caching \'%s\'', path);
+    }
   } else {
-    console.debug('recaching \'%s\'', path);
+    if(platform.configuration.server.debugging.cache === true) {
+      console.debug('recaching \'%s\'', path);
+    }
   }
 
   //C: detecting if operate asynchronously or synchronously
@@ -616,9 +620,13 @@ platform.io.cache.set.bytes = function(path, tag, data, callback){
 
   //C: removing previous cached data
   if (platform.io.cache.unset(path, tag) === false) {
-    console.debug('caching \'%s\'', path);
+    if(platform.configuration.server.debugging.cache === true) {
+      console.debug('caching \'%s\'', path);
+    }
   } else {
-    console.debug('recaching \'%s\'', path);
+    if(platform.configuration.server.debugging.cache === true) {
+      console.debug('recaching \'%s\'', path);
+    }
   }
 
   //C: detecting if operate asynchronously or synchronously
@@ -660,6 +668,17 @@ platform.io.cache.set.stream = function(path, tag, callback){
     cachetime = platform.io.info(path).mtime.getTime();
   } catch(err) {
     cachetime = 0;
+  }
+
+  //C: removing previous cached data
+  if (platform.io.cache.unset(path, tag) === false) {
+    if(platform.configuration.server.debugging.cache === true) {
+      console.debug('caching \'%s\'', path);
+    }
+  } else {
+    if(platform.configuration.server.debugging.cache === true) {
+      console.debug('recaching \'%s\'', path);
+    }
   }
 
   //C: creating gzipped stream for cache
