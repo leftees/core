@@ -87,7 +87,7 @@ platform.io.store.unregister = function(name){
 };
 
 //F: Lists the backends registered in multistore IO engine.
-//R: Returns an array of backend instances ordered by priority.
+//R: Returns an array of backend names ordered by priority.
 //H: It doesn't include backends registered with no priority.
 platform.io.store.list = function(){
   var result = [];

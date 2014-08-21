@@ -104,6 +104,7 @@ native.console = {};
 //C: adding emulation for console.debug
 native.console.debug = native.console.log;
 
+//F: Returns a human readable timespan.
 var humanElapsed = function (elapsed) {
   var labels = ['ms', 's', 'm', 'h', 'd'];
   var sizes = [1000, 60, 60, 24 ];

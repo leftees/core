@@ -34,14 +34,13 @@ platform.development.tools.__start__ = function(name,port,internal_port){
     //T: support custom ports (both for frontend)
     if (platform.development.tools[name].hasOwnProperty('__agent__') === true) {
       //T: support spawned process close detection
-      //C: activating node-webkit-agent for console
+      //C: activating agent for node-webkit-agent based tools
       platform.development.tools[name].__agent__ = new (global.require(platform.runtime.path.core + platform.development.tools[name].__agent_path__))();
       platform.development.tools[name].__agent__.start(port, '0.0.0.0', internal_port, false);
     }
-    //C: executing console frontend in a separate process
+    //C: executing tool separate process(es)
     if (Array.isArray(platform.development.tools[name].__process_path__) === true){
       platform.development.tools[name].__process__ = [];
-
       platform.development.tools[name].__process_path__.forEach(function(process_path){
         platform.development.tools[name].__process__.push(require('child_process').spawn('node', [platform.runtime.path.core + process_path, port, internal_port]));
       });
@@ -70,6 +69,7 @@ platform.development.tools.__stop__ = function(name){
       platform.development.tools[name].__agent__.stop();
       platform.development.tools[name].__agent__ = undefined;
     }
+    //C: killing separate process(es)
     if (Array.isArray(platform.development.tools[name].__process_path__) === true){
       platform.development.tools[name].__process__.forEach(function(process){
         process.kill();
@@ -90,7 +90,10 @@ platform.development.tools.inspector = {};
 //V: Checks whether the tool is running.
 platform.development.tools.inspector.running = false;
 
+//V: Contains forked child process object when running.
 platform.development.tools.inspector.__process__ = undefined;
+
+//V: Define separated process path for inspector.
 platform.development.tools.inspector.__process_path__ = '/node_modules/node-inspector/bin/inspector.js';
 
 //F: Starts the specified tool.
@@ -110,9 +113,15 @@ platform.development.tools.console = {};
 //V: Checks whether the tool is running.
 platform.development.tools.console.running = false;
 
+//V: Contains forked child process object when running.
 platform.development.tools.console.__process__ = undefined;
-platform.development.tools.console.__process_path__ = '/node_modules/node-console/server.js';
+//V: Contains forked child process object for agent when running.
 platform.development.tools.console.__agent__ = undefined;
+
+//V: Define separated process path for console.
+platform.development.tools.console.__process_path__ = '/node_modules/node-console/server.js';
+
+//V: Define agent path for inspector.
 platform.development.tools.console.__agent_path__ = '/node_modules/node-console/agent.js';
 
 //F: Starts the specified tool.
@@ -131,7 +140,10 @@ platform.development.tools.ide = {};
 //V: Checks whether the tool is running.
 platform.development.tools.ide.running = false;
 
+//V: Contains forked child process object when running (as array).
 platform.development.tools.ide.__process__ = undefined;
+
+//V: Define separated process path for brackets.io IDE.
 platform.development.tools.ide.__process_path__ = [
   '/node_modules/node-brackets/agent.js',
   '/node_modules/node-brackets/server.js'
@@ -155,15 +167,18 @@ platform.development.tools.ide.stop = platform.development.tools.__stop__.bind(n
 //C: attaching exit events to kill node-inspector
 ['exit','SIGINT','SIGTERM','uncaughtException'].forEach(function (e) {
   process.on(e, function () {
+    //C: stopping inspector before exit
     if (platform.development.tools.inspector.running === true) {
       platform.development.tools.inspector.stop();
     }
 
-    if (platform.development.tools.console.running) {
+    //C: stopping console before exit
+    if (platform.development.tools.console.running === true) {
       platform.development.tools.console.stop();
     }
 
-    if (platform.development.tools.ide.running) {
+    //C: stopping ide before exit
+    if (platform.development.tools.ide.running === true) {
       platform.development.tools.ide.stop();
     }
   });
@@ -187,6 +202,8 @@ if (platform.runtime.development === true) {
 //O: Provides support for memory monitoring and management (based on memwatch).
 platform.development.tools.memory = {};
 platform.development.tools.memory.__memwatch__ = require('memwatch');
+
+//V: Contains HeapDiff class instance during heap diff analysis.
 platform.development.tools.memory.__heapdiff__ = null;
 
 //F: Starts memory heap diff analysis.
@@ -212,6 +229,7 @@ platform.development.tools.memory.__previous__ = {};
 platform.development.tools.memory.__previous__.heap = 0;
 platform.development.tools.memory.__previous__.rss = 0;
 
+//F: Returns human readable byte size.
 var humanSize = function (bytes) {
   var labels = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   if (bytes === 0) return 'n/a';
@@ -262,6 +280,7 @@ platform.development.tools.memory.__memwatch__.on('stats', function (stats) {
   }
 });
 
+//C: starting forced gc interval if requested by configuration
 if (platform.configuration.server.memory.gc.force === true) {
   platform.development.tools.memory.__interval__ = setInterval(platform.development.tools.memory.collect, platform.configuration.server.memory.gc.interval);
 }

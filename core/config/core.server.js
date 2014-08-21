@@ -25,8 +25,7 @@ platform.configuration = {};
 //O: Contains general application info.
 platform.configuration.application = {
   'name': 'Novetica Ljve',
-  'version': '0.4',
-  'domain': 'localhost'
+  'version': '0.4'
 };
 
 //O: Contains server configuration.
@@ -87,19 +86,27 @@ platform.configuration.server.http.ports = {
     '8080': {
       //V: Define standard unsecure HTTP server on specified ports.
       'secure': false,
+      //V: Enable or disable verbose HTTP debug log on specified ports (overrides defaults).
       'debug': true,
+      //V: Define content body max byte size for requests on specified ports (overrides defaults).
       'limit': 5000000,
-      'auth': false, //'basic',
-      'realm': null //'private',
+      //V: Define HTTP authorization type on specified ports (overrides defaults): 'basic', 'digest' or false.
+      'auth': false,
+      //V: Define realm for HTTP authorization on specified ports (overrides defaults).
+      'realm': null
     },
     //V: Define port to be configured.
     '8443': {
-      //V: Defines secure HTTPS server on specified ports.
+      //V: Enable or disable secure TLS on specified ports.
       'secure': true,
+      //V: Enable or disable verbose HTTP debug log on specified ports (overrides defaults).
       'debug': true,
+      //V: Define content body max byte size for requests on specified ports (overrides defaults).
       'limit': 5000000,
-      'auth': false, //'digest',
-      'realm': null, //'private',
+      //V: Define HTTP authorization type on specified ports (overrides defaults): 'basic', 'digest' or false.
+      'auth': false,
+      //V: Define realm for HTTP authorization on specified ports (overrides defaults).
+      'realm': null,
       //V: Defines ciphers suite for TLS stack.
       'ciphers': 'HIGH !aNULL !eNULL !MEDIUM !LOW !3DES !MD5 !EXP !PSK !SRP !DSS',
       //V: Enable or disable specific secure protocol versions (SSLv2 is deprecated by default).
@@ -120,28 +127,42 @@ platform.configuration.server.http.ports = {
     }
 };
 
+//O: Contains common defaults for web server configuration.
 platform.configuration.server.http.default = {};
 
-//T: allow port-specific max length configuration
+//V: Define default content body max byte size for requests.
 platform.configuration.server.http.default.limit = 5000000;
 
 //T: improve with support for match multiple rules
-platform.configuration.server.http.default.auth = {};
-platform.configuration.server.http.default.auth.url = {};
-platform.configuration.server.http.default.auth.url.invalid = /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//;
+//T: allow port specific configuration
+//O: Contains common defaults for HTTP security.
+platform.configuration.server.http.default.reject = {};
+//V: Define default regexp to reject request by URI.
+//H: Filter is applied against request relative URI cleaned by querystring.
+platform.configuration.server.http.default.reject.url = /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//;
 
+//T: allow port specific configuration
+//O: Contains default HTTP redirect configuration.
+//H: Filters are applied against request relative URI cleaned by querystring.
 platform.configuration.server.http.default.redirect = {
+  //V: Define new redirector name.
   'myredirectbystring': {
-   //C: filters are applied to full path cleaned by querystring
-   'filter': '/facebook',
-   'with': 'http://example.com/a/'
-   },
-   'myredirectbyregexp': {
-   'filter': /^\/twitter(.*)/,
-   'with': 'http://example.com/$1/'
-   }
+    //V: Define string to be searched into URL as string.
+    'filter': '/facebook',
+    //V: Define new URI to redirect to, as string.
+    'to': 'http://example.com/a/'
+  },
+  //V: Define new redirector name.
+  'myredirectbyregexp': {
+    //V: Define string to be searched into URL as regexp.
+    'filter': /^\/twitter(.*)/,
+    //V: Define new URI to redirect to, as string but with regexp grouping support.
+    'to': 'http://example.com/$1/'
+  }
 };
 
+//T: allow port specific configuration
+//O: Contains default mime types by extension.
 platform.configuration.server.http.default.mimetypes = {
   '.json': 'application/json',
   '.jsa': 'application/json',
@@ -243,16 +264,30 @@ platform.configuration.server.http.default.mimetypes = {
   '.asf': 'video/x-ms-asf',
   '.wmv': 'video/x-ms-wmv',
   '.avi': 'video/x-msvideo'
-}
+};
 
+//O: Contains global debugging configuration.
 platform.configuration.server.debugging = {};
-platform.configuration.server.debugging.http = true;
-platform.configuration.server.debugging.websocket = true;
-platform.configuration.server.debugging.memory = true;
 
+//V: Enable or disable global verbose HTTP debug log.
+platform.configuration.server.debugging.http = true;
+//V: Enable or disable global verbose WebSocket debug log.
+platform.configuration.server.debugging.websocket = true;
+//V: Enable or disable global verbose memory watcher debug log.
+platform.configuration.server.debugging.memory = true;
+//V: Enable or disable global verbose code load debug log.
+platform.configuration.server.debugging.load = true;
+//V: Enable or disable global verbose cache debug log.
+platform.configuration.server.debugging.cache = true;
+
+//O: Contains memory management configuration.
 platform.configuration.server.memory = {};
+
+//O: Contains memory garbage collector configuration.
 platform.configuration.server.memory.gc = {
+  //V: Enable or disable forced garbage collector.
   'force': true,
+  //V: Define forced garbage collection interval (ms).
   'interval': 15000
 };
 
@@ -265,7 +300,6 @@ platform.configuration.server.io = {};
 platform.configuration.server.io.store = platform.configuration.server.io.store || {};
 
 //O: Contains multiple custom backends for IO multistore support.
-//H: Priority '0' and name 'app' are reserved for backends.
 platform.configuration.server.io.store.backends = {
   //V: Define custom backend name to be configured.
   'core-override':{
