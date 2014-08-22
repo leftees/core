@@ -54,6 +54,7 @@ native.dom.html.defaultDocumentFeatures = {
 };
 native.dom.html = native.dom.html.jsdom;
 native.dom.xml = require('libxmljs').parseXml;
+native.request = require('request');
 native.moment = require('moment');
 native.esprima = require('esprima');
 
