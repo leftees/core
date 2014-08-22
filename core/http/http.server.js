@@ -66,28 +66,45 @@ platform.server.http.stop = function(port){
 
 //F: Initializes HTTP(S) listeners.
 platform.server.http.init = function() {
+  //C creating native HTTP listener for each configured port
   Object.keys(platform.configuration.server.http.ports).forEach(function (portlist) {
+    //C: getting port configuration
     var config = platform.configuration.server.http.ports[portlist];
+    //C: splitting multiple ports (separated by '|')
     var ports = portlist.split('|');
     ports.forEach(function (port) {
       var agentHttp, agentWebSocket, options;
+      //C: detecting whether the listener should be an HTTPS one
       if (config.secure === true) {
         options = {};
+        //C: using localhost self-signed certificate if missing
         if (config.pfx == null && config.cert == null) {
           options.pfx = null;
           options.passphrase = null;
           options.cert = native.fs.readFileSync(platform.runtime.path.core + '/core/ssl/self.crt');
           options.key = native.fs.readFileSync(platform.runtime.path.core + '/core/ssl/self.key');
         } else {
-          //T: convert pfx, key, cert, ca[] from file paths to file data (requires mapPath)
+          //C: loading certificates from files if any
+          if (config.pfx != null) {
+            options.pfx = platform.io.get.bytes(config.pfx);
+          }
+          if (config.cert != null) {
+            options.cert = platform.io.get.bytes(config.cert);
+          }
+          if (config.key != null) {
+            options.key = platform.io.get.bytes(config.key);
+          }
         }
+        //C: defining default ciphers if missing
         options.ciphers = config.ciphers || 'HIGH !aNULL !eNULL !MEDIUM !LOW !3DES !MD5 !EXP !PSK !SRP !DSS';
+        //C: defining default supported protocols if missing
         var protocols = config.protocols || {
           'SSLv3': false,
           'TLSv10': true,
           'TLSv11': true,
           'TLSv12': true
         };
+        //C: masking the protocol version to be supported
         var SSL_OP_NO = {
           'SSLv2': 0x01000000,
           'SSLv3': 0x02000000,
@@ -102,11 +119,17 @@ platform.server.http.init = function() {
           }
         });
       }
+
+      //C: getting port-specific debug log configuration
       config.debug = (config.debug == null || config.debug === true);
+
+      //C: getting protocol scheme
       var protocol = (config.secure === true) ? 'https' : 'http';
 
+      //C: instancing native HTTP listener
       //T: implement http auth internally (dismiss http-auth module)
       if (config.auth === 'basic' || config.auth === 'digest') {
+        //C: enabling httpauth module if requested
         agentHttp = native[protocol].createServer(native.httpauth[config.auth](
           {
             'realm': config.realm
@@ -116,66 +139,125 @@ platform.server.http.init = function() {
       } else {
         agentHttp = native[protocol].createServer(options);
       }
+
+      //C: extending native http listener with config info
       agentHttp.secure = config.secure;
       agentHttp.debug = config.debug;
       agentHttp.limit = config.limit || platform.configuration.server.http.default.limit;
       agentHttp.auth = config.auth;
       agentHttp.realm = config.realm;
       agentHttp.port = port;
+      agentHttp.redirect = config.redirect||{};
+      agentHttp.reject = config.reject||{};
+
+      //C: extending native http listener with request counter
       agentHttp.count = 0;
+
+      //C: attaching to new request event
       agentHttp.on('request',function (request, response) {
+
+        //C: getting needed listener configurations
         var secure = this.secure;
         var port = this.port;
         var debug = this.debug;
-        if (this.count === Number.MAX_VALUE) {
-          this.count = 0;
-        }
-        var count = request.id = ++this.count;
+        var redirect = this.redirect;
+        var reject = this.reject;
+
+        //C: extending requestobject with needed properties from listener
         request.limit = this.limit;
+
+        //C: creating request.client property (with address and port) to simulate common behavior
         request.client = {};
         var remoteAddress = request.client.address = request.socket.remoteAddress || request.socket._peername.address;
         var remotePort = request.client.port = request.socket.remotePort || request.socket._peername.port;
 
+        //C: incrementing request count for listener and using it as request.id property
+        if (this.count === Number.MAX_VALUE) {
+          this.count = 0;
+        }
+        var count = request.id = ++this.count;
+
+        //C: extending request object with HTTP redirect function
+        request.redirect = function (redirect_to) {
+          if (debug === true && platform.configuration.server.debugging.http === true) {
+            console.warn('[http' + ((secure) ? 's' : '') + ':%s] redirected request #%s from %s:%s: from \'%s\' to \'%s\'', port, count, remoteAddress, remotePort, request.url, redirect_to);
+          }
+          response.statusCode = '302';
+          response.setHeader('Location', redirect_to);
+          response.end();
+        };
+
+        //C: getting url cleaned by querystring
         var cleaned_url = request.url;
         var query_marker = cleaned_url.indexOf('?');
-        if(query_marker > -1) {
-          cleaned_url = cleaned_url.substr(0,query_marker);
+        if (query_marker > -1) {
+          cleaned_url = cleaned_url.substr(0, query_marker);
         }
 
-        for(var redirect in platform.configuration.server.http.default.redirect) {
-          if (platform.configuration.server.http.default.redirect.hasOwnProperty(redirect) === true) {
-            var redirect_data = platform.configuration.server.http.default.redirect[redirect];
-            var redirect_to = null;
-            if (redirect_data.filter != null) {
-              if (typeof redirect_data.filter === 'string') {
-                if (cleaned_url === redirect_data.filter) {
-                  redirect_to = redirect_data.to;
-                }
-              } else if (redirect_data.filter.constructor === RegExp) {
-                if (redirect_data.filter.test(cleaned_url) === true) {
-                  redirect_to = cleaned_url.replace(redirect_data.filter, redirect_data.to);
-                }
+        //F: Applies redirect filter and returns new location as string if matched
+        var check_redirection = function (redirect_data) {
+          if (redirect_data.filter != null) {
+            //C: checking match against string
+            if (typeof redirect_data.filter === 'string') {
+              if (cleaned_url === redirect_data.filter) {
+                return redirect_data.to;
+              }
+            //C: chacking match against regexp
+            } else if (redirect_data.filter.constructor === RegExp) {
+              if (redirect_data.filter.test(cleaned_url) === true) {
+                return cleaned_url.replace(redirect_data.filter, redirect_data.to);
               }
             }
+          }
+          //C: no match found
+          return null;
+        };
+
+        //C: checking if request should be redirected (port-specific)
+        for(var redirector in redirect) {
+          if (redirect.hasOwnProperty(redirector) === true) {
+            //C: getting redirect data
+            var redirect_data = redirect[redirector];
+            //C: applying filter and getting redirection URI
+            var redirect_to = check_redirection(redirect_data);
             if (redirect_to != null) {
-              if(query_marker > -1) {
+              //C: preserving querystring parameters
+              if (query_marker > -1){
                 redirect_to += request.url.substr(query_marker);
               }
-              if (debug === true && platform.configuration.server.debugging.http === true) {
-                console.warn('[http' + ((secure) ? 's' : '') + ':%s] redirected request #%s from %s:%s: from \'%s\' to \'%s\'', port, count, remoteAddress, remotePort, request.url, redirect_to);
-              }
-              response.statusCode = '302';
-              response.setHeader('Location', redirect_to);
-              response.end();
+              //C: redirecting and exiting
+              request.redirect(redirect_to);
               return;
             }
           }
         }
 
-        if (platform.engine.process.auth.url(cleaned_url) === false) {
+        //C: checking if request should be redirected (global default)
+        for(var redirector in platform.configuration.server.http.default.redirect) {
+          if (platform.configuration.server.http.default.redirect.hasOwnProperty(redirector) === true) {
+            //C: getting redirect data
+            var redirect_data = platform.configuration.server.http.default.redirect[redirector];
+            //C: applying filter and getting redirection URI
+            var redirect_to = check_redirection(redirect_data);
+            if (redirect_to != null) {
+              //C: preserving querystring parameters
+              if (query_marker > -1){
+                redirect_to += request.url.substr(query_marker);
+              }
+              //C: redirecting and exiting
+              request.redirect(redirect_to);
+              return;
+            }
+          }
+        }
+
+        //C: validating URL
+        if ((reject.url||platform.configuration.server.http.default.reject.url).test(cleaned_url) === true) {
+          //C: logging reject if debug enabled
           if (debug === true && platform.configuration.server.debugging.http === true) {
             console.warn('[http' + ((secure) ? 's' : '') + ':%s] rejected client request #%s from %s:%s: url \'%s\' not allowed', port, count, remoteAddress, remotePort, request.url);
           }
+          //C: returning 404 status code (for security reason we do not reply with 403/406)
           response.statusCode = 404;
           //T: return json, html or text depending on acceptable content type
           response.end ("404 File not found");
@@ -183,11 +265,16 @@ platform.server.http.init = function() {
         }
 
         //T: complete port of multihost support from 0.3.x branch
+        //C: logging new context if debug enabled
         if (debug === true && platform.configuration.server.debugging.http === true) {
           console.debug('[http' + ((secure) ? 's' : '') + ':%s] creating context request #%s from %s:%s', port, count, remoteAddress, remotePort);
         }
+
+        //C: creating request-specific domain (required for call context)
+        //T: migrate to contextify or similar for isolation?
         var domain = native.domain.create();
 
+        //C: attaching to domain events error/dispose if debug is enabled
         if (debug === true && platform.configuration.server.debugging.http === true) {
           domain.on('error', function (err) {
             console.warn('[http' + ((secure) ? 's' : '') + ':%s] exception in request #%s from %s:%s: %s', port, count, remoteAddress, remotePort, err);
@@ -197,64 +284,96 @@ platform.server.http.init = function() {
           });
         }
 
+        //C: attaching to domain end event (request processing ended)
         request.on('end', function () {
           if (debug === true && platform.configuration.server.debugging.http === true) {
             console.debug('[http' + ((secure) ? 's' : '') + ':%s] finished client request #%s from %s:%s', port, count, remoteAddress, remotePort);
           }
+          //C: disposing domain
           domain.dispose();
         });
+
+        //C: attaching to domain close event (domain closed?)
         request.on('close', function () {
           if (debug === true && platform.configuration.server.debugging.http === true) {
             console.debug('[http' + ((secure) ? 's' : '') + ':%s] closed client request #%s from %s:%s', port, count, remoteAddress, remotePort);
           }
+          //C: disposing domain
           domain.dispose();
         });
 
+        //C: logging request processing if debug enabled
         if (debug === true && platform.configuration.server.debugging.http === true) {
           console.debug('[http' + ((secure) ? 's' : '') + ':%s] processing client request #%s from %s:%s', port, count, remoteAddress, remotePort);
         }
+
+        //C: processing request within domain
         domain.run(function(){
           platform.engine.process.http(request, response, this);
         });
+
       });
+
+      //C: instancing antive WebSocket server
       agentWebSocket = new native.websocket.server({ noServer: true });
+
+      //C: attaching to native HTTP listener upgrade event
       agentHttp.on('upgrade', function(request, socket, upgradeHead) {
+        //C: getting needed listener configurations
         var secure = this.secure;
         var port = this.port;
         var debug = this.debug;
+
+        //C: creating request.client property (with address and port) to simulate common behavior
         request.client = {};
         var remoteAddress = request.client.address = request.socket.remoteAddress || request.socket._peername.address;
         var remotePort = request.client.port = request.socket.remotePort || request.socket._peername.port;
 
+        //C: logging connection if debug is enabled
         if (debug === true && platform.configuration.server.debugging.http === true) {
           console.debug('[http' + ((secure) ? 's' : '') + ':%s] upgrading client request %s:%s', port, remoteAddress, remotePort);
         }
 
-        var head = new Buffer(upgradeHead.length);
-        upgradeHead.copy(head);
-
+        //C: getting server object
         var server = this;
-        agentWebSocket.handleUpgrade(request, socket, head, function(websocket) {
-          if (debug === true && platform.configuration.server.debugging.websocket === true) {
-            console.debug('[ws' + ((secure) ? 's' : '') + ':%s] accepting new socket %s:%s', port, remoteAddress, remotePort);
-          }
 
-          //T: complete port of multihost support from 0.3.x branch
-          platform.engine.process.websocket(request, server, websocket);
-        });
+        //C: handling upgrade protocol
+        switch(request.headers['upgrade']) {
+          case 'websocket':
+            //C: upgrading request to WebSocket
+            agentWebSocket.handleUpgrade(request, socket, upgradeHead, function (websocket) {
+              //C: logging new websocket if debug is enabled
+              if (debug === true && platform.configuration.server.debugging.websocket === true) {
+                console.debug('[ws' + ((secure) ? 's' : '') + ':%s] accepting new socket %s:%s', port, remoteAddress, remotePort);
+              }
+
+              //C: processing new websocket
+              //T: complete port of multihost support from 0.3.x branch
+              platform.engine.process.websocket(request, server, websocket);
+            });
+            break;
+          default:
+            //C: rejecting unknown protocols
+            request.reject(501,'Not implemented');
+            break;
+        }
       });
+
+      //C: attaching to native HTTP listener connection/clientError/close events for debug log
       if (agentHttp.debug === true && platform.configuration.server.debugging.http === true) {
         agentHttp.on('connection', function (socket) {
           console.debug('[http' + ((this.secure) ? 's' : '') + ':%s] accepting new client %s:%s', this.port, socket.remoteAddress, socket.remotePort);
         });
-        agentHttp.on('clientError',function (exception, socket) {
+        agentHttp.on('clientError', function (exception, socket) {
           console.warn('[http' + ((this.secure) ? 's' : '') + ':%s] exception new client %s:%s: %s', this.port, socket.remoteAddress, socket.remotePort, exception.message);
           console.warn(exception);
         });
+        agentHttp.on('close', function () {
+          console.debug('closed server for port %s', this);
+        });
       }
-      agentHttp.on('close',function () {
-        console.debug('closed server for port %s',this);
-      });
+
+      //C: storing native HTTP listener instance
       platform.server.http.__agents__[port] = {};
       platform.server.http.__agents__[port].http = agentHttp;
       platform.server.http.__agents__[port].websocket = agentWebSocket;

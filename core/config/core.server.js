@@ -90,10 +90,26 @@ platform.configuration.server.http.ports = {
       'debug': true,
       //V: Define content body max byte size for requests on specified ports (overrides defaults).
       'limit': 5000000,
-      //V: Define HTTP authorization type on specified ports (overrides defaults): 'basic', 'digest' or false.
+      //V: Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
       'auth': false,
-      //V: Define realm for HTTP authorization on specified ports (overrides defaults).
-      'realm': null
+      //V: Define realm for HTTP authorization on specified ports.
+      'realm': null,
+      //V: Define port-specific regexp to reject request by URI (overrides defaults).
+      //H: Filter is applied against request relative URI cleaned by querystring.
+      'reject': {
+        'url': /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//
+      },
+      //V: Contains port-specific HTTP redirect configuration.
+      //H: Filters are applied against request relative URI cleaned by querystring.
+      'redirect':{
+        //V: Define new redirector name.
+        'myredirectbystring': {
+          //V: Define string to be searched into URL as string.
+          'filter': '/example',
+          //V: Define new URI to redirect to, as string.
+          'to': 'http://example.com/ljve/8080/'
+        }
+      }
     },
     //V: Define port to be configured.
     '8443': {
@@ -103,10 +119,21 @@ platform.configuration.server.http.ports = {
       'debug': true,
       //V: Define content body max byte size for requests on specified ports (overrides defaults).
       'limit': 5000000,
-      //V: Define HTTP authorization type on specified ports (overrides defaults): 'basic', 'digest' or false.
+      //V: Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
       'auth': false,
-      //V: Define realm for HTTP authorization on specified ports (overrides defaults).
+      //V: Define realm for HTTP authorization on specified ports.
       'realm': null,
+      //V: Contains port-specific HTTP redirect configuration.
+      //H: Filters are applied against request relative URI cleaned by querystring.
+      'redirect':{
+        //V: Define new redirector name.
+        'myredirectbystring': {
+          //V: Define string to be searched into URL as string.
+          'filter': '/example',
+          //V: Define new URI to redirect to, as string.
+          'to': 'http://example.com/ljve/8443/'
+        }
+      },
       //V: Defines ciphers suite for TLS stack.
       'ciphers': 'HIGH !aNULL !eNULL !MEDIUM !LOW !3DES !MD5 !EXP !PSK !SRP !DSS',
       //V: Enable or disable specific secure protocol versions (SSLv2 is deprecated by default).
@@ -121,9 +148,9 @@ platform.configuration.server.http.ports = {
       //V: Specifies the passphrase to unwrap the private key in pfx file.
       'passphrase': null,
       //V: Specifies the absolute path to PEM certificate file.
-      'cert': null,
+      'cert': '/core/ssl/self.crt',
       //V: Specifies the absolute path to certificate private key file.
-      'key': null
+      'key': '/core/ssl/self.key'
     }
 };
 
@@ -134,28 +161,26 @@ platform.configuration.server.http.default = {};
 platform.configuration.server.http.default.limit = 5000000;
 
 //T: improve with support for match multiple rules
-//T: allow port specific configuration
 //O: Contains common defaults for HTTP security.
 platform.configuration.server.http.default.reject = {};
 //V: Define default regexp to reject request by URI.
 //H: Filter is applied against request relative URI cleaned by querystring.
 platform.configuration.server.http.default.reject.url = /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//;
 
-//T: allow port specific configuration
 //O: Contains default HTTP redirect configuration.
 //H: Filters are applied against request relative URI cleaned by querystring.
 platform.configuration.server.http.default.redirect = {
   //V: Define new redirector name.
   'myredirectbystring': {
     //V: Define string to be searched into URL as string.
-    'filter': '/facebook',
+    'filter': '/example',
     //V: Define new URI to redirect to, as string.
-    'to': 'http://example.com/a/'
+    'to': 'http://example.com/ljve/'
   },
   //V: Define new redirector name.
   'myredirectbyregexp': {
     //V: Define string to be searched into URL as regexp.
-    'filter': /^\/twitter(.*)/,
+    'filter': /^\/examplex(.*)/,
     //V: Define new URI to redirect to, as string but with regexp grouping support.
     'to': 'http://example.com/$1/'
   }
@@ -270,7 +295,7 @@ platform.configuration.server.http.default.mimetypes = {
 platform.configuration.server.debugging = {};
 
 //V: Enable or disable global verbose HTTP debug log.
-platform.configuration.server.debugging.http = true;
+platform.configuration.server.debugging.http = false;
 //V: Enable or disable global verbose WebSocket debug log.
 platform.configuration.server.debugging.websocket = true;
 //V: Enable or disable global verbose memory watcher debug log.
