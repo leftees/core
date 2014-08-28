@@ -41,8 +41,10 @@ platform.kernel.get = function(name,root,divisor) {
   tree = name.split (divisor||'.');
   for (count = 0; count < tree.length; count++) {
     subname = tree [count];
+    if (subname === '')
+      continue;
     if (target [subname] == null) {
-      throw new Exception('unable to get \'%s\': member \'%s\' does not exist',name,subname);
+      throw new Exception('unable to get %s: member %s does not exist',name,subname);
     }
     target = target [subname];
   }
@@ -69,10 +71,12 @@ platform.kernel.set = function(name,value,create,root,divisor) {
   subname = null;
   tree = name.split (divisor||'.');
   for (count = 0; count < tree.length-1; count++) {
+    if (subname === '')
+      continue;
     subname = tree [count];
     if (target [subname] == null) {
       if (create === false) {
-        throw new Exception('unable to set \'%s\': member \'%s\' does not exist',name,subname);
+        throw new Exception('unable to set %s: member %s does not exist',name,subname);
       } else {
         target [subname] = {};
       }
@@ -104,8 +108,10 @@ platform.kernel.unset = function(name,root,divisor) {
   tree = name.split (divisor||'.');
   for (count = 0; count < tree.length-1; count++) {
     subname = tree [count];
+    if (subname === '')
+      continue;
     if (target [subname] == null) {
-      throw new Exception('unable to unset \'%s\': member \'%s\' does not exist',name,subname);
+      throw new Exception('unable to unset %s: member %s does not exist',name,subname);
     }
     target = target [subname];
   }
@@ -114,7 +120,7 @@ platform.kernel.unset = function(name,root,divisor) {
     //T: clean augmented data if any
     return (delete target [subname]);
   }
-  throw new Exception('unable to unset \'%s\': member \'%s\' does not exist',name,subname);
+  throw new Exception('unable to unset %s: member %s does not exist',name,subname);
 };
 
 //F: Invokes a function in current environment.
@@ -138,15 +144,17 @@ platform.kernel.invoke = function(name,args,scope,root,divisor) {
   tree = name.split (divisor||'.');
   for (count = 0; count < tree.length; count++) {
     subname = tree [count];
+    if (subname === '')
+      continue;
     if (target [subname] == null) {
-      throw new Exception('unable to invoke \'%s\': member \'%s\' does not exist',name,subname);
+      throw new Exception('unable to invoke %s: member %s does not exist',name,subname);
     }
     target = target [subname];
   }
   if (typeof target === 'function') {
     return target.apply(scope,args);
   } else {
-    throw new Exception('unable to invoke \'%s\': member \'%s\' is not a function',name,subname);
+    throw new Exception('unable to invoke %s: member %s is not a function',name,subname);
   }
 };
 
@@ -181,8 +189,10 @@ platform.kernel.new = function (name,args,root,divisor) {
   tree = name.split (divisor||'.');
   for (count = 0; count < tree.length; count++) {
     subname = tree [count];
+    if (subname === '')
+      continue;
     if (target [subname] == null) {
-      throw new Exception('unable to instance class \'%s\': member \'%s\' does not exist',name,subname);
+      throw new Exception('unable to instance class %s: member %s does not exist',name,subname);
     }
     target = target [subname];
   }

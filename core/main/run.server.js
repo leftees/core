@@ -32,7 +32,7 @@ global.main.commands.run = function(base){
       //C: storing new root folder
       global.main.path.app = native.path.normalize(root);
     } else {
-      throw new Exception('specified root folder \'%s\' does not exist, please use absolute path', root);
+      throw new Exception('specified root folder %s does not exist, please use absolute path', root);
     }
   }
 

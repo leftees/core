@@ -52,7 +52,7 @@ platform.kernel.preprocess = function(code, file, module){
 platform.kernel.load = function(file,module,preprocess) {
   //C: checking whether the file exists
   if (platform.io.exist(file) === false) {
-    throw new Exception('resource \'%s\' not found', file);
+    throw new Exception('resource %s not found', file);
   }
   //C: detecting if file is already cached
   var is_cached = platform.io.cache.is(file, 'built');
@@ -68,7 +68,7 @@ platform.kernel.load = function(file,module,preprocess) {
     }
     //C: saving augmented file to be loaded through require (only for testing environment)
     if (global.testing === true) {
-      platform.kernel.__backend__.set.string(file, preprocessed_code);
+      platform.kernel._backend.set.string(file, preprocessed_code);
     }
     //C: caching augmented file
     //T: replace with sync  set call
@@ -82,7 +82,7 @@ platform.kernel.load = function(file,module,preprocess) {
     if(platform.configuration.server.debugging.load === true){
       console.debug('loading %s', file);
     }
-    return global.require(native.path.join(platform.kernel.__backend__.base,file));
+    return global.require(native.path.join(platform.kernel._backend.base,file));
   } else {
     if(platform.configuration.server.debugging.load === true) {
       console.debug('loading %s' + ((is_cached === false) ? '' : ' from cache'), file);
@@ -96,4 +96,4 @@ platform.kernel.load = function(file,module,preprocess) {
 platform.io.store.register('build',platform.kernel.new('core.io.store.file',[ native.path.join(platform.runtime.path.app,'build') ]),-1);
 
 //V: Stores the 'build' store backend.
-platform.kernel.__backend__ = platform.io.store.getByName('build');
+platform.kernel._backend = platform.io.store.getByName('build');

@@ -25,8 +25,8 @@ describe('io', function() {
 
     before(function(){
       platform.io.create('/tmp/doexist.txt');
-      platform.io.cache.__backend__.delete('/');
-      platform.io.cache.__backend__.create('/');
+      platform.io.cache._backend.delete('/');
+      platform.io.cache._backend.create('/');
     });
 
     it('namespace should exists', function () {
@@ -34,7 +34,7 @@ describe('io', function() {
     });
 
     it('backend should exist', function () {
-      var result = platform.io.cache.__backend__;
+      var result = platform.io.cache._backend;
       should.exist(result);
     });
 
@@ -599,7 +599,7 @@ describe('io', function() {
 
       it('clean should succeed', function () {
         platform.io.cache.clean();
-        var result = platform.io.cache.__backend__.list('/',true);
+        var result = platform.io.cache._backend.list('/',true);
         result.should.deep.equal([]);
       });
 
@@ -1251,7 +1251,7 @@ describe('io', function() {
 
       it('clean should succeed', function () {
         platform.io.cache.clean();
-        var result = platform.io.cache.__backend__.list('/',true);
+        var result = platform.io.cache._backend.list('/',true);
         result.should.deep.equal([]);
       });
 

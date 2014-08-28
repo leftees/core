@@ -30,7 +30,7 @@ global.main.commands.create = function(root, template){
   }
   //C: checking whether destination forlder exists
   if (native.fs.existsSync(target) === true) {
-    throw new Exception('folder \'%s\' already exists',target);
+    throw new Exception('folder %s already exists',target);
   }
   //C: checking template argument exist
   skeleton = template||native.args.template;
@@ -40,11 +40,11 @@ global.main.commands.create = function(root, template){
   //C: checking whether skeleton folder exists
   source = native.path.join(global.main.path.core,'core/skel/' + skeleton);
   if (native.fs.existsSync(source) === false){
-    throw new Exception('skeleton template \'%s\' not found, please check ljve is correctly installed', skeleton);
+    throw new Exception('skeleton template %s found, please check ljve is correctly installed', skeleton);
   }
   //C: copying skel folder to new root folder
   native.fs.copySync(source, target);
-  console.info('created app in \'%s\'', target);
+  console.info('created app in %s', target);
 };
 
 //C: defining create CLI command manual

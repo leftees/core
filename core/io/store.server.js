@@ -26,10 +26,10 @@ platform.io = platform.io || {};
 platform.io.store = platform.io.store || {};
 
 //V: Stores backend priorities for overlay abstract filesystem.
-platform.io.store.__priorities__ = [];
+platform.io.store._priorities = [];
 
 //V: Stores backends objects and instances.
-platform.io.store.__backends__ = {};
+platform.io.store._backends = {};
 
 //F: Registers a new backend into multistore IO engine.
 //A: name: Specifies the name of the new backend.
@@ -53,17 +53,17 @@ platform.io.store.register = function(name,backend,priority){
 
     //T: check if every method is implemented (interface?)
     //C: storing backend instance and extending it with name
-    platform.io.store.__backends__[name] = backend;
-    platform.io.store.__backends__[name].name = name;
+    platform.io.store._backends[name] = backend;
+    platform.io.store._backends[name].name = name;
 
     //C: storing backend priority
     if (newpriority > -1) {
-      platform.io.store.__priorities__.splice(newpriority, 0, name);
+      platform.io.store._priorities.splice(newpriority, 0, name);
     }
 
     return true;
   } else {
-    throw new Exception('class \'%s\' already exists',name);
+    throw new Exception('class %s already exists',name);
   }
 };
 
@@ -75,14 +75,14 @@ platform.io.store.unregister = function(name){
   //C: checking if backend exists and is not reserved
   if (platform.io.store.exist(name) === true /*&& name !== 'app'*/) {
     //C: removing backend from priority array
-    var oldindex = platform.io.store.__priorities__.indexOf(name);
+    var oldindex = platform.io.store._priorities.indexOf(name);
     if (oldindex > -1) {
-      platform.io.store.__priorities__.splice(oldindex, 1);
+      platform.io.store._priorities.splice(oldindex, 1);
     }
     //C: deleting backend object
-    return delete platform.io.store.__backends__[name];
+    return delete platform.io.store._backends[name];
   } else {
-    throw new Exception('store \'%s\' does not exist',name);
+    throw new Exception('store %s does not exist',name);
   }
 };
 
@@ -92,8 +92,8 @@ platform.io.store.unregister = function(name){
 platform.io.store.list = function(){
   var result = [];
   //C: adding backend objects to results by priority
-  platform.io.store.__priorities__.forEach(function(name){
-    result.push(platform.io.store.__backends__[name]);
+  platform.io.store._priorities.forEach(function(name){
+    result.push(platform.io.store._backends[name]);
   });
   return result;
 };
@@ -104,8 +104,8 @@ platform.io.store.list = function(){
 platform.io.store.listAll = function(){
   var result = [];
   //C: adding backend objects to results by name
-  Object.keys(platform.io.store.__backends__).forEach(function(name){
-    result.push(platform.io.store.__backends__[name]);
+  Object.keys(platform.io.store._backends).forEach(function(name){
+    result.push(platform.io.store._backends[name]);
   });
   return result;
 };
@@ -114,7 +114,7 @@ platform.io.store.listAll = function(){
 //A: name: Specifies the name of the backend.
 //R: Returns true if the backend exists.
 platform.io.store.exist = function(name){
-  return (platform.io.store.__backends__.hasOwnProperty(name));
+  return (platform.io.store._backends.hasOwnProperty(name));
 };
 
 //F: Gets a backend by name.
@@ -123,9 +123,9 @@ platform.io.store.exist = function(name){
 platform.io.store.getByName = function(name){
   //C: checking whether backend exists and returning its instance
   if (platform.io.store.exist(name) === true) {
-    return platform.io.store.__backends__[name];
+    return platform.io.store._backends[name];
   } else {
-    throw new Exception('store \'%s\' not found',name);
+    throw new Exception('store %s not found',name);
   }
 };
 
@@ -137,14 +137,14 @@ platform.io.store.getByPriority = function(priority){
   var newpriority = priority;
   if (typeof newpriority !== 'number'){
     return null;
-  } else if (newpriority < 0 || newpriority >= platform.io.store.__priorities__.length) {
+  } else if (newpriority < 0 || newpriority >= platform.io.store._priorities.length) {
     return null;
   }
   //C: getting name by priority
-  var name = platform.io.store.__priorities__[newpriority];
+  var name = platform.io.store._priorities[newpriority];
   //C: checking whether the backend exists and returning it
   if (platform.io.store.exist(name) === true) {
-    return platform.io.store.__backends__[name];
+    return platform.io.store._backends[name];
   } else {
     return null;
   }
@@ -156,9 +156,9 @@ platform.io.store.getByPriority = function(priority){
 platform.io.store.getPriority = function(name){
   //C: checking whether backend exists and returning its priority
   if (platform.io.store.exist(name) === true) {
-    return platform.io.store.__priorities__.indexOf(name);
+    return platform.io.store._priorities.indexOf(name);
   } else {
-    throw new Exception('store \'%s\' not found',name);
+    throw new Exception('store %s not found',name);
   }
 };
 
@@ -179,16 +179,16 @@ platform.io.store.setPriority = function(name,priority){
       throw new Exception('store \'app\' with priority \'0\' cannot be modified');
     }*/
     //C: unsetting old priority
-    var oldindex = platform.io.store.__priorities__.indexOf(name);
+    var oldindex = platform.io.store._priorities.indexOf(name);
     if (oldindex > -1) {
-      platform.io.store.__priorities__.splice(oldindex, 1);
+      platform.io.store._priorities.splice(oldindex, 1);
     }
     //C: setting new priority (if any)
     if (newpriority > -1) {
-      platform.io.store.__priorities__.splice(newpriority, 0, name);
+      platform.io.store._priorities.splice(newpriority, 0, name);
     }
   } else {
-    throw new Exception('store \'%s\' not found',name);
+    throw new Exception('store %s not found',name);
   }
 };
 

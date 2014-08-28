@@ -29,10 +29,10 @@ describe('classes', function() {
     (function () {
       var test_myclass = function(a,b){
         this.member1 = a;
-        this.__member2__ = b;
+        this._member2 = b;
       };
       test_myclass.prototype.member2 = function(){
-        return this.__member2__;
+        return this._member2;
       };
       platform.classes.register('test.myclass',test_myclass);
     }).should.not.throw();
@@ -42,10 +42,10 @@ describe('classes', function() {
     (function () {
       var test_myclass = function(a,b){
         this.member1 = a;
-        this.__member2__ = b;
+        this._member2 = b;
       };
       test_myclass.prototype.member2 = function(){
-        return this.__member2__;
+        return this._member2;
       };
       platform.classes.register('test.myclass',test_myclass);
     }).should.throw();
@@ -112,10 +112,10 @@ describe('kernel', function() {
     before(function(){
       var test_myclass = function(a,b){
         this.member1 = a;
-        this.__member2__ = b;
+        this._member2 = b;
       };
       test_myclass.prototype.member2 = function(){
-        return this.__member2__;
+        return this._member2;
       };
       platform.classes.register('test.myclass',test_myclass);
       platform.kernel.set('doexist.test',test_myclass);

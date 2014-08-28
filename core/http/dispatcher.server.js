@@ -31,10 +31,10 @@ platform.server.dispatcher = platform.server.dispatcher || {};
 platform.server.dispatcher.multihost = false;
 
 //V: Stores the host engines for site/service provisioning.
-platform.server.dispatcher.__providers__ = {};
+platform.server.dispatcher._providers = {};
 
 //V: Stores the host appdomains for site/service provisioning.
-platform.server.dispatcher.__resolvemap__ = {};
+platform.server.dispatcher._resolvemap = {};
 
 //F: Initializes host dispatcher and host providers.
 platform.server.dispatcher.init = function(){

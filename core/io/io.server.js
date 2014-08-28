@@ -93,7 +93,7 @@ platform.io.info = function(path){
       return backend.info(path);
     }
   }
-  throw new Exception('resource \'%s\' does not exist',path);
+  throw new Exception('resource %s does not exist',path);
 };
 
 //O: Provides get implementations.
@@ -113,7 +113,7 @@ platform.io.get.string = function(path){
       return backend.get.string(path);
     }
   }
-  throw new Exception('resource \'%s\' does not exist',path);
+  throw new Exception('resource %s does not exist',path);
 };
 
 //F: Gets whole data as bytes (Buffer) from file throughout the overlay abstract filesystem.
@@ -130,7 +130,7 @@ platform.io.get.bytes = function(path){
       return backend.get.bytes(path);
     }
   }
-  throw new Exception('resource \'%s\' does not exist',path);
+  throw new Exception('resource %s does not exist',path);
 };
 
 //F: Gets read stream for file throughout the overlay abstract filesystem.
@@ -150,7 +150,7 @@ platform.io.get.stream = function(path,options){
   }
   var stream = require('stream').Writable();
   setTimeout(function(){
-    stream.emit('error',new Exception('resource \'%s\' does not exist',path));
+    stream.emit('error',new Exception('resource %s does not exist',path));
   });
   return stream;
 
