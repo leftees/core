@@ -86,17 +86,18 @@ global.Exception = function(message){
   if (arguments_array.length > 0){
     formatted_message = native.util.format.apply(native.util,arguments_array);
   }
-  //C: assigning formatted message to this instance
-  this.message = formatted_message;
   //C: removing original message from arguments
-  if (arguments_array > 0) {
+  if (arguments_array.length > 0) {
     arguments_array.shift();
   }
+  var error = new Error(formatted_message);
   //C: storing arguments as exception data
-  this.data = arguments_array;
-  this.data.shift();
+  error.data = arguments_array;
   //C: initializing dump as null (will be populated by embedded runtime debugger)
-  this.dump = null;
+  error.dump = null;
+  //C: patching stack
+  error.stack = error.stack.replace(/\n\s*?at new global\.Exception.*?\n/,'\n');
+  return error;
 };
 //C: overriding toString() function to provide Error emulation
 global.Exception.prototype.toString = function(){
