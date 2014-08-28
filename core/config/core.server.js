@@ -25,7 +25,8 @@ platform.configuration = {};
 //O: Contains general application info.
 platform.configuration.application = {
   'name': 'Novetica Ljve',
-  'version': '0.4'
+  'version': '0.4',
+  'available': false
 };
 
 //O: Contains server configuration.
@@ -38,6 +39,7 @@ platform.configuration.server.bootloader = {};
 //H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. 'http://cdn.example.com/...').
 platform.configuration.server.bootloader.preload = [
   'runtime.server.js',
+  'stat.server.js',
   'utility.server.js',
   'kernel/kernel.server.js',
   'kernel/prototype.server.js',
@@ -53,8 +55,9 @@ platform.configuration.server.bootloader.preload = [
 //H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. 'http://cdn.example.com/...').
 platform.configuration.server.bootloader.modules = [
   'runtime.server.js',
+  'stat.server.js',
   'utility.server.js',
-  'dev/devtools.server.js',
+  'development/tools.server.js',
   'kernel/kernel.server.js',
   'kernel/prototype.server.js',
   'kernel/classes.server.js',
@@ -63,8 +66,17 @@ platform.configuration.server.bootloader.modules = [
   'io/io.server.js',
   'io/cache.server.js',
   'kernel/preprocess.server.js',
-  'http/context.server.js',
   'engine/engine.server.js',
+  'client/bootstrap.server.js',
+  'client/supported.server.js',
+  'session/session.server.js',
+  'session/session.store.server.js',
+  'session/sgen.server.js',
+  'session/pool.server.js',
+  'session/pool.store.server.js',
+  'system/memory.server.js',
+  'messaging/mail/mail.server.js',
+  'http/context.server.js',
   'http/http.server.js'
 ];
 
@@ -90,6 +102,11 @@ platform.configuration.server.http.ports = {
       'debug': true,
       //V: Define content body max byte size for requests on specified ports (overrides defaults).
       'limit': 5000000,
+      'timeout': 15000,
+      'compression': {
+        'enable': true,
+        'limit': 1024
+      },
       //V: Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
       'auth': false,
       //V: Define realm for HTTP authorization on specified ports.
@@ -119,6 +136,11 @@ platform.configuration.server.http.ports = {
       'debug': true,
       //V: Define content body max byte size for requests on specified ports (overrides defaults).
       'limit': 5000000,
+      'timeout': 15000,
+      'compression': {
+        'enable': true,
+        'limit': 1024
+      },
       //V: Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
       'auth': false,
       //V: Define realm for HTTP authorization on specified ports.
@@ -159,6 +181,13 @@ platform.configuration.server.http.default = {};
 
 //V: Define default content body max byte size for requests.
 platform.configuration.server.http.default.limit = 5000000;
+
+platform.configuration.server.http.default.timeout = 15000;
+
+platform.configuration.server.http.default.compression = {
+  'enable': true,
+  'limit': 1024
+};
 
 //T: improve with support for match multiple rules
 //O: Contains common defaults for HTTP security.
@@ -292,18 +321,25 @@ platform.configuration.server.http.default.mimetypes = {
 };
 
 //O: Contains global debugging configuration.
-platform.configuration.server.debugging = {};
-
-//V: Enable or disable global verbose HTTP debug log.
-platform.configuration.server.debugging.http = false;
-//V: Enable or disable global verbose WebSocket debug log.
-platform.configuration.server.debugging.websocket = true;
-//V: Enable or disable global verbose memory watcher debug log.
-platform.configuration.server.debugging.memory = true;
-//V: Enable or disable global verbose code load debug log.
-platform.configuration.server.debugging.load = true;
-//V: Enable or disable global verbose cache debug log.
-platform.configuration.server.debugging.cache = true;
+platform.configuration.server.debugging = {
+  //V: Enable or disable global verbose HTTP debug log.
+  'http': false,
+  //V: Enable or disable global verbose WebSocket debug log.
+  'websocket': true,
+  //V: Enable or disable global verbose memory watcher debug log.
+  'memory': true,
+  //V: Enable or disable global verbose code load debug log.
+  'load': true,
+  //V: Enable or disable global verbose cache debug log.
+  'cache': true,
+  //V: Enable or disable global verbose session debug log.
+  'session': true,
+  //V: Enable or disable global verbose bootstrap debug log.
+  'bootstrap': true,
+  'messaging': {
+    'mail': true
+  }
+};
 
 //O: Contains memory management configuration.
 platform.configuration.server.memory = {};
@@ -313,7 +349,7 @@ platform.configuration.server.memory.gc = {
   //V: Enable or disable forced garbage collector.
   'force': true,
   //V: Define forced garbage collection interval (ms).
-  'interval': 15000
+  'interval': 1000*60*1
 };
 
 //T: support multiple backends by configuration
@@ -337,3 +373,69 @@ platform.configuration.server.io.store.backends = {
   }
 };
 */
+
+platform.configuration.client = {};
+
+platform.configuration.client.bootstrap = {};
+
+platform.configuration.client.bootstrap.root = 'platform._bootstrap.seed';
+platform.configuration.client.bootstrap.loader = 'platform._bootstrap.load';
+
+platform.configuration.cache = {
+  'startup': {
+    'clean': false
+  }
+};
+
+platform.configuration.engine = {};
+
+platform.configuration.engine.session = {};
+
+platform.configuration.engine.session.gc = {
+  'generational': true,
+  'poll': 5000,
+  'state': {
+    'socket': 5000,
+    'http': 10000,
+    'dispose': 10000,
+    'time': 60000,
+    'bootstrap': 10000
+  }
+};
+
+platform.configuration.engine.messaging = {};
+
+platform.configuration.engine.messaging.mail = {
+  'enable': false,
+  'account': {
+    'host': 'localhost',
+    'port': '25',
+    'secure': true,
+    'tls': {
+      'rejectUnauthorized': false
+    },
+    'auth': {
+      'user': '',
+      'pass': ''
+    },
+    'authMethod': 'PLAIN',
+    'maxConnections': 5,
+    'maxMessages': 100
+  }
+};
+
+platform.configuration.addons = {};
+
+platform.configuration.addons.css = {};
+
+platform.configuration.addons.css.reset = {
+  'enable': true
+};
+
+platform.configuration.addons.google = {};
+
+platform.configuration.addons.google.analytics = {
+  'enable': false,
+  'id': '',
+  'domain': ''
+};
