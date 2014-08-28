@@ -23,65 +23,182 @@
 platform.utility = platform.utility || {};
 
 //F: Processes a function recursively for each element in specified object tree preventing maximum call stack exceed.
-//A: leafCallback: Specifies which function to call for each element in the object tree.
-//A: [endCallback]: Specifies which function to call after the whole tree has been processed.
+//A: leaf_callback: Specifies which function to call for each element in the object tree.
+//A: [end_callback]: Specifies which function to call after the whole tree has been processed.
 //A: rootObject: Specifies the element containing the whole object tree.
 //A: [...]: Unhardcoded pass-through arguments to push when calling CallFunction.
-platform.utility.recursiveCallH = function (leafCallback,endCallback,root) {
-  var pendingObjects = [];
+platform.utility.recursiveCallH = function (leaf_callback,end_callback,root) {
+  var pending = [];
   //C: getting array object from arguments custom object extending Array.prototype
-  var argumentsArray = Array.prototype.slice.call(arguments);
+  var invoke_arguments = Array.prototype.slice.call(arguments);
   //C: adding root object to pending queue
-  pendingObjects.push(argumentsArray[2]);
+  pending.push(invoke_arguments[2]);
   //C: removing RecursiveCall specific arguments (RootObject, CallFunction, CompleteFunction)
-  argumentsArray.shift();
-  argumentsArray.shift();
-  argumentsArray.shift();
+  invoke_arguments.shift();
+  invoke_arguments.shift();
+  invoke_arguments.shift();
   //C: processing pending queue until is empty
   do {
     //C: calling specified function with current pending object, as first argument, and pass-through arguments (sanitizing returned values to empty array if null)
-    var pendingArray = leafCallback.apply(this,[pendingObjects[0]].concat(argumentsArray)) || [];
+    var pendingArray = leaf_callback.apply(this,[pending[0]].concat(invoke_arguments)) || [];
     //C: cleaning current processed object
-    pendingObjects.shift();
+    pending.shift();
     //C: extending pending queue to vertically traverse
     if (pendingArray.constructor === Array) {
-      pendingObjects = pendingArray.concat(pendingObjects);
+      pending = pendingArray.concat(pending);
     }
-  } while (pendingObjects.length);
+  } while (pending.length);
   //C: executing CompleteFunction if not null
-  if (endCallback != null) {
-    endCallback.apply(this,argumentsArray);
+  if (end_callback != null) {
+    end_callback.apply(this,invoke_arguments);
   }
 };
 
 //F: Processes a function recursively for each element in specified object tree preventing maximum call stack exceed.
-//A: leafCallback: Specifies which function to call for each element in the object tree.
-//A: [endCallback]: Specifies which function to call after the whole tree has been processed.
+//A: leaf_callback: Specifies which function to call for each element in the object tree.
+//A: [end_callback]: Specifies which function to call after the whole tree has been processed.
 //A: rootObject: Specifies the element containing the whole object tree.
 //A: [...]: Unhardcoded pass-through arguments to push when calling CallFunction.
-platform.utility.recursiveCallV = function (leafCallback,endCallback,root) {
-  var pendingObjects = [];
+platform.utility.recursiveCallV = function (leaf_callback,end_callback,root) {
+  var pending = [];
   //C: getting array object from arguments custom object extending Array.prototype
-  var argumentsArray = Array.prototype.slice.call(arguments);
+  var invoke_arguments = Array.prototype.slice.call(arguments);
   //C: adding root object to pending queue
-  pendingObjects.push(argumentsArray[2]);
+  pending.push(invoke_arguments[2]);
   //C: removing RecursiveCall specific arguments (RootObject, CallFunction, CompleteFunction)
-  argumentsArray.shift();
-  argumentsArray.shift();
-  argumentsArray.shift();
+  invoke_arguments.shift();
+  invoke_arguments.shift();
+  invoke_arguments.shift();
   //C: processing pending queue until is empty
   do {
     //C: calling specified function with current pending object, as first argument, and pass-through arguments (sanitizing returned values to empty array if null)
-    var pendingArray = leafCallback.apply(this,[pendingObjects[0]].concat(argumentsArray)) || [];
+    var pendingArray = leaf_callback.apply(this,[pending[0]].concat(invoke_arguments)) || [];
     //C: cleaning current processed object
-    pendingObjects.shift();
+    pending.shift();
     //C: extending pending queue to vertically traverse
     if (pendingArray.constructor === Array) {
-      pendingObjects = pendingObjects.concat(pendingArray);
+      pending = pending.concat(pendingArray);
     }
-  } while (pendingObjects.length);
+  } while (pending.length);
   //C: executing CompleteFunction if not null
-  if (endCallback != null) {
-    endCallback.apply(this,argumentsArray);
+  if (end_callback != null) {
+    end_callback.apply(this,invoke_arguments);
   }
+};
+
+//F: Gets the arguments of a function.
+//A: target: Specifies the function object within retrieve arguments.
+//R: Returns the arguments name of a function, as array of string.
+Function.info = {};
+Function.info.arguments = function(target) {
+  var result = target.toString().match(/[^\0]*?(?=\))/g)[0].replace(/[^\0]*?\(|\s/g,'').split(',');
+  if (result.length != 0) {
+    //**WORKAROUND Chrome 20.0.15**//
+    if (result[result.length-1] == '/**/') {
+      result.pop();
+    }
+  }
+  if (result.length == 1 && result[0] == "")
+    return [];
+  else
+    return result;
+};
+
+//F: Creates a new object using a string as JSON representation with type-guessing. [Functions are not processed by default for security reasons.]
+//A: json_string: Specifies the string object to use for JSON object creation.
+//A: [safe]: Specifies whether functions should be parsed. Default is true.
+//R: Returns object created by JSON string.
+JSON._parseNormalize = function(json_string,safe) {
+  json_string = json_string.replace(/\n|\t/gi, '');
+  if ((/^\"{0,1}function[^\051]*?\050{1}[^\0]*?\051{1}\040*?\173{1}.*\175{1}$/g).test(json_string) === true) {
+    if (safe === false) {
+      var function_arguments = json_string.match(/^function[^\051]*?\050{1}[^\0]*?\051{1}\040*/)[0].replace(/^function[^\051]*?\050{1}/, '').replace(/\040*$/, '').slice(0, -1);
+      var function_body = json_string.replace(/^function[^\051]*?\050{1}[^\0]*?\051{1}\040*?\173{1}\040*/, '').slice(0, -1);
+      return new Function(function_arguments, function_body);
+    }
+  } else if ((/^\"{0,1}\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\"{0,1}$/g).test(json_string) === true) {
+    return new Date(json_string.replace(/\"/gi, ''));
+  } else if (json_string === '\"undefined\"' || json_string === 'undefined') {
+    return undefined;
+  } else if (json_string === '\"null\"' || json_string == 'null') {
+    return null;
+  } else if (json_string === '\"true\"' || json_string == 'true') {
+    return true;
+  } else if (json_string === '\"false\"' || json_string == 'false') {
+    return false;
+  } else if ((/^\"{0,1}\/.*\/[gmix]*\"{0,1}$/).test(json_string) === true) {
+    var regexp_body = json_string.slice(2).slice(0, -2);
+    var regexp_modifiers = (regexp_body.match(/[gmi]*$/) != null) ? regexp_body.match(/[gmi]*$/)[0] : '';
+    var regexp_patterns = regexp_body.replace(/[gmi]*$/, '');
+    return new RegExp(regexp_patterns, regexp_modifiers);
+  }
+  return json_string;
+};
+
+JSON.normalize = function(target,safe){
+  platform.utility.recursiveCallH(function(json_object){
+    var pending = [];
+    Object.keys(json_object).forEach(function(key){
+      var leaf_target = json_object[key];
+      if (leaf_target != null){
+        if (leaf_target.constructor === String) {
+          json_object[key] = JSON._parseNormalize(leaf_target,safe);
+        } else if(leaf_target.constructor === Object || leaf_target.constructor === Array){
+          //C: pushing object into pending array, if it is a generic object or an array
+          pending.push(leaf_target);
+        }
+      }
+    });
+    return pending;
+  }, null, target);
+  return target;
+};
+
+JSON.parseAndNormalize = function(json_string,safe,useEval) {
+  //eval = true;
+  var json_normalized = JSON._parseNormalize(json_string,safe);
+  if (typeof json_normalized !== 'string'){
+    return json_normalized;
+  }
+  var result;
+  if (eval === true) {
+    result = eval("(" + json_normalized + ")");
+    return result;
+  } else {
+    result = JSON.parse(json_normalized);
+    //T: try-catch to use custom json parser?
+  }
+  result = JSON.normalize(result,safe);
+  return result;
+};
+
+//F: Returns a human readable timespan.
+Number.toHumanTime = function (elapsed) {
+  var labels = ['ms', 's', 'm', 'h', 'd'];
+  var sizes = [1000, 60, 60, 24 ];
+  var data = [];
+  sizes.forEach(function(value){
+    data.push(elapsed % value);
+    elapsed = parseInt(elapsed/value);
+  });
+  var pos = 0;
+  data.forEach(function(value,index){
+    if(value > 0){
+      pos = index;
+    }
+  });
+  var result = data[pos];
+  if (pos > 0) {
+    result += '.' + parseInt(data[pos-1]/sizes[pos-1]*10);
+  }
+  result += labels[pos];
+  return result;
+};
+
+//F: Returns human readable byte size.
+Number.toHumanSize = function (bytes) {
+  var labels = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  if (bytes === 0) return 'n/a';
+  var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+  return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + labels[i];
 };
