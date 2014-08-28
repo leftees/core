@@ -99,16 +99,18 @@ describe('io', function() {
 
     it('listAll should succeed', function () {
       var result = platform.io.store.listAll();
-      result.length.should.equal(9);
+      result.length.should.equal(11);
       result[0].name.should.equal('app');
       result[1].name.should.equal('core');
       result[2].name.should.equal('system');
       result[3].name.should.equal('cache');
       result[4].name.should.equal('build');
-      result[5].name.should.equal('doexist');
-      result[6].name.should.equal('doexistHol');
-      result[7].name.should.equal('doexistNop');
-      result[8].name.should.equal('doexistNeg');
+      result[5].name.should.equal('session');
+      result[6].name.should.equal('pool');
+      result[7].name.should.equal('doexist');
+      result[8].name.should.equal('doexistHol');
+      result[9].name.should.equal('doexistNop');
+      result[10].name.should.equal('doexistNeg');
     });
 
     it('getByName missing store should fail', function () {
@@ -202,12 +204,14 @@ describe('io', function() {
         result[0].name.should.equal('app');
         result[1].name.should.equal('core');
         result = platform.io.store.listAll();
-        result.length.should.equal(5);
+        result.length.should.equal(7);
         result[0].name.should.equal('app');
         result[1].name.should.equal('core');
         result[2].name.should.equal('system');
         result[3].name.should.equal('cache');
         result[4].name.should.equal('build');
+        result[5].name.should.equal('session');
+        result[6].name.should.equal('pool');
       }).should.not.throw();
     });
 
