@@ -33,9 +33,9 @@ describe('devtools', function() {
 
     it('should be running if development mode is enabled', function () {
       if (platform.runtime.debugging === true) {
-        should.exist(platform.development.tools.inspector.__process__);
+        should.exist(platform.development.tools.inspector._process);
       } else {
-        should.not.exist(platform.development.tools.inspector.__process__);
+        should.not.exist(platform.development.tools.inspector._process);
       }
     });
 
@@ -51,7 +51,7 @@ describe('devtools', function() {
         (function () {
           platform.development.tools.inspector.stop();
         }).should.not.throw();
-        should.not.exist(platform.development.tools.inspector.__process__);
+        should.not.exist(platform.development.tools.inspector._process);
       });
 
       it('stop when not running should fail', function () {
@@ -64,7 +64,7 @@ describe('devtools', function() {
         (function () {
           platform.development.tools.inspector.start();
         }).should.not.throw();
-        should.exist(platform.development.tools.inspector.__process__);
+        should.exist(platform.development.tools.inspector._process);
       });
 
       after(function(){
@@ -82,11 +82,11 @@ describe('devtools', function() {
 
     it('should be running if development mode is enabled', function () {
       if (platform.runtime.development === true) {
-        should.exist(platform.development.tools.console.__agent__);
-        should.exist(platform.development.tools.console.__process__);
+        should.exist(platform.development.tools.console._agent);
+        should.exist(platform.development.tools.console._process);
       } else {
-        should.not.exist(platform.development.tools.console.__agent__);
-        should.not.exist(platform.development.tools.console.__process__);
+        should.not.exist(platform.development.tools.console._agent);
+        should.not.exist(platform.development.tools.console._process);
         platform.development.tools.console.start();
       }
     });
@@ -101,8 +101,8 @@ describe('devtools', function() {
       (function(){
         platform.development.tools.console.stop();
       }).should.not.throw();
-      should.not.exist(platform.development.tools.console.__agent__);
-      should.not.exist(platform.development.tools.console.__process__);
+      should.not.exist(platform.development.tools.console._agent);
+      should.not.exist(platform.development.tools.console._process);
     });
 
     it('stop when not running should fail', function () {
@@ -115,8 +115,8 @@ describe('devtools', function() {
       (function(){
         platform.development.tools.console.start();
       }).should.not.throw();
-      should.exist(platform.development.tools.console.__agent__);
-      should.exist(platform.development.tools.console.__process__);
+      should.exist(platform.development.tools.console._agent);
+      should.exist(platform.development.tools.console._process);
     });
 
     after(function(){
@@ -125,27 +125,7 @@ describe('devtools', function() {
 
   });
 
-  describe('memory',function() {
 
-    it('should exists', function () {
-      should.exist(platform.development.tools.memory);
-    });
-
-    it('collect should succeed', function () {
-      (function(){
-        platform.development.tools.memory.collect();
-      }).should.not.throw();
-    });
-
-    it('heap diff should succeed', function () {
-      this.timeout(10000);
-      (function(){
-        platform.development.tools.memory.start();
-        platform.development.tools.memory.stop();
-      }).should.not.throw();
-    });
-
-  });
 
 });
 
