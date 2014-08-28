@@ -65,7 +65,7 @@ platform.server.http.stop = function(port){
 };
 
 //F: Initializes HTTP(S) listeners.
-platform.server.http.init = function() {
+platform.server.http._init = function() {
   //C creating native HTTP listener for each configured port
   Object.keys(platform.configuration.server.http.ports).forEach(function (port_list) {
     //C: getting port configuration
@@ -227,7 +227,12 @@ platform.server.http.init = function() {
               if (cleaned_url === redirect_data.filter) {
                 return redirect_data.to;
               }
-            //C: chacking match against regexp
+            //C: checking match against function
+            } else if (typeof redirect_data.filter === 'function') {
+              if (redirect_data.filter() === true) {
+                return redirect_data.to;
+              }
+            //C: checking match against regexp
             } else if (redirect_data.filter.constructor === RegExp) {
               if (redirect_data.filter.test(cleaned_url) === true) {
                 return cleaned_url.replace(redirect_data.filter, redirect_data.to);
@@ -441,5 +446,5 @@ platform.server.http.init = function() {
 
 //C: initializing and starting HTTP(S) listeners
 //T: move init and HTTP(S) start in PXE events
-platform.server.http.init();
+platform.server.http._init();
 platform.server.http.start();
