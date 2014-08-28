@@ -37,8 +37,15 @@ Object.defineProperty(global,"platform",{
 
 //C: defining post power-on-self-test bootstrap function
 bootstrap.post = function(){
-  console.log('initializing');
+  var time_start = Date.now();
+
+  console.log('initializing core');
   //T: implement power-on-self-test
+
+  //C: deleting temporary folder if any
+  if (native.fs.existsSync(native.path.join(global.main.path.app, '/tmp')) === true) {
+    native.fs.removeSync(native.path.join(global.main.path.app, '/tmp'));
+  }
 
   //C: creating default folders
   //T: default folders should be created after platform.io stores loading for first store
@@ -75,6 +82,12 @@ bootstrap.post = function(){
   //C: loading preload module
   console.log('loading core modules');
   bootstrap.loadModules(platform.configuration.server.bootloader.modules,'/core/');
+
+  var time_stop = Date.now();
+
+  console.log('core initialized in %s', Number.toHumanTime(time_stop-time_start));
+
+  platform.system.memory.collect();
 
   //T: switch to PXE (pre execution environment)
   //T: PXE test http ports to prevent EADDRINUSE exception later
@@ -116,23 +129,23 @@ bootstrap.get = function(file,load) {
     //C: creating result with .uri and delayed .data properties
     result.uri = uri;
     result.file = file;
-    result.__data__ = undefined;
+    result._data = undefined;
     Object.defineProperty(result, 'data', { get: function () {
       //C: loading data if empty
-      if (this.__data__ === undefined) {
+      if (this._data === undefined) {
         try {
           //C: getting data from filesystem
-          this.__data__ = native.fs.readFileSync(this.uri, { encoding: 'utf-8' });
+          this._data = native.fs.readFileSync(this.uri, { encoding: 'utf-8' });
         } catch (e) {
-          throw new Exception("file \'%s\' not found", this.uri, e);
+          throw new Exception("file %s not found", this.uri, e);
         }
       }
-      return this.__data__;
+      return this._data;
     }, set: function () {
     } });
     return result;
   } else {
-    throw new Exception("file \'%s\' not found", uri);
+    throw new Exception("file %s not found", uri);
   }
 };
 
@@ -146,7 +159,7 @@ bootstrap.load = function(file){
       global.require.main._compile('\n'+resource.data,'app://'+file);
     //}
   } catch (ex) {
-    throw new Exception("error loading \'%s\': %s", resource.uri, ex.message, ex);
+    throw new Exception("error loading %s: %s", resource.uri, ex.message, ex);
   }
 };
 
