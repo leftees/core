@@ -32,11 +32,9 @@ platform.server.http.context = {};
 //A: request: Specifies the current request object.
 //A: response: Specifies the response object for current request.
 //A: server: Specifies the server object for current request.
-//A: session: Specifies the session object for current request.
-//A: identity: Specifies the identity object for current request.
 //A: callback<err,context>: Specifies the callback to be invoked when object is ready or error occurred.
 //R: Returns a context object.
-platform.server.http.context.create = function(request, response, server, session, identity, callback){
+platform.server.http.context.create = function(request, response, server, callback){
   //C: creating result object
   var result = {};
 
@@ -44,8 +42,8 @@ platform.server.http.context.create = function(request, response, server, sessio
   result.request = request;
   result.response = response;
   result.server = server;
-  result.session = session;
-  result.identity = identity;
+  result.session = null;
+  result.identity = null;
 
   //C: creating call object
   var call = result.call = {};
@@ -76,9 +74,6 @@ platform.server.http.context.create = function(request, response, server, sessio
   }
   //C: extending call object with HTTP method
   call.method = request.method;
-
-  //C: extending call object with invokable js strongname
-  call.invoke = call.url.pathname.substr(1).replace(/\//g,'.');
 
   //C: extending call object with type extracted from ContentType header
   call.type = request.headers['content-type'];
@@ -129,9 +124,11 @@ platform.server.http.context.create = function(request, response, server, sessio
           //C: assigning object representation of object
           call.data.object = data;
       }
+      call.arguments = JSON.normalize(call.arguments,true);
       callback(null, result);
     });
   } else {
+    call.arguments = JSON.normalize(call.arguments,true);
     callback(null, result);
   }
 };
@@ -141,8 +138,8 @@ platform.server.http.context.create = function(request, response, server, sessio
 Object.defineProperty(global,'context',{
   get: function(){
     //C: returning context object from active domain
-    if (native.domain.active != null && native.domain.active.__context__ != null) {
-      return native.domain.active.__context__;
+    if (native.domain.active != null && native.domain.active._context != null) {
+      return native.domain.active._context;
     } else {
       return null;
     }
@@ -155,7 +152,7 @@ Object.defineProperty(global,'context',{
 platform.server.http.context.bodyTypes = {};
 
 //V: Stores parser objects and instances.
-platform.server.http.context.bodyTypes.__store__ = {};
+platform.server.http.context.bodyTypes._store = {};
 
 //F: Registers a new body parser.
 //A: type: Specifies the content type of the parser.
@@ -163,10 +160,10 @@ platform.server.http.context.bodyTypes.__store__ = {};
 //R: Returns true if the parser is successfully registered.
 platform.server.http.context.bodyTypes.register = function(type,parseFunction){
   if (platform.server.http.context.bodyTypes.exist(type) === false) {
-    platform.server.http.context.bodyTypes.__store__[type] = parseFunction;
+    platform.server.http.context.bodyTypes._store[type] = parseFunction;
     return true;
   } else {
-    throw new Exception('type \'%s\' already exists',type);
+    throw new Exception('type %s already exists',type);
   }
 };
 
@@ -175,16 +172,16 @@ platform.server.http.context.bodyTypes.register = function(type,parseFunction){
 //R: Returns true if the backend has been unregistered.
 platform.server.http.context.bodyTypes.unregister = function(type){
   if (platform.server.http.context.bodyTypes.exist(type) === true) {
-    return delete platform.server.http.context.bodyTypes.__store__[type];
+    return delete platform.server.http.context.bodyTypes._store[type];
   } else {
-    throw new Exception('type \'%s\' does not exist',type);
+    throw new Exception('type %s does not exist',type);
   }
 };
 
 //F: Lists the content types registered.
 //R: Returns an array of types registered.
 platform.server.http.context.bodyTypes.list = function(){
-  return Object.keys(platform.server.http.context.bodyTypes.__store__);
+  return Object.keys(platform.server.http.context.bodyTypes._store);
 };
 
 //F: Gets a body parser by content type.
@@ -192,9 +189,9 @@ platform.server.http.context.bodyTypes.list = function(){
 //R: Returns the body parser function.
 platform.server.http.context.bodyTypes.get = function(type){
   if (platform.server.http.context.bodyTypes.exist(type) === true) {
-    return platform.server.http.context.bodyTypes.__store__[type];
+    return platform.server.http.context.bodyTypes._store[type];
   } else {
-    throw new Exception('parser for \'%s\' not found',type);
+    throw new Exception('parser for %s not found',type);
   }
 };
 
@@ -202,7 +199,7 @@ platform.server.http.context.bodyTypes.get = function(type){
 //A: type: Specifies the content type of the parser to be checked.
 //R: Returns true if the body parser exists.
 platform.server.http.context.bodyTypes.exist = function(type){
-  return (platform.server.http.context.bodyTypes.__store__.hasOwnProperty(type) && typeof platform.server.http.context.bodyTypes.__store__[type] === 'function');
+  return (platform.server.http.context.bodyTypes._store.hasOwnProperty(type) && typeof platform.server.http.context.bodyTypes._store[type] === 'function');
 };
 
 //C: registering body parser for text/plain (uses body node module)
