@@ -29,6 +29,9 @@ native.path = require('path');
 native.util = require('util');
 native.url = require('url');
 native.querystring = require('querystring');
+native.useragent = require('useragent');
+native.useragent(true);
+require('useragent/features');
 native.http = require('http');
 native.https = require('https');
 native.httpauth ={};
@@ -57,6 +60,9 @@ native.dom.xml = require('libxmljs').parseXml;
 native.request = require('request');
 native.moment = require('moment');
 native.esprima = require('esprima');
+native.uuid = require('node-uuid');
+native.metrics = require('measured');
+native.mail = require('nodemailer');
 
 //C: injecting core HTML5 classes implementation (we like a mirrored environment)
 //T: test W3C compliance for Worker
@@ -88,6 +94,7 @@ global.Exception = function(message){
   }
   //C: storing arguments as exception data
   this.data = arguments_array;
+  this.data.shift();
   //C: initializing dump as null (will be populated by embedded runtime debugger)
   this.dump = null;
 };
@@ -105,41 +112,18 @@ native.console = {};
 //C: adding emulation for console.debug
 native.console.debug = native.console.log;
 
-//F: Returns a human readable timespan.
-var humanElapsed = function (elapsed) {
-  var labels = ['ms', 's', 'm', 'h', 'd'];
-  var sizes = [1000, 60, 60, 24 ];
-  var data = [];
-  sizes.forEach(function(value){
-    data.push(elapsed % value);
-    elapsed = parseInt(elapsed/value);
-  });
-  var pos = 0;
-  data.forEach(function(value,index){
-    if(value > 0){
-      pos = index;
-    }
-  });
-  var result = data[pos];
-  if (pos > 0) {
-    result += '.' + parseInt(data[pos-1]/sizes[pos-1]*10);
-  }
-  result += labels[pos];
-  return result;
-};
-
 //C: defining centralized print with level and color support (xterm int code as second argument)
 console.print = function (level,color,args) {
   var formatted_message = native.util.format.apply(native.util, args);
   /*var now = Date.now();
-  var elapsed = now - console.print.__lasttime__;
-  console.print.__lasttime__ = now;
+  var elapsed = now - console.print._lasttime;
+  console.print._lasttime = now;
   if (global.hasOwnProperty('platform') === true){
-    formatted_message = '[' + native.moment(now).format('YYYY-MM-DD HH:mm:ss.SSS') + '] [+' + humanElapsed(elapsed) + '] [' + level + '] ' + formatted_message;
+    formatted_message = '[' + native.moment(now).format('YYYY-MM-DD HH:mm:ss.SSS') + '] [+' + Number.toHumanTime(elapsed) + '] [' + level + '] ' + formatted_message;
   }*/
   return native.console[level](native.cli.color.xterm(color)(formatted_message));
 };
-console.print.__lasttime__ = null;
+console.print._lasttime = null;
 
 //C: replacing console.log with coloured implementation
 console.log = function () {
