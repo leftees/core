@@ -281,7 +281,7 @@ var filesystem_backend = function(root) {
     if (native.fs.existsSync(fullpath) === false) {
       //T: throw real ENOENT error
       if (typeof callback === 'function') {
-        callback(new Error());
+        callback(new Exception());
       } else {
         throw Error();
       }

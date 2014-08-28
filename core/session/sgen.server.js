@@ -29,7 +29,7 @@ platform.sessions.gc.start = function(){
   if (platform.sessions.gc._interval === null){
     platform.sessions.gc._interval = setInterval(platform.sessions.gc.collect, platform.configuration.engine.session.gc.poll);
   } else {
-    throw new Error();
+    throw new Exception();
   }
 };
 
@@ -38,7 +38,7 @@ platform.sessions.gc.stop = function(){
     clearInterval(platform.sessions.gc._interval);
     platform.sessions.gc._interval = null;
   } else {
-    throw new Error();
+    throw new Exception();
   }
 };
 
