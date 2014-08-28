@@ -130,9 +130,9 @@ platform.sessions.unregister = function(session_id) {
         console.debug('session %s unregistered after %s',session.name,Number.toHumanTime(Date.now()-session._session.start));
       }
 
-      delete platform.sessions._store[session_id];
-
       platform.sessions.pools.remove(session_id);
+
+      delete platform.sessions._store[session_id];
 
       //T: clean socket auths for session
 
