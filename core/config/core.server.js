@@ -333,7 +333,7 @@ platform.configuration.server.http.default.mimetypes = {
 //O: Contains global debugging configuration.
 platform.configuration.server.debugging = {
   //V: Enable or disable global verbose HTTP debug log.
-  'http': false,
+  'http': true,
   //V: Enable or disable global verbose WebSocket debug log.
   'websocket': true,
   //V: Enable or disable global verbose memory watcher debug log.
@@ -443,8 +443,11 @@ platform.configuration.engine.handlers = {
     'host': '',
     'port': '',
     'headers': {
-      'keep': [],
-      'mask': []
+      'mask': {
+        'post': [ 'keep-alive' ],
+        'pre': [ 'connection', 'cache-control' ]
+      },
+      'keep': []
     },
     'daemon': {
       'bin': '',
@@ -452,15 +455,34 @@ platform.configuration.engine.handlers = {
       'root': ''
     }
   },
-  'proxy': {
-    'filter': '/proxy',
-    'type': 'proxy',
-    'base': 'https://localhost:8443/test/',
-    'host': '',
-    'port': '',
+  'http': {
+    'filter': /^\/git\/(.*?)/gi,
+    'type': 'http',
+    'base': 'https://www.npmjs.org/$1',
     'headers': {
-      'keep': [],
-      'mask': []
+      'mask': {
+        'post': [
+          'keep-alive',
+          'etag',
+          'access-control-allow-origin',
+          'content-security-policy',
+          'x-xss-protection',
+          'x-frame-options',
+          'x-content-type-options',
+          'strict-transport-security',
+          'cache-control',
+          'via',
+          'x-served-by',
+          'x-cache',
+          'x-cache-hits',
+          'vary',
+          'source-age',
+          'connection',
+          'accept-ranges'
+        ],
+        'pre': [ 'connection', 'cache-control', 'if-none-match' ]
+      },
+      'keep': []
     },
     'daemon': {
       'bin': '',
@@ -471,9 +493,8 @@ platform.configuration.engine.handlers = {
   'status_by_regexp': {
     'filter': /^\/status/gi,
     'type': 'invoke',
-    'invoke': function(callback){
+    'invoke': function(){
       platform.engine.process.file();
-      callback(null);
     }
   },
   'status_by_function': {
@@ -481,9 +502,8 @@ platform.configuration.engine.handlers = {
       return true;
     },
     'type': 'invoke',
-    'invoke': function(callback){
+    'invoke': function(){
       platform.engine.process.file();
-      callback(null);
     }
   }
 };

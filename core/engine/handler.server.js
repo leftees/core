@@ -27,16 +27,12 @@ platform.engine.handlers.register = function(name,options){
   if (platform.engine.handlers.exist(name) === false) {
     var handler = options;
 
-    switch(handler.type){
-      case 'fastcgi':
-      case 'proxy':
-        if (handler.daemon != null && handler.daemon.bin != null){
-          if (handler.daemon.root != null && handler.daemon.root.startsWith(ntive.path.sep) === false){
-            handler.daemon.root = platform.io.map(handler.daemon.root);
-          }
-          handler._process = require('child_process').spawn(handler.daemon.bin, handler.daemon.args||[],{ 'cwd': handler.daemon.root });
-        }
-        break;
+    //T: check if handler.daemon.bin is executable file
+    if (handler.daemon != null && handler.daemon.bin != null && platform.io.system.exist(handler.daemon.bin) === true && platform.io.system.info(handler.daemon.bin).isFile() === true){
+      if (handler.daemon.root != null && handler.daemon.root.startsWith(native.path.sep) === false){
+        handler.daemon.root = platform.io.map(handler.daemon.root);
+      }
+      handler._process = require('child_process').spawn(handler.daemon.bin, handler.daemon.args||[],{ 'cwd': handler.daemon.root });
     }
 
     platform.engine.handlers._store[name] = handler;
@@ -56,14 +52,9 @@ platform.engine.handlers.unregister = function(name){
       console.debug('handler %s unregistered', name);
     }
 
-    switch(handler.type){
-      case 'fastcgi':
-      case 'proxy':
-        if (handler._process != null){
-          handler._process.kill();
-          handler._process = undefined;
-        }
-        break;
+    if (handler._process != null){
+      handler._process.kill();
+      handler._process = undefined;
     }
 
     delete (platform.engine.handlers._store[name]);
@@ -121,12 +112,199 @@ platform.engine.handlers.resolve = function(request){
   }
 };
 
-platform.engine.handlers.process = function(name){
+platform.engine.handlers.data = {};
 
+platform.engine.handlers.data.get = function(name, key){
+  if (key == null) {
+    if (context.session != null && context.session.handlers[name] != null) {
+      return context.session.handlers[name];
+    }
+  } else {
+    if (context.session != null && context.session.handlers[name] != null) {
+      return context.session.handlers[name][key];
+    }
+  }
+  return null;
+};
+
+platform.engine.handlers.data.set = function(name, key, value){
+  if (context.session != null) {
+    if (context.session.handlers[name] == null) {
+      context.session.handlers[name] = {};
+    }
+    context.session.handlers[name][key] = value;
+  }
+};
+
+platform.engine.handlers.data._merge = function(name, handler, headers){
+  var result = {};
+  Object.keys(headers).forEach(function(key){
+    if(key === 'host' || (handler.headers != null && handler.headers.mask != null && handler.headers.mask.pre != null && handler.headers.mask.pre.constructor === Array && handler.headers.mask.pre.indexOf(key) > -1)){
+    } else {
+      result[key] = headers[key];
+    }
+  });
+  if (context.session != null && context.session.handlers[name] != null) {
+    Object.keys(context.session.handlers[name]).forEach(function (key) {
+      if (key === 'cookie'){
+        var cookie_store = {};
+        context.session.handlers[name][key].forEach(function(cookie_object){
+          //T: add support for expire/maxAge
+          var cookie_name = Object.keys(cookie_object)[0];
+          cookie_store[cookie_name] = cookie_object[cookie_name];
+        });
+        result['cookie'] = native.cookie.serialize(cookie_store);
+      } else if (handler.headers != null && handler.headers.keep != null && handler.headers.keep.constructor === Array && handler.headers.keep.indexOf(key) > -1) {
+        if (context.session.handlers[name] != null && context.session.handlers[name][key] != null) {
+          result[key] = context.session.handlers[name][key];
+        }
+      }
+    });
+  }
+  return result;
+};
+
+platform.engine.handlers.data._keep = function(name, handler, headers){
+  if (context.session != null) {
+    Object.keys(headers).forEach(function (key) {
+      if (key === 'set-cookie'){
+        if (typeof headers[key] === 'string'){
+          headers[key] = [headers[key]];
+        }
+        headers[key].forEach(function(cookie_string){
+          if (context.session.handlers[name] == null) {
+            context.session.handlers[name] = {};
+          }
+          if (context.session.handlers['cookie'] == null) {
+            context.session.handlers['cookie'] = {};
+          }
+          var cookie_data = native.cookie.parse(cookie_string);
+          var cookie_name = Object.keys(cookie_data)[0];
+          context.session.handlers[name]['cookie'][cookie_name] = cookie_data;
+        });
+      } else if (handler.headers != null && handler.headers.keep != null && handler.headers.keep.constructor === Array && handler.headers.keep.indexOf(key) > -1) {
+        if (context.session.handlers[name] == null) {
+          context.session.handlers[name] = {};
+        }
+        context.session.handlers[name][key] = headers[key];
+      }
+    });
+  }
+};
+
+platform.engine.handlers.data._mask = function(name, handler, headers){
+  var result = {};
+  Object.keys(headers).forEach(function(key){
+    if(handler.headers != null && handler.headers.mask != null && handler.headers.mask.post != null && handler.headers.mask.post.constructor === Array && handler.headers.mask.post.indexOf(key) > -1){
+    } else {
+      result[key] = headers[key];
+    }
+  });
+  return result;
+};
+
+platform.engine.handlers.data.clean = function(name){
+  if (context.session != null) {
+    delete context.session.handlers[name];
+  }
+};
+
+platform.engine.handlers.process = function(name){
+  if (platform.engine.handlers.exist(name) === true) {
+    var request = context.request;
+    var response = context.response;
+    var call = context.call;
+
+    var handler = platform.engine.handlers._store[name];
+
+    switch(handler.type){
+      case 'fastcgi':
+        if (handler.count === Number.MAX_VALUE) {
+          handler.count = 0;
+        }
+        var id = ++handler.count;
+
+        break;
+      case 'http':
+        if (handler.base != null){
+          var remote_url = null;
+          var cleaned_url = request.url;
+          var query_marker = cleaned_url.indexOf('?');
+          if (query_marker > -1) {
+            cleaned_url = cleaned_url.substr(0, query_marker);
+          }
+          if (handler.filter.constructor !== RegExp) {
+            remote_url = native.url.resolve(handler.base,cleaned_url);
+          } else {
+            remote_url = cleaned_url.replace(handler.filter,handler.base);
+          }
+          if (query_marker > -1){
+            remote_url += request.url.substr(query_marker);
+          }
+          var options = {};
+          options.method = request.method;
+          options.url = remote_url;
+          options.headers = platform.engine.handlers.data._merge(name, handler,request.headers);
+          //T: explore header trailers to stream response without buffer
+          var buffer = [];
+          var request_proxy = native.request(options,function(err, remote_response, body){
+            if (err) {
+              console.error(err.stack||err.message);
+              //T: propagate error to client
+              response.end();
+              return;
+            }
+            platform.engine.handlers.data._keep(name, handler,remote_response.headers);
+            response.statusCode = remote_response.statusCode;
+            var masked_headers = platform.engine.handlers.data._mask(name, handler,remote_response.headers);
+            Object.keys(masked_headers).forEach(function(key){
+              response.setHeader(key,masked_headers[key]);
+            });
+            buffer.forEach(function(chunk){
+              response.write(chunk);
+            });
+            response.end();
+          });
+          //T: apply body size limit
+          //T: handle errors
+          request_proxy.on('data', function (chunk) {
+            buffer.push(chunk);
+          });
+          //T: test postdata forwarding
+          if (call.data.length > 0) {
+            request.pipe(request_proxy);
+          }
+        }
+        break;
+      case 'invoke':
+        var invoke = null;
+        if (typeof handler.invoke === 'function'){
+          invoke = handler.invoke;
+        } else if (typeof handler.invoke === 'string'){
+          invoke = platform.kernel.get(handler.invoke);
+          if (typeof invoke !== 'function') {
+            invoke = null;
+          }
+        }
+        if (invoke != null){
+          invoke();
+        }
+        break;
+      default:
+        throw new Exception('unsupport handler type %s for %s',handler.type,name);
+        break;
+    }
+
+  } else {
+    throw new Exception('handler %s does not exist',name);
+  }
 };
 
 platform.engine.handlers._init = function(){
-
+  Object.keys(platform.configuration.engine.handlers).forEach(function(name){
+    var options = platform.configuration.engine.handlers[name];
+    platform.engine.handlers.register(name,options);
+  });
 };
 
 //T: move init and HTTP(S) start in PXE events
