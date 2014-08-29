@@ -444,8 +444,8 @@ platform.configuration.engine.handlers = {
     'port': '',
     'headers': {
       'mask': {
-        'post': [ 'keep-alive' ],
-        'pre': [ 'connection', 'cache-control' ]
+        'in': [ 'keep-alive', 'set-cookie' ],
+        'out': [ 'connection', 'cache-control', 'cookie' ]
       },
       'keep': []
     },
@@ -461,7 +461,7 @@ platform.configuration.engine.handlers = {
     'base': 'https://www.npmjs.org/$1',
     'headers': {
       'mask': {
-        'post': [
+        'in': [
           'keep-alive',
           'etag',
           'access-control-allow-origin',
@@ -478,9 +478,10 @@ platform.configuration.engine.handlers = {
           'vary',
           'source-age',
           'connection',
-          'accept-ranges'
+          'accept-ranges',
+          'set-cookie'
         ],
-        'pre': [ 'connection', 'cache-control', 'if-none-match' ]
+        'out': [ 'connection', 'cache-control', 'if-none-match', 'cookie' ]
       },
       'keep': []
     },

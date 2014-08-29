@@ -139,7 +139,7 @@ platform.engine.handlers.data.set = function(name, key, value){
 platform.engine.handlers.data._merge = function(name, handler, headers){
   var result = {};
   Object.keys(headers).forEach(function(key){
-    if(key === 'host' || (handler.headers != null && handler.headers.mask != null && handler.headers.mask.pre != null && handler.headers.mask.pre.constructor === Array && handler.headers.mask.pre.indexOf(key) > -1)){
+    if(key === 'host' || (handler.headers != null && handler.headers.mask != null && handler.headers.mask.out != null && handler.headers.mask.out.constructor === Array && handler.headers.mask.out.indexOf(key) > -1)){
     } else {
       result[key] = headers[key];
     }
@@ -195,7 +195,7 @@ platform.engine.handlers.data._keep = function(name, handler, headers){
 platform.engine.handlers.data._mask = function(name, handler, headers){
   var result = {};
   Object.keys(headers).forEach(function(key){
-    if(handler.headers != null && handler.headers.mask != null && handler.headers.mask.post != null && handler.headers.mask.post.constructor === Array && handler.headers.mask.post.indexOf(key) > -1){
+    if(handler.headers != null && handler.headers.mask != null && handler.headers.mask.in != null && handler.headers.mask.in.constructor === Array && handler.headers.mask.in.indexOf(key) > -1){
     } else {
       result[key] = headers[key];
     }
