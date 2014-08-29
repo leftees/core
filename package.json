@@ -1,6 +1,6 @@
 {
   "name": "ljve",
-  "version": "0.3.9999-4",
+  "version": "0.3.9999-5",
   "description": "Live Javascript Virtualized Environment",
   "author": "Marco Minetti <marco.minetti@novetica.org>",
   "contributors": [],
@@ -41,6 +41,8 @@
     "chokidar": "*",
     "multiparty": "*",
     "body": "*",
+    "cookie": "*",
+    "cookie-signature": "*",
     "jsdom": "*",
     "libxmljs": "*",
     "request": "*",

@@ -49,6 +49,18 @@ native.body.text = require('body');
 native.body.json = require('body/json');
 native.body.form = require('body/form');
 native.body.multipart = require('multiparty').Form;
+native.cookie = require('cookie');
+native.cookie.create = native.cookie.serialize;
+native.cookie.serialize = function(data){
+  var result = [];
+  Object.keys(data).forEach(function(name){
+    result.push(name+'='+data[name]);
+  });
+  return result.join('; ');
+};
+native.cookie._signature = require('cookie-signature');
+native.cookie.sign = native.cookie._signature.sign;
+native.cookie.unsign = native.cookie._signature.unsign;
 native.dom = {};
 native.dom.html = require('jsdom');
 native.dom.html.defaultDocumentFeatures = {
