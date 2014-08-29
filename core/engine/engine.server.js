@@ -170,11 +170,13 @@ platform.engine.process.http = function (context) {
 };
 
 platform.engine.process.fallback = function(){
-  //T: check if handler exists
-  //T: process handler
+  var handler = platform.engine.handlers.resolve(context.request);
 
-  //T: process file
-  platform.engine.process.file();
+  if (handler != null) {
+    platform.engine.handlers.process(handler);
+  } else {
+    platform.engine.process.file();
+  }
 };
 
 platform.engine.process.restful = function(target){
@@ -249,10 +251,6 @@ platform.engine.process.restful._callback = function(err,result){
     data_stream.write(content);
   }
   data_stream.end();
-};
-
-platform.engine.process.handler = function(){
-
 };
 
 platform.engine.process.file = function(){

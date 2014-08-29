@@ -29,6 +29,7 @@ platform.sessions._export = function(session_id){
     if (platform.sessions.exist(session_id) === true) {
       var session = platform.sessions.get(session_id);
 
+      //T: choose final session persistency strategy (reboot or expire?)
       var data_to_store = {};
       data_to_store.name = session.name;
       data_to_store.id = session.id;
@@ -45,6 +46,7 @@ platform.sessions._export = function(session_id){
       data_to_store._session.working = 0;
       data_to_store._session.files = [];
       data_to_store._session.modules = [];
+      data_to_store._session.handlers = {};
       data_to_store._session.storage = session._session.storage;
       data_to_store._session.engine = session._session.engine;
       data_to_store.global = {};

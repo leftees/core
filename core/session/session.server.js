@@ -70,6 +70,7 @@ platform.sessions.register = function() {
       'files':[],
       'modules':[],
       'storage':{},
+      'handlers': {},
       'engine': platform.engine.id
     },
     'global':{}
@@ -220,7 +221,7 @@ platform.sessions.isValid = function (session_id){
 //A: session_id: Specifies name of new class to check.
 //R: Returns true if session is registered.
 platform.sessions.exist = function(session_id){
-  return (platform.sessions._store.hasOwnProperty(session_id));
+  return platform.sessions._store.hasOwnProperty(session_id);
 };
 
 //F: Gets session object by session id.

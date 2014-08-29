@@ -25,8 +25,8 @@ platform.configuration = {};
 //O: Contains general application info.
 platform.configuration.application = {
   'name': 'Novetica Ljve',
-  'version': '0.4',
-  'available': false
+  'version': '0.4.0-porting',
+  'available': true
 };
 
 //O: Contains server configuration.
@@ -67,6 +67,7 @@ platform.configuration.server.bootloader.modules = [
   'io/cache.server.js',
   'kernel/preprocess.server.js',
   'engine/engine.server.js',
+  'engine/handler.server.js',
   'client/bootstrap.server.js',
   'client/supported.server.js',
   'session/session.server.js',
@@ -149,7 +150,7 @@ platform.configuration.server.http.ports = {
       //H: Filters are applied against request relative URI cleaned by querystring.
       'redirect':{
         //V: Define new redirector name.
-        'myredirectbystring': {
+        'override_redirect_by_string': {
           //V: Define string to be searched into URL as string.
           'filter': '/example',
           //V: Define new URI to redirect to, as string.
@@ -200,16 +201,25 @@ platform.configuration.server.http.default.reject.url = /^\/LICENSE|^\/README|\/
 //H: Filters are applied against request relative URI cleaned by querystring.
 platform.configuration.server.http.default.redirect = {
   //V: Define new redirector name.
-  'myredirectbystring': {
+  'redirect_by_string': {
     //V: Define string to be searched into URL as string.
     'filter': '/example',
     //V: Define new URI to redirect to, as string.
     'to': 'http://example.com/ljve/'
   },
   //V: Define new redirector name.
-  'myredirectbyregexp': {
+  'redirect_by_regexp': {
     //V: Define string to be searched into URL as regexp.
     'filter': /^\/examplex(.*)/,
+    //V: Define new URI to redirect to, as string but with regexp grouping support.
+    'to': 'http://example.com/$1/'
+  },
+  //V: Define new redirector name.
+  'redirect_by_function': {
+    //V: Define function to be called for custom tests.
+    'filter': function(){
+      return false;
+    },
     //V: Define new URI to redirect to, as string but with regexp grouping support.
     'to': 'http://example.com/$1/'
   }
@@ -338,7 +348,8 @@ platform.configuration.server.debugging = {
   'bootstrap': true,
   'messaging': {
     'mail': true
-  }
+  },
+  'handler': true
 };
 
 //O: Contains memory management configuration.
@@ -421,6 +432,59 @@ platform.configuration.engine.messaging.mail = {
     'authMethod': 'PLAIN',
     'maxConnections': 5,
     'maxMessages': 100
+  }
+};
+
+platform.configuration.engine.handlers = {
+  'php': {
+    'filter': /\.php$/gi,
+    'type': 'fastcgi',
+    'socket': '',
+    'host': '',
+    'port': '',
+    'headers': {
+      'keep': [],
+      'mask': []
+    },
+    'daemon': {
+      'bin': '',
+      'args': [],
+      'root': ''
+    }
+  },
+  'proxy': {
+    'filter': '/proxy',
+    'type': 'proxy',
+    'base': 'https://localhost:8443/test/',
+    'host': '',
+    'port': '',
+    'headers': {
+      'keep': [],
+      'mask': []
+    },
+    'daemon': {
+      'bin': '',
+      'args': [],
+      'root': ''
+    }
+  },
+  'status_by_regexp': {
+    'filter': /^\/status/gi,
+    'type': 'invoke',
+    'invoke': function(callback){
+      platform.engine.process.file();
+      callback(null);
+    }
+  },
+  'status_by_function': {
+    'filter': function(){
+      return true;
+    },
+    'type': 'invoke',
+    'invoke': function(callback){
+      platform.engine.process.file();
+      callback(null);
+    }
   }
 };
 
