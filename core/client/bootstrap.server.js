@@ -266,7 +266,7 @@ platform._bootstrap.release = function(statistics_data,oldsession_data,relogin_d
         //if (platform.engine.id === engine_id) {
           if (platform.sessions.isValid(session_id) === true) {
             if (platform.sessions.exist(session_id) === true) {
-              session = platform.sessions.get(session_id);
+              session = platform.sessions._store[session_id];
 
               if (session._session.token !== session_token) {
                 session = null;
@@ -274,6 +274,7 @@ platform._bootstrap.release = function(statistics_data,oldsession_data,relogin_d
                 if (Object.keys(session.sockets).length === 0 || (Object.keys(session.sockets).length === 1 && Object.keys(session.sockets)[0] === "fakefunnel")) {
                   session._session.files = early_session._session.files;
                   session._session.modules = [];
+                  session._session.handlers = {};
                   session._session.timeout = platform.configuration.engine.session.gc.state.http;
                   session._session.lease = Date.now() + platform.configuration.engine.session.gc.state.http;
                   if (session.state == 0 || session.state == 2) {
@@ -310,7 +311,7 @@ platform._bootstrap.release = function(statistics_data,oldsession_data,relogin_d
         var session_parts = platform.sessions.register().split(':');
         session_id = session_parts[0];
         session_token = session_parts[1];
-        session = platform.sessions.get(session_id);
+        session = platform.sessions._store[session_id];
         session._session.files = early_session._session.files;
       }
 

@@ -72,7 +72,7 @@ platform.sessions.pools.register = function(name, session_list){
 platform.sessions.pools.unregister = function(pool_id){
   if (platform.sessions.pools.isValid(pool_id) === true) {
     if (platform.sessions.pools.exist(pool_id) === true) {
-      var pool = platform.sessions.pools.get(pool_id);
+      var pool = platform.sessions.pools._store[pool_id];
 
       //T: store statistics
       //T: raise event
@@ -97,7 +97,7 @@ platform.sessions.pools.isValid = function (pool_id){
 };
 
 platform.sessions.pools.exist = function(pool_id){
-  return (platform.sessions.pools._store.hasOwnProperty(pool_id));
+  return platform.sessions.pools._store.hasOwnProperty(pool_id);
 };
 
 platform.sessions.pools.get = function(pool_id) {
@@ -132,7 +132,7 @@ platform.sessions.pools.getByName = function(name) {
   var pool_list = Object.keys(platform.sessions.pools._store);
   var result = null;
   pool_list.forEach(function(pool_id) {
-    var pool = platform.sessions.pools.get(pool_id);
+    var pool = platform.sessions.pools._store[pool_id];
     if (pool.name === name){
       result = pool_id;
     }
@@ -216,7 +216,7 @@ platform.sessions.pools.contains = function(session_id,pool_id){
     if (platform.sessions.exist(session_id) === true) {
       if (platform.sessions.pools.isValid(pool_id) === true) {
         if (platform.sessions.pools.exist(pool_id) === true) {
-          var pool = platform.sessions.pools.get(pool_id);
+          var pool = platform.sessions.pools._store[pool_id];
           return (pool.sessions.indexOf(session_id) !== -1);
         } else {
           throw new Exception('session pool %s does not exist',pool_id);
@@ -236,7 +236,7 @@ platform.sessions.pools.contains = function(session_id,pool_id){
 platform.sessions.pools.clear = function(pool_id){
   if (platform.sessions.pools.isValid(pool_id) === true) {
     if (platform.sessions.pools.exist(pool_id) === true) {
-      var pool = platform.sessions.pools.get(pool_id);
+      var pool = platform.sessions.pools._store[pool_id];
       pool.sessions = [];
       return true;
     } else {
@@ -260,7 +260,7 @@ platform.sessions.resolve = function(session_or_pool_id, include_hidden){
 
   if (platform.sessions.pools.isValid(session_or_pool_id) === true) {
     if (platform.sessions.pools.exist(session_or_pool_id) === true) {
-      var pool = platform.sessions.pools.get(session_or_pool_id);
+      var pool = platform.sessions.pools._store[session_or_pool_id];
       result = pool.sessions;
       return result;
     }
@@ -273,7 +273,7 @@ platform.sessions.resolve = function(session_or_pool_id, include_hidden){
   }
   var test_pool_id = platform.sessions.pools.getByName(session_or_pool_id);
   if (test_pool_id != null) {
-    var pool = platform.sessions.pools.get(session_or_pool_id);
+    var pool = platform.sessions.pools._store[test_pool_id];
     result = pool.sessions;
     return result;
   }
@@ -283,7 +283,7 @@ platform.sessions.resolve = function(session_or_pool_id, include_hidden){
 
   var session_list = platform.sessions.list(include_hidden);
   session_list.forEach(function(session_id){
-    var session = platform.sessions.get(session_id);
+    var session = platform.sessions._store[session_id];
     if(session_id !== session.name && minimatch(session.name,session_or_pool_id) === true){
       if (result.indexOf(session_id) === -1) {
         result.push(session_id);
@@ -293,7 +293,7 @@ platform.sessions.resolve = function(session_or_pool_id, include_hidden){
 
   var pool_list = platform.sessions.pools.list(include_hidden);
   pool_list.forEach(function(pool_id){
-    var pool = platform.sessions.get(pool_id);
+    var pool = platform.sessions.pools._store[pool_id];
     if(pool_id !== session.name && minimatch(pool.name,session_or_pool_id) === true){
       pool.sessions.forEach(function(session_id){
         if (result.indexOf(session_id) === -1) {
