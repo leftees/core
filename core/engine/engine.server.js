@@ -81,7 +81,7 @@ platform.engine.process.auth.digest = function(realm,username,callback){
 };
 
 //F: Processes an HTTP request.
-platform.engine.process.http = function (context) {
+platform.engine.process.http = function () {
   var request = context.request;
   var response = context.response;
   var call = context.call;
@@ -159,7 +159,10 @@ platform.engine.process.http = function (context) {
     //T: check if protected/unprotected
 
     if (skip === false) {
-      platform.engine.process.restful(target);
+      call.data.get(function(err){
+        //T: handle errors
+        platform.engine.process.restful(target);
+      });
     } else {
       platform.engine.process.fallback();
     }

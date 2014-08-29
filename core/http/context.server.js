@@ -34,7 +34,7 @@ platform.server.http.context = {};
 //A: server: Specifies the server object for current request.
 //A: callback<err,context>: Specifies the callback to be invoked when object is ready or error occurred.
 //R: Returns a context object.
-platform.server.http.context.create = function(request, response, server, callback){
+platform.server.http.context.create = function(request, response, server){
   //C: creating result object
   var result = {};
 
@@ -94,43 +94,71 @@ platform.server.http.context.create = function(request, response, server, callba
   //C: defining content object representation (assigned later)
   call.data.object = null;
 
-  //C: generating request body if type is supported
-  if (call.data.length > 0 && platform.server.http.context.bodyTypes.exist(call.type) === true) {
-    //C: getting body parser by content type and executing
-    platform.server.http.context.bodyTypes.get(call.type)(request,function(err,data){
-      //C: returning error if any
-      if (err) {
-        callback(err);
-        return;
-      }
-      //C: performing more data handling by type
-      //T: move into parser specific code?
-      switch(call.type) {
-        case 'application/x-www-form-urlencoded':
-        case 'application/json':
-        case 'multipart/form-data':
-          //C: extending call arguments object with content data
-          call.arguments = {};
-          Object.keys(data).forEach(function(name){
-            call.arguments[name] = data[name];
-          });
-          Object.keys(call.url.query).forEach(function(name){
-            call.arguments[name] = call.url.query[name];
-          });
-          //C: assigning object representation of object
-          call.data.object = data;
-          break;
-        default:
-          //C: assigning object representation of object
-          call.data.object = data;
-      }
+  call.data.ready = false;
+
+  call.data.get = function(callback){
+    //C: generating request body if type is supported
+    if (call.data.length === 0) {
+      callback(null);
+    } else if (platform.server.http.context.parsers.exist(call.type) === true) {
+      //C: getting body parser by content type and executing
+      platform.server.http.context.parsers.get(call.type)(request,function(err,data){
+        //C: returning error if any
+        if (err) {
+          callback(err);
+          return;
+        }
+        //C: performing more data handling by type
+        //T: move into parser specific code?
+        switch(call.type) {
+          case 'application/x-www-form-urlencoded':
+          case 'application/json':
+          case 'multipart/form-data':
+            //C: extending call arguments object with content data
+            call.arguments = {};
+            Object.keys(data).forEach(function(name){
+              call.arguments[name] = data[name];
+            });
+            Object.keys(call.url.query).forEach(function(name){
+              call.arguments[name] = call.url.query[name];
+            });
+            //C: assigning object representation of object
+            call.data.object = data;
+            break;
+          default:
+            //C: assigning object representation of object
+            call.data.object = data;
+        }
+        call.arguments = JSON.normalize(call.arguments,true);
+        call.data.ready = true;
+        callback(null);
+      });
+    } else {
       call.arguments = JSON.normalize(call.arguments,true);
-      callback(null, result);
-    });
-  } else {
-    call.arguments = JSON.normalize(call.arguments,true);
-    callback(null, result);
-  }
+      var buffer = [];
+      var buffer_length = 0;
+      //T: apply body size limit
+      //T: handle errors
+      request.on('data', function (chunk) {
+        buffer_length += chunk.length;
+        buffer.push(chunk);
+        if (buffer_length > call.data.length && call.data.ready === false) {
+          call.data.object = Buffer.concat(buffer).slice(0, call.data.length);
+          call.data.ready = true;
+          callback(null);
+        }
+      });
+      request.on('end', function () {
+        if (call.data.ready === false) {
+          call.data.object = Buffer.concat(buffer);
+          call.data.ready = true;
+          callback(null);
+        }
+      });
+    }
+  };
+
+  return result;
 };
 
 //T: migrate to contextify or similar for isolation?
@@ -149,18 +177,18 @@ Object.defineProperty(global,'context',{
 });
 
 //N: Provides body parser classes and namespace.
-platform.server.http.context.bodyTypes = {};
+platform.server.http.context.parsers = {};
 
 //V: Stores parser objects and instances.
-platform.server.http.context.bodyTypes._store = {};
+platform.server.http.context.parsers._store = {};
 
 //F: Registers a new body parser.
 //A: type: Specifies the content type of the parser.
 //A: parseFunction<request,callback>: Specifies the parser as function.
 //R: Returns true if the parser is successfully registered.
-platform.server.http.context.bodyTypes.register = function(type,parseFunction){
-  if (platform.server.http.context.bodyTypes.exist(type) === false) {
-    platform.server.http.context.bodyTypes._store[type] = parseFunction;
+platform.server.http.context.parsers.register = function(type,parseFunction){
+  if (platform.server.http.context.parsers.exist(type) === false) {
+    platform.server.http.context.parsers._store[type] = parseFunction;
     return true;
   } else {
     throw new Exception('type %s already exists',type);
@@ -170,9 +198,9 @@ platform.server.http.context.bodyTypes.register = function(type,parseFunction){
 //F: Unregisters a body parser for a content type.
 //A: type: Specifies the content type of the parser to be unregistered.
 //R: Returns true if the backend has been unregistered.
-platform.server.http.context.bodyTypes.unregister = function(type){
-  if (platform.server.http.context.bodyTypes.exist(type) === true) {
-    return delete platform.server.http.context.bodyTypes._store[type];
+platform.server.http.context.parsers.unregister = function(type){
+  if (platform.server.http.context.parsers.exist(type) === true) {
+    return delete platform.server.http.context.parsers._store[type];
   } else {
     throw new Exception('type %s does not exist',type);
   }
@@ -180,16 +208,16 @@ platform.server.http.context.bodyTypes.unregister = function(type){
 
 //F: Lists the content types registered.
 //R: Returns an array of types registered.
-platform.server.http.context.bodyTypes.list = function(){
-  return Object.keys(platform.server.http.context.bodyTypes._store);
+platform.server.http.context.parsers.list = function(){
+  return Object.keys(platform.server.http.context.parsers._store);
 };
 
 //F: Gets a body parser by content type.
 //A: type: Specifies the content type of the parser to be returned.
 //R: Returns the body parser function.
-platform.server.http.context.bodyTypes.get = function(type){
-  if (platform.server.http.context.bodyTypes.exist(type) === true) {
-    return platform.server.http.context.bodyTypes._store[type];
+platform.server.http.context.parsers.get = function(type){
+  if (platform.server.http.context.parsers.exist(type) === true) {
+    return platform.server.http.context.parsers._store[type];
   } else {
     throw new Exception('parser for %s not found',type);
   }
@@ -198,12 +226,12 @@ platform.server.http.context.bodyTypes.get = function(type){
 //F: Checks whether the parser is registered for a content type.
 //A: type: Specifies the content type of the parser to be checked.
 //R: Returns true if the body parser exists.
-platform.server.http.context.bodyTypes.exist = function(type){
-  return (platform.server.http.context.bodyTypes._store.hasOwnProperty(type) && typeof platform.server.http.context.bodyTypes._store[type] === 'function');
+platform.server.http.context.parsers.exist = function(type){
+  return (platform.server.http.context.parsers._store.hasOwnProperty(type) && typeof platform.server.http.context.parsers._store[type] === 'function');
 };
 
 //C: registering body parser for text/plain (uses body node module)
-platform.server.http.context.bodyTypes.register('text/plain',function(request,callback){
+platform.server.http.context.parsers.register('text/plain',function(request,callback){
   //C: executing external module body with content size limit
   native.body.text(request,null,{
     limit: request.limit
@@ -211,7 +239,7 @@ platform.server.http.context.bodyTypes.register('text/plain',function(request,ca
 });
 
 //C: registering body parser for application/x-www-form-urlencoded (uses body node module)
-platform.server.http.context.bodyTypes.register('application/x-www-form-urlencoded',function(request,callback){
+platform.server.http.context.parsers.register('application/x-www-form-urlencoded',function(request,callback){
   //C: executing external module body/form with content size limit
   native.body.form(request,null,{
     limit: request.limit
@@ -219,7 +247,7 @@ platform.server.http.context.bodyTypes.register('application/x-www-form-urlencod
 });
 
 //C: registering body parser for application/json (uses body node module)
-platform.server.http.context.bodyTypes.register('application/json',function(request,callback){
+platform.server.http.context.parsers.register('application/json',function(request,callback){
   //C: executing external module body/json with content size limit
   native.body.json(request,null,{
     limit: request.limit
@@ -227,7 +255,7 @@ platform.server.http.context.bodyTypes.register('application/json',function(requ
 });
 
 //C: registering body parser for text/html (uses tuned jsdom node module)
-platform.server.http.context.bodyTypes.register('text/html',function(request,callback){
+platform.server.http.context.parsers.register('text/html',function(request,callback){
   //C: executing external module body with content size limit
   native.body.text(request,null,{
     limit: request.limit
@@ -246,7 +274,7 @@ platform.server.http.context.bodyTypes.register('text/html',function(request,cal
 });
 
 //C: registering body parser for text/xml (uses libxmljs node module)
-platform.server.http.context.bodyTypes.register('text/xml',function(request,callback){
+platform.server.http.context.parsers.register('text/xml',function(request,callback){
   //C: executing external module body with content size limit
   native.body.text(request,null,{
     limit: request.limit
@@ -265,7 +293,7 @@ platform.server.http.context.bodyTypes.register('text/xml',function(request,call
 });
 
 //C: registering body parser for multipart/form-data (uses multiparty node module)
-platform.server.http.context.bodyTypes.register('multipart/form-data',function(request,callback) {
+platform.server.http.context.parsers.register('multipart/form-data',function(request,callback) {
   //C: instancing multipart parser with content size limit and temporary directory for uploaded files
   (new native.body.multipart({
     maxFilesSize: request.limit,
