@@ -77,6 +77,7 @@ platform.sessions.register = function() {
   };
 
   platform.sessions._store[session_id] = session;
+  context.session = session;
 
   //T: create identity/login as anonymous
   //T: create identity/login from httpauth
