@@ -186,7 +186,7 @@ platform.server.http._init = function() {
         request.limit = this.limit;
         request.timeout = this.timeout;
         request.setTimeout(this.timeout,function(){
-          request.abort();
+          //request.abort();
         });
 
         //C: creating request.client property (with address and port) to simulate common behavior
@@ -324,28 +324,34 @@ platform.server.http._init = function() {
           });
         }
 
-        //C: attaching to domain end event (request processing ended)
-        request.on('end', function () {
+        //C: attaching to response finish event (request processing ended)
+        response.on('finish', function () {
           if (debug === true && platform.configuration.server.debugging.http === true) {
             console.debug('[http' + ((secure) ? 's' : '') + ':%s] finished client request #%s from %s:%s with status %s in %s' + ((domain._context['response']._async === true) ? ' (async)' : ' (sync)'), port, count, remote_address, remote_port, domain._context['response'].statusCode, Number.toHumanTime(Date.now()-domain._context['request'].start));
           }
           //C: clearing context data
-          delete domain._context['request'];
-          delete domain._context['response'];
-          delete domain._context['server'];
-          delete domain._context['call'];
+          if (domain._context != null) {
+            delete domain._context['request'];
+            delete domain._context['response'];
+            delete domain._context['server'];
+            delete domain._context['call'];
+            domain._context = null;
+          }
         });
 
-        //C: attaching to request close event (domain closed?)
+        //C: attaching to request close event
         request.on('close', function () {
           if (debug === true && platform.configuration.server.debugging.http === true) {
             console.debug('[http' + ((secure) ? 's' : '') + ':%s] closed client request #%s from %s:%s', port, count, remote_address, remote_port);
           }
           //C: clearing context data
-          delete domain._context['request'];
-          delete domain._context['response'];
-          delete domain._context['server'];
-          delete domain._context['call'];
+          if (domain._context != null) {
+            delete domain._context['request'];
+            delete domain._context['response'];
+            delete domain._context['server'];
+            delete domain._context['call'];
+            domain._context = null;
+          }
         });
 
         //C: logging request processing if debug enabled
@@ -355,15 +361,12 @@ platform.server.http._init = function() {
 
         //C: processing request within domain
         domain.run(function(){
-          //C: creating http call context
-          platform.server.http.context.create(request, response, server, function(err,context) {
-            //C: setting pseudo-thread-static context object
-            //T: should be disposed somewhere? (maybe domain.dispose is sufficient)
-            native.domain.active._context = context;
-            //C: processing request
-            //T: complete port of multihost support from 0.3.x branch
-            platform.engine.process.http(context);
-          });
+          //C: creating http call context and storing through pseudo-thread-static context object
+          //T: should be disposed somewhere? (maybe domain.dispose is sufficient)
+          native.domain.active._context = platform.server.http.context.create(request, response, server);
+          //C: processing request
+          //T: complete port of multihost support from 0.3.x branch
+          platform.engine.process.http();
         });
 
       });
