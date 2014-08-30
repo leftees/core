@@ -45,7 +45,7 @@ platform.system.memory.stop = function(){
 //F: Demands a V8 runtime garbage collection.
 platform.system.memory.collect = function(){
   if (platform.configuration.server.debugging.memory === true) {
-    platform.system.memory.log(true,true);
+    platform.system.memory.log(true,false);
   }
   var time_start = Date.now();
   platform.system.memory._memwatch.gc();
