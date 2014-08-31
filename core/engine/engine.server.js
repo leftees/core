@@ -237,6 +237,8 @@ platform.engine.process.restful._callback = function(err,result){
       'result': result
     });
   } else {
+    //T: return json, html or text depending on acceptable content type
+    response.statusCode = 500;
     content = JSON.stringify({
       'error': err
     });
