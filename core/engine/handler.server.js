@@ -27,12 +27,34 @@ platform.engine.handlers.register = function(name,options){
   if (platform.engine.handlers.exist(name) === false) {
     var handler = options;
 
-    //T: check if handler.daemon.bin is executable file
-    if (handler.daemon != null && handler.daemon.bin != null && platform.io.system.exist(handler.daemon.bin) === true && platform.io.system.info(handler.daemon.bin).isFile() === true){
+    if (handler.daemon != null && handler.daemon.exec != null){
       if (handler.daemon.root != null && handler.daemon.root.startsWith(native.path.sep) === false){
         handler.daemon.root = platform.io.map(handler.daemon.root);
       }
-      handler._process = require('child_process').spawn(handler.daemon.bin, handler.daemon.args||[],{ 'cwd': handler.daemon.root });
+      handler._process = require('child_process').spawn('bash', ['-c',handler.daemon.exec||''],{ 'cwd': handler.daemon.root });
+
+      //C: attaching child stdout to process stdoud
+      handler._process.stdout.pipe(process.stdout);
+      //handler._process.stdout.on('data',function(data){
+      //  process.stdout.write(data);
+      //});
+
+      //C: attaching child stderr to process stderr
+      handler._process.stderr.pipe(process.stderr);
+      //handler._process.stderr.on('data',function(data){
+      //  process.stderr.write(data);
+      //});
+
+      //C: attaching on child close event to exit main
+      handler._process.on('close', function (code,signal) {
+        handler._process = undefined;
+      });
+    }
+
+    switch(handler.type){
+      case 'fastcgi':
+        handler._client = platform.kernel.new('core.net.fastcgi.client',[handler.port||handler.socket,((handler.socket == null) ? (handler.host||'localhost') : null)]);
+        break;
     }
 
     platform.engine.handlers._store[name] = handler;
@@ -55,6 +77,13 @@ platform.engine.handlers.unregister = function(name){
     if (handler._process != null){
       handler._process.kill();
       handler._process = undefined;
+    }
+
+    switch(handler.type){
+      case 'fastcgi':
+        //T: close fcgi client when pool will be implemented
+        handler._client = null;
+        break;
     }
 
     delete (platform.engine.handlers._store[name]);
@@ -89,7 +118,6 @@ platform.engine.handlers.resolve = function(request){
   for(var name in platform.engine.handlers._store) {
     if (platform.engine.handlers._store.hasOwnProperty(name) === true) {
       var handler = platform.engine.handlers._store[name];
-
       if (handler.filter != null) {
         //C: checking match against string
         if (typeof handler.filter === 'string') {
@@ -103,7 +131,7 @@ platform.engine.handlers.resolve = function(request){
           }
           //C: checking match against regexp
         } else if (handler.filter.constructor === RegExp) {
-          if (handler.filter.test(cleaned_url) === true) {
+          if (handler.filter.test(cleaned_url) === true && (handler.filter.lastIndex = 0) === 0) {
             return name;
           }
         }
@@ -133,6 +161,9 @@ platform.engine.handlers.data.set = function(name, key, value){
       context.session.handlers[name] = {};
     }
     context.session.handlers[name][key] = value;
+    if (handler.debug === true && platform.configuration.server.debugging.handler === true) {
+      console.debug('keeping header %s for handler %s in session %s (manual)',key,name,context.session.name);
+    }
   }
 };
 
@@ -154,9 +185,16 @@ platform.engine.handlers.data._merge = function(name, handler, headers){
           cookie_store[cookie_name] = cookie_object[cookie_name];
         });
         result['cookie'] = native.cookie.serialize(cookie_store);
+        if (handler.debug === true && platform.configuration.server.debugging.handler === true) {
+          console.debug('merging cookie %s for handler %s from session %s',cookie_name,name,context.session.name);
+        }
       } else if (handler.headers != null && handler.headers.keep != null && handler.headers.keep.constructor === Array && handler.headers.keep.indexOf(key) > -1) {
         if (context.session.handlers[name] != null && context.session.handlers[name][key] != null) {
           result[key] = context.session.handlers[name][key];
+          //T: support multiple header values (a.k.a. arrays)
+          if (handler.debug === true && platform.configuration.server.debugging.handler === true) {
+            console.debug('merging header %s for handler %s from session %s',key,name,context.session.name);
+          }
         }
       }
     });
@@ -181,12 +219,19 @@ platform.engine.handlers.data._keep = function(name, handler, headers){
           var cookie_data = native.cookie.parse(cookie_string);
           var cookie_name = Object.keys(cookie_data)[0];
           context.session.handlers[name]['cookie'][cookie_name] = cookie_data;
+          if (handler.debug === true && platform.configuration.server.debugging.handler === true) {
+            console.debug('keeping cookie %s for handler %s in session %s',cookie_name,name,context.session.name);
+          }
         });
       } else if (handler.headers != null && handler.headers.keep != null && handler.headers.keep.constructor === Array && handler.headers.keep.indexOf(key) > -1) {
         if (context.session.handlers[name] == null) {
           context.session.handlers[name] = {};
         }
+        //T: support multiple header values (a.k.a. arrays)
         context.session.handlers[name][key] = headers[key];
+        if (handler.debug === true && platform.configuration.server.debugging.handler === true) {
+          console.debug('keeping header %s for handler %s in session %s',key,name,context.session.name);
+        }
       }
     });
   }
@@ -196,6 +241,9 @@ platform.engine.handlers.data._mask = function(name, handler, headers){
   var result = {};
   Object.keys(headers).forEach(function(key){
     if(handler.headers != null && handler.headers.mask != null && handler.headers.mask.in != null && handler.headers.mask.in.constructor === Array && handler.headers.mask.in.indexOf(key) > -1){
+      if (handler.debug === true && platform.configuration.server.debugging.handler === true) {
+        console.debug('masking header %s for handler %s',key,name);
+      }
     } else {
       result[key] = headers[key];
     }
@@ -216,65 +264,79 @@ platform.engine.handlers.process = function(name){
     var call = context.call;
 
     var handler = platform.engine.handlers._store[name];
+    if (context.server.debug === true && platform.configuration.server.debugging.http === true) {
+      console.debug('[http' + ((context.server.secure) ? 's' : '') + ':%s] forwarding client request #%s to %s handler %s', context.server.port, request.id, handler.type,name);
+    }
 
     switch(handler.type){
       case 'fastcgi':
-        if (handler.count === Number.MAX_VALUE) {
-          handler.count = 0;
-        }
-        var id = ++handler.count;
-
-        break;
       case 'http':
-        if (handler.base != null){
-          var remote_url = null;
-          var cleaned_url = request.url;
-          var query_marker = cleaned_url.indexOf('?');
+        response._async = true;
+        //T: use native.url.parse/native.url.format?
+        var remote_url = request.url;
+        if (handler.to != null) {
+          var query_marker = remote_url.indexOf('?');
           if (query_marker > -1) {
-            cleaned_url = cleaned_url.substr(0, query_marker);
+            remote_url = remote_url.substr(0, query_marker);
           }
           if (handler.filter.constructor !== RegExp) {
-            remote_url = native.url.resolve(handler.base,cleaned_url);
+            remote_url = native.url.resolve(handler.to, remote_url);
           } else {
-            remote_url = cleaned_url.replace(handler.filter,handler.base);
+            remote_url = remote_url.replace(handler.filter, handler.to);
           }
-          if (query_marker > -1){
+          if (query_marker > -1) {
             remote_url += request.url.substr(query_marker);
           }
-          var options = {};
-          options.method = request.method;
-          options.url = remote_url;
-          options.headers = platform.engine.handlers.data._merge(name, handler,request.headers);
-          //T: explore header trailers to stream response without buffer
-          var buffer = [];
-          var request_proxy = native.request(options,function(err, remote_response, body){
-            if (err) {
-              console.error(err.stack||err.message);
-              //T: propagate error to client
-              response.end();
-              return;
-            }
-            platform.engine.handlers.data._keep(name, handler,remote_response.headers);
-            response.statusCode = remote_response.statusCode;
-            var masked_headers = platform.engine.handlers.data._mask(name, handler,remote_response.headers);
-            Object.keys(masked_headers).forEach(function(key){
-              response.setHeader(key,masked_headers[key]);
-            });
-            buffer.forEach(function(chunk){
-              response.write(chunk);
-            });
-            response.end();
-          });
-          //T: apply body size limit
-          //T: handle errors
-          request_proxy.on('data', function (chunk) {
-            buffer.push(chunk);
-          });
-          //T: test postdata forwarding
-          if (call.data.length > 0) {
-            request.pipe(request_proxy);
-          }
         }
+        var remote_url_object = native.url.parse(remote_url);
+        if (typeof handler.strip === 'number' && handler.strip > 0) {
+          remote_url_object.path = remote_url_object.path.split('/');
+          remote_url_object.path.splice(1,handler.strip);
+          remote_url_object.path = remote_url_object.path.join('/');
+        }
+
+        var options = {};
+        options.method = request.method;
+        options.host = remote_url_object.host;
+        options.port = remote_url_object.port;
+        options.path = remote_url_object.path;
+        options.headers = platform.engine.handlers.data._merge(name, handler,request.headers);
+        var remote_request = null;
+        if (handler.type === 'fastcgi'){
+          remote_request = handler._client.request(options);
+        } else if (handler.type === 'http'){
+          remote_request = native[(remote_url_object.protocol||'http:').replace(':','')].request(options);
+        }
+        remote_request.on('error',function(err){
+          if (handler.debug === true && platform.configuration.server.debugging.handler === true) {
+            console.error('exception caught in handler %s for client request #%s: %s',name,request.id,err.stack||err.message);
+          }
+        });
+        remote_request.on('response',function(remote_response){
+          if (handler.debug === true && platform.configuration.server.debugging.handler === true) {
+            console.debug('forwarding response from %s handler %s to client request #%s with status %s',handler.type,name,request.id,remote_response.statusCode);
+          }
+          platform.engine.handlers.data._keep(name,handler,remote_response.headers);
+          response.statusCode = remote_response.statusCode;
+          var masked_headers = platform.engine.handlers.data._mask(name,handler,remote_response.headers);
+          Object.keys(masked_headers).forEach(function(key){
+            response.setHeader(key,masked_headers[key]);
+          });
+          remote_response.pipe(response);
+          //remote_response.on('data',function(chunk){
+          //  response.write(chunk);
+          //});
+          //remote_response.on('end',function(){
+          //  response.end();
+          //});
+        });
+        request.pipe(remote_request);
+        //request.on('data',function(chunk){
+        //  remote_request.write(chunk);
+        //});
+        //request.on('end',function(){
+        //  remote_request.end();
+        //});
         break;
       case 'invoke':
         var invoke = null;
