@@ -66,6 +66,8 @@ platform.configuration.server.bootloader.modules = [
   'io/io.server.js',
   'io/cache.server.js',
   'kernel/preprocess.server.js',
+  'system/memory.server.js',
+  'net/fastcgi.server.js',
   'engine/engine.server.js',
   'engine/handler.server.js',
   'client/bootstrap.server.js',
@@ -75,7 +77,6 @@ platform.configuration.server.bootloader.modules = [
   'session/sgen.server.js',
   'session/pool.server.js',
   'session/pool.store.server.js',
-  'system/memory.server.js',
   'messaging/mail/mail.server.js',
   'http/context.server.js',
   'http/http.server.js'
@@ -115,7 +116,7 @@ platform.configuration.server.http.ports = {
       //V: Define port-specific regexp to reject request by URI (overrides defaults).
       //H: Filter is applied against request relative URI cleaned by querystring.
       'reject': {
-        'url': /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//
+        'url': /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|\/^\/project\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//
       },
       //V: Contains port-specific HTTP redirect configuration.
       //H: Filters are applied against request relative URI cleaned by querystring.
@@ -195,7 +196,7 @@ platform.configuration.server.http.default.compression = {
 platform.configuration.server.http.default.reject = {};
 //V: Define default regexp to reject request by URI.
 //H: Filter is applied against request relative URI cleaned by querystring.
-platform.configuration.server.http.default.reject.url = /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//;
+platform.configuration.server.http.default.reject.url = /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|\/^\/project\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//;
 
 //O: Contains default HTTP redirect configuration.
 //H: Filters are applied against request relative URI cleaned by querystring.
@@ -349,7 +350,8 @@ platform.configuration.server.debugging = {
   'messaging': {
     'mail': true
   },
-  'handler': true
+  'handler': true,
+  'fastcgi': false
 };
 
 //O: Contains memory management configuration.
@@ -437,11 +439,13 @@ platform.configuration.engine.messaging.mail = {
 
 platform.configuration.engine.handlers = {
   'php': {
-    'filter': /\.php$/gi,
+    'filter': /^\/php/gi,
     'type': 'fastcgi',
-    'socket': '',
-    'host': '',
-    'port': '',
+    //'to': '$1',
+    'strip': 1,
+    'socket': 'tmp/php-fpm.sock',
+    //'host': '',
+    //'port': 8081,
     'headers': {
       'mask': {
         'in': [ 'keep-alive', 'set-cookie' ],
@@ -450,15 +454,16 @@ platform.configuration.engine.handlers = {
       'keep': []
     },
     'daemon': {
-      'bin': '',
-      'args': [],
-      'root': ''
-    }
+      'exec': '/usr/sbin/php5-fpm -p `pwd` -y test/files/php/php-fpm.conf -F',
+      'root': null
+    },
+    'debug': true
   },
   'http': {
-    'filter': /^\/git\/(.*?)/gi,
+    'filter': /\/git\/(.*?)$/gi,
     'type': 'http',
-    'base': 'https://www.npmjs.org/$1',
+    'to': 'https://raw.githubusercontent.com/to_strip/marcominetti/ljve.io/master/$1',
+    'strip': 1,
     'headers': {
       'mask': {
         'in': [
@@ -485,27 +490,18 @@ platform.configuration.engine.handlers = {
       },
       'keep': []
     },
-    'daemon': {
-      'bin': '',
-      'args': [],
-      'root': ''
-    }
+    'debug': true
   },
-  'status_by_regexp': {
-    'filter': /^\/status/gi,
-    'type': 'invoke',
-    'invoke': function(){
-      platform.engine.process.file();
-    }
-  },
-  'status_by_function': {
+  'coverage_by_function': {
     'filter': function(){
-      return true;
+      return (/^\/coverage$/gi).test(context.call.url.pathname);
     },
     'type': 'invoke',
     'invoke': function(){
+      context.call.url.pathname = '/project/stats/coverage.html';
       platform.engine.process.file();
-    }
+    },
+    'debug': true
   }
 };
 
