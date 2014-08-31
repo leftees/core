@@ -32,7 +32,8 @@ native.util = require('util');
 native.url = require('url');
 native.querystring = require('querystring');
 native.useragent = require('useragent');
-native.useragent(true);
+//T: fix update path for global installations
+//native.useragent(true);
 require('useragent/features');
 native.http = require('http');
 native.https = require('https');
