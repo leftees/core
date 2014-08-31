@@ -101,6 +101,9 @@ platform.server.http.context.create = function(request, response, server){
     if (call.data.length === 0) {
       callback(null);
     } else if (platform.server.http.context.parsers.exist(call.type) === true) {
+      if (server.debug === true && platform.configuration.server.debugging.http === true) {
+        console.debug('[http' + ((server.secure) ? 's' : '') + ':%s] parsing data for client request #%s', server.port, request.id);
+      }
       //C: getting body parser by content type and executing
       platform.server.http.context.parsers.get(call.type)(request,function(err,data){
         //C: returning error if any

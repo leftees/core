@@ -160,10 +160,6 @@ platform.server.http._init = function() {
       agent_http.on('request',function (request, response) {
         request.start =  Date.now();
 
-        //C: updating stats
-        platform.statistics.counter('http.requests.total').inc();
-        platform.statistics.meter('http.requests.active').mark();
-
         //C: getting needed listener configurations
         var secure = this.secure;
         var port = this.port;
@@ -197,21 +193,32 @@ platform.server.http._init = function() {
         //C: incrementing request count for listener and using it as request.id property
         if (this.count === Number.MAX_VALUE) {
           this.count = 0;
+          if (debug === true && platform.configuration.server.debugging.http === true) {
+            console.debug('[http' + ((secure) ? 's' : '') + ':%s] resetting request id counter because max value reached');
+          }
         }
         var count = request.id = ++this.count;
+
+        //C: updating stats
+        platform.statistics.counter('http.requests.total').inc();
+        platform.statistics.meter('http.requests.active').mark();
+        if (debug === true && platform.configuration.server.debugging.http === true) {
+          console.debug('[http' + ((secure) ? 's' : '') + ':%s] new request #%s from %s:%s', port, count, remote_address, remote_port);
+        }
 
         //C: extending request object with HTTP redirect function
         request.redirect = function (redirect_to) {
           //C: updating stats
           platform.statistics.meter('http.redirects').mark();
           if (debug === true && platform.configuration.server.debugging.http === true) {
-            console.warn('[http' + ((secure) ? 's' : '') + ':%s] redirected request #%s from %s:%s for %s to %s', port, count, remote_address, remote_port, request.url, redirect_to);
+            console.warn('[http' + ((secure) ? 's' : '') + ':%s] redirected request #%s for %s to %s', port, count, request.url, redirect_to);
           }
           response.statusCode = '302';
           response.setHeader('Location', redirect_to);
           response.end();
         };
 
+        //T: use native.url.parse/native.url.format?
         //C: getting url cleaned by querystring
         var cleaned_url = request.url;
         var query_marker = cleaned_url.indexOf('?');
@@ -234,7 +241,7 @@ platform.server.http._init = function() {
               }
             //C: checking match against regexp
             } else if (redirect_data.filter.constructor === RegExp) {
-              if (redirect_data.filter.test(cleaned_url) === true) {
+              if (redirect_data.filter.test(cleaned_url) === true && (redirect_data.filter.lastIndex = 0) === 0) {
                 return cleaned_url.replace(redirect_data.filter, redirect_data.to);
               }
             }
@@ -282,12 +289,12 @@ platform.server.http._init = function() {
         }
 
         //C: validating URL
-        if ((reject.url||platform.configuration.server.http.default.reject.url).test(cleaned_url) === true) {
+        if ((reject.url||platform.configuration.server.http.default.reject.url).test(cleaned_url) === true && ((reject.url||platform.configuration.server.http.default.reject.url).lastIndex = 0) === 0) {
           //C: updating stats
           platform.statistics.meter('http.rejects').mark();
           //C: logging reject if debug enabled
           if (debug === true && platform.configuration.server.debugging.http === true) {
-            console.warn('[http' + ((secure) ? 's' : '') + ':%s] rejected client request #%s from %s:%s with url %s not allowed', port, count, remote_address, remote_port, request.url);
+            console.warn('[http' + ((secure) ? 's' : '') + ':%s] rejected client request #%s with url %s not allowed', port, count, request.url);
           }
           //C: returning 404 status code (for security reason we do not reply with 403/406)
           response.statusCode = 404;
@@ -302,7 +309,7 @@ platform.server.http._init = function() {
 
         //C: logging new context if debug enabled
         if (debug === true && platform.configuration.server.debugging.http === true) {
-          console.debug('[http' + ((secure) ? 's' : '') + ':%s] creating context request #%s from %s:%s', port, count, remote_address, remote_port);
+          console.debug('[http' + ((secure) ? 's' : '') + ':%s] creating context request #%s', port, count);
         }
 
         //C: creating request-specific domain (required for call context)
@@ -317,17 +324,17 @@ platform.server.http._init = function() {
         //C: attaching to domain events error/dispose if debug is enabled
         if (debug === true && platform.configuration.server.debugging.http === true) {
           domain.on('error', function (err) {
-            console.warn('[http' + ((secure) ? 's' : '') + ':%s] exception in request #%s from %s:%s: %s', port, count, remote_address, remote_port, err.stack || err.message);
+            console.warn('[http' + ((secure) ? 's' : '') + ':%s] exception in request #%s: %s', port, count, err.stack || err.message);
           });
           domain.on('dispose', function () {
-            console.debug('[http' + ((secure) ? 's' : '') + ':%s] disposing context request #%s from %s:%s', port, count, remote_address, remote_port);
+            console.debug('[http' + ((secure) ? 's' : '') + ':%s] disposing context request #%s', port, count);
           });
         }
 
         //C: attaching to response finish event (request processing ended)
         response.on('finish', function () {
           if (debug === true && platform.configuration.server.debugging.http === true) {
-            console.debug('[http' + ((secure) ? 's' : '') + ':%s] finished client request #%s from %s:%s with status %s in %s' + ((domain._context['response']._async === true) ? ' (async)' : ' (sync)'), port, count, remote_address, remote_port, domain._context['response'].statusCode, Number.toHumanTime(Date.now()-domain._context['request'].start));
+            console.debug('[http' + ((secure) ? 's' : '') + ':%s] finished client request #%s with status %s in %s' + ((domain._context['response']._async === true) ? ' (async)' : ' (sync)'), port, count, domain._context['response'].statusCode, Number.toHumanTime(Date.now()-domain._context['request'].start));
           }
           //C: clearing context data
           if (domain._context != null) {
@@ -342,7 +349,7 @@ platform.server.http._init = function() {
         //C: attaching to request close event
         request.on('close', function () {
           if (debug === true && platform.configuration.server.debugging.http === true) {
-            console.debug('[http' + ((secure) ? 's' : '') + ':%s] closed client request #%s from %s:%s', port, count, remote_address, remote_port);
+            console.debug('[http' + ((secure) ? 's' : '') + ':%s] closed client request #%s', port, count);
           }
           //C: clearing context data
           if (domain._context != null) {
@@ -356,7 +363,7 @@ platform.server.http._init = function() {
 
         //C: logging request processing if debug enabled
         if (debug === true && platform.configuration.server.debugging.http === true) {
-          console.debug('[http' + ((secure) ? 's' : '') + ':%s] processing client request #%s from %s:%s for %s', port, count, remote_address, remote_port, request.url);
+          console.debug('[http' + ((secure) ? 's' : '') + ':%s] processing client request #%s for %s', port, count, request.url);
         }
 
         //C: processing request within domain
@@ -432,7 +439,7 @@ platform.server.http._init = function() {
           console.debug('[http' + ((this.secure) ? 's' : '') + ':%s] accepting new client %s:%s', this.port, socket.remoteAddress, socket.remotePort);
         });
         agent_http.on('clientError', function (exception, socket) {
-          console.warn('[http' + ((this.secure) ? 's' : '') + ':%s] exception new client %s:%s: %s', this.port, socket._peername.address, socket._peername.port, exception.stack);
+          console.warn('[http' + ((this.secure) ? 's' : '') + ':%s] exception client %s:%s: %s', this.port, socket._peername.address, socket._peername.port, exception.stack);
         });
         agent_http.on('close', function () {
           console.debug('closed server for port %s', this);
