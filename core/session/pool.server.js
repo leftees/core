@@ -93,7 +93,7 @@ platform.sessions.pools.unregister = function(pool_id){
 };
 
 platform.sessions.pools.isValid = function (pool_id){
-  return platform.sessions._validate_id_check.test(pool_id);
+  return (platform.sessions._validate_id_check.test(pool_id) && (platform.sessions._validate_id_check.lastIndex = 0) === 0);
 };
 
 platform.sessions.pools.exist = function(pool_id){

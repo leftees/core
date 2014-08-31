@@ -101,7 +101,7 @@ platform._bootstrap.unregister = function(bootstrap_id) {
 //A: bootstrap_id: Specifies the bootstrap id to validate.
 //R: Returns true if the bootstrap id is valid, false otherwise.
 platform._bootstrap.isValid = function (bootstrap_id){
-  return platform._bootstrap._validate_id_check.test(bootstrap_id);
+  return (platform._bootstrap._validate_id_check.test(bootstrap_id) && (platform._bootstrap._validate_id_check.lastIndex = 0) === 0);
 };
 
 //F: Checks whether a session is registered in current environment.

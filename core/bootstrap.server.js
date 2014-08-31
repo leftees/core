@@ -167,7 +167,7 @@ bootstrap.loadFolder = function(root,path){
   if (native.fs.existsSync(bootstrap.mapPath(path,root)) === true) {
     var config_files = native.fs.readdirSync(bootstrap.mapPath(path,root));
     config_files.forEach(function (file) {
-      if (bootstrap.regexs.serverJS.test(file) === true) {
+      if (bootstrap.regexs.serverJS.test(file) === true && (bootstrap.regexs.serverJS.lastIndex = 0) === 0) {
         bootstrap.load(root + path + file);
       }
     });
@@ -176,7 +176,7 @@ bootstrap.loadFolder = function(root,path){
 
 bootstrap.loadModules = function(modules,path){
   modules.forEach(function(file){
-    if (bootstrap.regexs.serverJS.test(file) === true) {
+    if (bootstrap.regexs.serverJS.test(file) === true && (bootstrap.regexs.serverJS.lastIndex = 0) === 0) {
       bootstrap.load(path + file);
     }
   });

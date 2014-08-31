@@ -25,6 +25,8 @@ global.native = {};
 //C: loading native modules and node-specific ones
 native.domain = require('domain');
 native.fs = require('fs-extra');
+native.stream = require('stream');
+native.net = require('net');
 native.path = require('path');
 native.util = require('util');
 native.url = require('url');
@@ -184,7 +186,7 @@ if (native.fs.existsSync(native.path.join(global.main.path.core,'/core/main')) =
   var js_file_check = /.js$/;
   //C: loading every .js files available in /core/main folder
   exec_files.forEach(function (file) {
-    if (js_file_check.test(file) === true) {
+    if (js_file_check.test(file) === true && (js_file_check.lastIndex = 0) === 0) {
       global.require.main._compile('\n' + native.fs.readFileSync(global.main.path.core + '/core/main/' + file, { encoding: 'utf-8' }), 'app:///core/main/' + file);
     }
   });

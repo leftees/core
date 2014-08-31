@@ -211,3 +211,5 @@ platform.messaging.mail.template.get = function(name){
 };
 
 platform.messaging.mail._init();
+
+//T: add default embedded templates

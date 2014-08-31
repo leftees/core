@@ -215,7 +215,7 @@ platform.sessions.isCurrent = function (session_id) {
 //A: session_id: Specifies the session id to validate.
 //R: Returns true if the session id is valid, false otherwise.
 platform.sessions.isValid = function (session_id){
-  return platform.sessions._validate_id_check.test(session_id);
+  return (platform.sessions._validate_id_check.test(session_id) && (platform.sessions._validate_id_check.lastIndex = 0) === 0);
 };
 
 //F: Checks whether a session is registered in current environment.

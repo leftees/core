@@ -148,12 +148,11 @@ platform.io.get.stream = function(path,options){
       return backend.get.stream(path,options);
     }
   }
-  var stream = require('stream').Writable();
+  var stream = native.stream.Writable();
   setTimeout(function(){
     stream.emit('error',new Exception('resource %s does not exist',path));
   });
   return stream;
-
 };
 
 //F: Creates a file or directory if the path doesn't exist through the first backend.
