@@ -1,6 +1,6 @@
 [submodule "wiki"]
 	path = wiki
-	url = https://github.com/marcominetti/ljve.io.wiki.git
+	url = https://git.novetica.org/ljve-io/wiki.git
 [submodule "external/node-inspector"]
 	path = external/node-inspector
 	url = https://github.com/marcominetti/node-inspector.git
@@ -10,3 +10,6 @@
 [submodule "external/node-brackets"]
 	path = external/node-brackets
 	url = https://github.com/marcominetti/node-brackets.git
+[submodule "external/esprima"]
+	path = external/esprima
+	url = https://github.com/marcominetti/esprima.git
