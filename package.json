@@ -46,7 +46,7 @@
     "jsdom": "*",
     "libxmljs": "*",
     "request": "*",
-    "esprima": "https://github.com/marcominetti/esprima/tarball/master",
+    "esprima": "https://github.com/marcominetti/esprima/tarball/codetags",
     "estraverse": "*",
     "esutils": "*",
     "escodegen": "*",
