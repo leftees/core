@@ -150,8 +150,8 @@ bootstrap.get = function(file,load) {
 };
 
 //C: defining early bootstrap .js load function
-bootstrap.load = function(file){
-  var resource = bootstrap.get(file);
+bootstrap.load = function(file,root){
+  var resource = bootstrap.get(native.path.join(root||'',file));
   try {
     /*if (global.testing === true) {
       global.require(resource.uri);
@@ -168,7 +168,7 @@ bootstrap.loadFolder = function(root,path){
     var config_files = native.fs.readdirSync(bootstrap.mapPath(path,root));
     config_files.forEach(function (file) {
       if (bootstrap.regexs.serverJS.test(file) === true && (bootstrap.regexs.serverJS.lastIndex = 0) === 0) {
-        bootstrap.load(root + path + file);
+        bootstrap.load(native.path.join(path,file),root);
       }
     });
   }
