@@ -23,6 +23,7 @@
 global.native = {};
 
 //C: loading native modules and node-specific ones
+native.semver = require('semver');
 native.domain = require('domain');
 native.fs = require('fs-extra');
 native.stream = require('stream');
@@ -46,7 +47,11 @@ native.websocket.server = require('ws').Server;
 native.args = require('yargs').argv;
 native.cli = {};
 native.cli.color = require('cli-color');
-native.zlib = require('zlib');
+if (native.semver.satisfies(native.semver.clean(process.version),'0.10.0 - 0.11.11') === true) {
+  native.zlib = require(global.main.path.core + '/core/backport/zlib/zlib.js');
+} else {
+  native.zlib = require('zlib');
+}
 native.body = {};
 native.body.text = require('body');
 native.body.json = require('body/json');

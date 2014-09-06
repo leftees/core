@@ -1,6 +1,6 @@
 {
   "name": "ljve",
-  "version": "0.3.9999-5",
+  "version": "0.3.9999-6",
   "description": "Live Javascript Virtualized Environment",
   "author": "Marco Minetti <marco.minetti@novetica.org>",
   "contributors": [],
@@ -75,9 +75,9 @@
     "test": "NODE_ENV=test node main.server.js test;"
   },
   "engines" : {
-    "node" : ">=0.11.13"
+    "node" : ">=0.10"
   },
-  "gypfile": false,
+  "gypfile": true,
   "preferGlobal": true,
   "private": false,
   "analyze": true,
