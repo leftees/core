@@ -265,7 +265,7 @@ platform.engine.handlers.process = function(name){
 
     var handler = platform.engine.handlers._store[name];
     if (context.server.debug === true && platform.configuration.server.debugging.http === true) {
-      console.debug('[http' + ((context.server.secure) ? 's' : '') + ':%s] forwarding client request #%s to %s handler %s', context.server.port, request.id, handler.type,name);
+      console.debug('forwarding client request http' + ((context.server.secure) ? 's' : '') + ':%s#%s to %s handler %s', context.server.port, request.id, handler.type,name);
     }
 
     switch(handler.type){
