@@ -23,110 +23,20 @@ platform.parser = platform.parser || {};
 
 platform.parser.js = {};
 
-platform.parser.js._tree_ref_enter = function(node,parent,previous){
-  node._tree = node._tree || {};
+platform.parser.js._tree_ast_ref_enter = function(node,parent,previous){
+  node.tree = node.tree || {};
   if (previous != null) {
-    previous._tree.next = node;
+    previous.tree.next = node;
   }
-  node._tree.previous = previous;
-  node._tree.start = node;
+  node.tree.previous = previous;
+  node.tree.start = node;
 };
 
-platform.parser.js._tree_ref_leave = function(node,parent,previous){
+platform.parser.js._tree_ast_ref_leave = function(node,parent,previous){
   if (previous === node) {
-    node._tree.end = node;
+    node.tree.end = node;
   } else {
-    node._tree.end = previous;
-  }
-};
-
-platform.parser.js._code_ref_enter = function(node,parent,previous,previous_to_patch){
-  node._code = node._code || {};
-  var next_previous_to_patch = undefined;
-  switch (node.type) {
-    case 'ArrayExpression':
-      node._code.start = node;
-      node._code.end = node.elements[node.elements.length-1]||node;
-      break;
-    case 'AssignmentExpression':
-    case 'BinaryExpression':
-    case 'LogicalExpression':
-      node._code.start = node;
-      node._code.end = node;
-      node._code.previous = node.left;
-      node._code.next = node.right;
-      node.left._code = node.left._code || {};
-      node.left._code.next = node;
-      node.left._code.previous = previous;
-      node.right._code = node.right._code || {};
-      node.right._code.previous = node;
-      break;
-    case 'UpdateExpression':
-      node._code.start = node;
-      node._code.end = node;
-      node._code.previous = node.argument;
-      node.argument._code = node.argument._code || {};
-      node.argument._code.previous = previous;
-      node.argument._code.next = node;
-      previous._code.next = node.argument;
-      next_previous_to_patch = node;
-      break;
-    case 'UnaryExpression':
-    case 'ArrowFunctionExpression':
-    case 'BlockStatement':
-    case 'BreakStatement':
-    case 'CallExpression':
-    case 'CatchClause':
-    case 'ConditionalExpression':
-    case 'ContinueStatement':
-    case 'DoWhileStatement':
-    case 'DebuggerStatement':
-    case 'EmptyStatement':
-    case 'ExpressionStatement':
-    case 'ForStatement':
-    case 'ForInStatement':
-    case 'FunctionDeclaration':
-    case 'FunctionExpression':
-    case 'Identifier':
-    case 'IfStatement':
-    case 'Literal':
-    case 'LabeledStatement':
-    case 'MemberExpression':
-    case 'NewExpression':
-    case 'ObjectExpression':
-    case 'Program':
-    case 'Property':
-    case 'ReturnStatement':
-    case 'SequenceExpression':
-    case 'SwitchStatement':
-    case 'SwitchCase':
-    case 'ThisExpression':
-    case 'ThrowStatement':
-    case 'TryStatement':
-    case 'VariableDeclaration':
-    case 'VariableDeclarator':
-    case 'WhileStatement':
-    case 'WithStatement':
-      break;
-  }
-  node._code.start = node._code.start || node;
-  node._code.previous = node._code.previous || previous;
-  if (previous_to_patch != null && node._code.next == null) {
-    previous_to_patch._code.next = previous_to_patch._code.next || node;
-    previous_to_patch = undefined;
-  } else if (node._code.previous != null) {
-    node._code.previous._code.next = node._code.previous._code.next || node;
-  }
-  return next_previous_to_patch || previous_to_patch;
-};
-
-platform.parser.js._code_ref_leave = function(node,parent,previous){
-  if (node._code.end == null){
-    if (previous === node) {
-      node._code.end = node;
-    } else {
-      node._code.end = previous;
-    }
+    node.tree.end = previous;
   }
 };
 
@@ -138,7 +48,40 @@ platform.parser.js.parse = function(code){
   var breadcrumb = [];
   var count_id = 0;
   var previous_node = null;
-  var previous_to_patch = null;
+
+  native.parser.js.traverse(ast, {
+    'enter': function (node, parent) {
+      switch (node.type) {
+        case 'IfStatement':
+          if (node.consequent != null && node.consequent.type !== 'BlockStatement') {
+            node.consequent = {
+              type: 'BlockStatement',
+              body: [node.consequent]
+            };
+          }
+          if (node.alternate != null && node.alternate.type !== 'BlockStatement') {
+            node.alternate = {
+              type: 'BlockStatement',
+              body: [node.alternate]
+            };
+          }
+          break;
+        case 'LabeledStatement':
+        case 'WithStatement':
+        case 'WhileStatement':
+        case 'DoWhileStatement':
+        case 'ForStatement':
+        case 'ForInStatement':
+          if (node.body != null && node.body.type !== 'BlockStatement') {
+            node.body = {
+              type: 'BlockStatement',
+              body: node.body
+            };
+          }
+          break;
+      }
+    }
+  });
 
   native.parser.js.traverse(ast,{
     'enter': function(node,parent){
@@ -149,9 +92,10 @@ platform.parser.js.parse = function(code){
         }
       }
       breadcrumb.push(node);
-      node._parent = parent;
-      platform.parser.js._tree_ref_enter(node,parent,previous_node);
-      previous_to_patch = platform.parser.js._code_ref_enter(node,parent,previous_node,previous_to_patch);
+      node.parent = parent;
+      node.prepend = [];
+      node.append = [];
+      platform.parser.js._tree_ast_ref_enter(node,parent,previous_node);
       previous_node = node;
       delete node.trailingComments;
       if (node.leadingComments != null){
@@ -165,16 +109,13 @@ platform.parser.js.parse = function(code){
             var params_position = comment.value.indexOf('(');
             if (params_position === -1) {
               name = comment.value;
-              node.tags[name] = {
-                'name': name
-              };
             } else {
               name = comment.value.slice(0, params_position);
               data = comment.value.slice(params_position + 1, comment.value.lastIndexOf(')'));
-              node.tags[name] = {
-                'name': name,
-                'data': data
-              };
+            }
+            node.tags[name] = node.tags[name] || [];
+            if (data != null){
+              node.tags[name].push(data);
             }
           }
         });
@@ -182,8 +123,7 @@ platform.parser.js.parse = function(code){
     },
     'leave': function(node,parent){
       breadcrumb.pop();
-      platform.parser.js._tree_ref_leave(node,parent,previous_node);
-      platform.parser.js._code_ref_leave(node,parent,previous_node);
+      platform.parser.js._tree_ast_ref_leave(node,parent,previous_node);
       if (platform.configuration.server.debugging.parser.js === true) {
         console.debug('%s |%s found node #%s type %s',breadcrumb.length,' '.repeat(breadcrumb.length),node._id,node.type);
       }
@@ -201,7 +141,7 @@ platform.parser.js.parse = function(code){
         if (node.comments != null){
           comments_label = Object.keys(node.comments).length + ' comments';
         }
-        console.debug('node #%s type %s:\n\ttree: start #%s, end #%s, previous #%s, next #%s\n\tcode: start #%s , end #%s, previous #%s, next #%s\n\t%s\n\t%s',node._id,node.type,((node._tree.start!=null)?node._tree.start._id:'n/a'),((node._tree.end!=null)?node._tree.end._id:'n/a'),((node._tree.previous!=null)?node._tree.previous._id:'n/a'),((node._tree.next!=null)?node._tree.next._id:'n/a'),((node._code.start!=null)?node._code.start._id:'n/a'),((node._code.end!=null)?node._code.end._id:'n/a'),((node._code.previous!=null)?node._code.previous._id:'n/a'),((node._code.next!=null)?node._code.next._id:'n/a'),comments_label,tags_label);
+        console.debug('node #%s type %s:\n\ttree: start #%s, end #%s, previous #%s, next #%s\n\t%s\n\t%s',node._id,node.type,((node.tree.start!=null)?node.tree.start._id:'n/a'),((node.tree.end!=null)?node.tree.end._id:'n/a'),((node.tree.previous!=null)?node.tree.previous._id:'n/a'),((node.tree.next!=null)?node.tree.next._id:'n/a'),comments_label,tags_label);
       }
     });
   }
@@ -231,7 +171,7 @@ platform.parser.js.stringify = function(ast){
     },
     moz: {
       starlessGenerator: false,
-      parenthesizedComprehensionBlock: false,
+      parenthesizedComprehensionBlock: true,
       comprehensionExpressionStartsWithAssignment: false
     },
     parse: null,
