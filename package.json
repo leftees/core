@@ -49,7 +49,7 @@
     "esprima": "https://github.com/marcominetti/esprima/tarball/codetags",
     "estraverse": "*",
     "esutils": "*",
-    "escodegen": "*",
+    "escodegen": "https://github.com/marcominetti/escodegen/tarball/codetags",
     "source-map": "*",
     "moment": "*",
     "node-uuid": "*",
