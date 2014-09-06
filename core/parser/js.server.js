@@ -169,14 +169,9 @@ platform.parser.js.stringify = function(ast,tag){
       semicolons: platform.runtime.development,
       safeConcatenation: true
     },
-    moz: {
-      starlessGenerator: false,
-      parenthesizedComprehensionBlock: true,
-      comprehensionExpressionStartsWithAssignment: false
-    },
     parse: null,
     comment: platform.runtime.development,
-    tag: tag||false,
+    tag: tag || false,
     //sourceMap: undefined,
     //sourceMapRoot: null,
     //sourceMapWithCode: false,
