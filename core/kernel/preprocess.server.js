@@ -22,6 +22,10 @@
 //N: Provides kernel functions to execute and manage environment.
 platform.kernel = platform.kernel || {};
 
+platform.kernel._preprocessors = platform.kernel._preprocessors || {};
+platform.kernel._preprocessors.client = platform.kernel._preprocessors.client || {};
+platform.kernel._preprocessors.server = platform.kernel._preprocessors.server || {};
+
 //F: Augments Javascript code for injection to current environment.
 //A: code: Specifies Javascript code to be augmented.
 //A: [file]: Specifies the file name containing code to be augmented.
@@ -38,10 +42,46 @@ platform.kernel.preprocess = function(code, file, module){
   }
 
   var ast = platform.parser.js.parse(code);
+
+  var side = null;
+  if (file != null) {
+    if (file.endsWith('.server.js') === true) {
+      side = 'server';
+    } else {
+      side = 'client';
+    }
+  } else {
+    side = 'server';
+  }
+  var preprocessors = platform.kernel._preprocessors[side];
+  Object.keys(preprocessors).forEach(function(preprocessor){
+    var process = preprocessors[preprocessor];
+    if (typeof process === 'function'){
+      process(ast,code,file,module,preprocessor);
+    }
+  });
+
   var augmented_code = platform.parser.js.stringify(ast);
 
   //T: migrate preprocessor stack from 0.3.x branch
   return augmented_code;
+};
+
+//F: Injects Javascript code to current environment.
+//A: code: Specifies Javascript code to be injected.
+//A: [file]: Specifies the file name containing code to be injected.
+//A: [module]: Specifies name of the module that is injecting code
+//A: [preprocess]: Specifies whether the code should be augmented before injection. Default is true.
+//R: Returns the return value from injected code.
+//H: Temporary implementation uses the global.eval function, it will be replaced with global.require to support debuggers.
+platform.kernel.inject = function (code,file,module,preprocess) {
+  var preprocessed_code;
+  if (preprocess === true && platform.kernel.preprocess != null && typeof platform.kernel.preprocess === 'function') {
+    preprocessed_code = platform.kernel.preprocess(code,file,module);
+  } else {
+    preprocessed_code = code;
+  }
+  return global.eval.call(global,preprocessed_code);
 };
 
 //F: Loads Javascript file into current environment.
@@ -51,6 +91,7 @@ platform.kernel.preprocess = function(code, file, module){
 //R: Returns the return value from loaded code.
 //H: This function will resolve paths, augment code if requested, cache and inject into current environment.
 platform.kernel.load = function(file,module,preprocess) {
+  //preprocess = false;
   //C: checking whether the file exists
   if (platform.io.exist(file) === false) {
     throw new Exception('resource %s not found', file);
