@@ -50,7 +50,8 @@ platform.configuration.server.bootloader.preload = [
   'io/cache.server.js',
   'parser/js.server.js',
   'kernel/preprocess.server.js',
-  'kernel/preprocessors/code.blocking.server.js'
+  'kernel/preprocessors/code.blocking.server.js',
+  'kernel/preprocessors/code.leveling.server.js'
 ];
 
 //O: Contains Javascript core modules, as array, to be inject after bootstrap to load application server (these are augmented).
@@ -92,6 +93,8 @@ platform.configuration.server.kernel = {};
 //H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. 'http://cdn.example.com/...').
 platform.configuration.server.kernel.preprocessors = [
 ];
+
+platform.configuration.server.kernel.runleveling = true;
 
 //O: Contains web server configuration.
 platform.configuration.server.http = {};
