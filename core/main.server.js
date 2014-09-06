@@ -78,6 +78,7 @@ native.parser = {};
 native.parser.js = {};
 native.parser.js.parse = require('esprima').parse;
 native.parser.js.traverse = require('estraverse').traverse;
+native.parser.js.utils = require('esutils');
 native.parser.js.codegen = require('escodegen').generate;
 native.parser.js.sourcemap = require('source-map');
 native.uuid = require('node-uuid');
