@@ -149,7 +149,7 @@ platform.parser.js.parse = function(code){
   return ast;
 };
 
-platform.parser.js.stringify = function(ast){
+platform.parser.js.stringify = function(ast,tag){
   return native.parser.js.codegen(ast,{
     format: {
       indent: {
@@ -176,7 +176,7 @@ platform.parser.js.stringify = function(ast){
     },
     parse: null,
     comment: platform.runtime.development,
-    tag: true,
+    tag: tag||false,
     //sourceMap: undefined,
     //sourceMapRoot: null,
     //sourceMapWithCode: false,
