@@ -49,7 +49,8 @@ platform.configuration.server.bootloader.preload = [
   'io/io.server.js',
   'io/cache.server.js',
   'parser/js.server.js',
-  'kernel/preprocess.server.js'
+  'kernel/preprocess.server.js',
+  'kernel/preprocessors/code.blocking.server.js'
 ];
 
 //O: Contains Javascript core modules, as array, to be inject after bootstrap to load application server (these are augmented).
