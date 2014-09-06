@@ -200,20 +200,3 @@ platform.kernel.new = function (name,args,root,divisor) {
   target.apply(new_instance,args);
   return new_instance;
 };
-
-//F: Injects Javascript code to current environment.
-//A: code: Specifies Javascript code to be injected.
-//A: [file]: Specifies the file name containing code to be injected.
-//A: [module]: Specifies name of the module that is injecting code
-//A: [preprocess]: Specifies whether the code should be augmented before injection. Default is true.
-//R: Returns the return value from injected code.
-//H: Temporary implementation uses the global.eval function, it will be replaced with global.require to support debuggers.
-platform.kernel.inject = function (code,file,module,preprocess) {
-  var preprocessed_code;
-  if (preprocess === true && platform.kernel.preprocess != null && typeof platform.kernel.preprocess === 'function') {
-    preprocessed_code = platform.kernel.preprocess(code,file,module);
-  } else {
-    preprocessed_code = code;
-  }
-  return global.eval.call(global,preprocessed_code);
-};
