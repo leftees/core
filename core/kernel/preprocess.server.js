@@ -37,10 +37,11 @@ platform.kernel.preprocess = function(code, file, module){
     }
   }
 
-  var ast = native.esprima.parse(code,{ 'attachComment': true, 'range': true, 'comment': true });
+  var ast = platform.parser.js.parse(code);
+  var augmented_code = platform.parser.js.stringify(ast);
 
   //T: migrate preprocessor stack from 0.3.x branch
-  return code;
+  return augmented_code;
 };
 
 //F: Loads Javascript file into current environment.
@@ -87,7 +88,7 @@ platform.kernel.load = function(file,module,preprocess) {
     if(platform.configuration.server.debugging.load === true) {
       console.debug('loading %s' + ((is_cached === false) ? '' : ' from cache'), file);
     }
-    return global.require.main._compile('\n'+preprocessed_code,'app://'+file);
+    return global.require.main._compile(preprocessed_code,'app://'+file);
   }
 };
 
