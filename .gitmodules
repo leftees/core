@@ -13,3 +13,6 @@
 [submodule "external/esprima"]
 	path = external/esprima
 	url = https://github.com/marcominetti/esprima.git
+[submodule "external/escodegen"]
+	path = external/escodegen
+	url = https://github.com/marcominetti/escodegen.git
