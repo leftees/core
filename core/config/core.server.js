@@ -48,6 +48,7 @@ platform.configuration.server.bootloader.preload = [
   'io/store.server.js',
   'io/io.server.js',
   'io/cache.server.js',
+  'parser/js.server.js',
   'kernel/preprocess.server.js'
 ];
 
@@ -65,6 +66,7 @@ platform.configuration.server.bootloader.modules = [
   'io/store.server.js',
   'io/io.server.js',
   'io/cache.server.js',
+  'parser/js.server.js',
   'kernel/preprocess.server.js',
   'system/memory.server.js',
   'net/fastcgi.server.js',
@@ -351,7 +353,10 @@ platform.configuration.server.debugging = {
     'mail': true
   },
   'handler': true,
-  'fastcgi': false
+  'fastcgi': false,
+  'parser': {
+    'js': false
+  }
 };
 
 //O: Contains memory management configuration.
@@ -396,7 +401,7 @@ platform.configuration.client.bootstrap.loader = 'platform._bootstrap.load';
 
 platform.configuration.cache = {
   'startup': {
-    'clean': false
+    'clean': true
   }
 };
 
