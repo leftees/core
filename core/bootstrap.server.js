@@ -145,7 +145,7 @@ bootstrap.get = function(file,load) {
     } });
     return result;
   } else {
-    throw new Exception("file %s not found", uri);
+    throw new Exception("file %s not found", file);
   }
 };
 
