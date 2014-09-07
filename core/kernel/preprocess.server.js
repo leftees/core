@@ -109,7 +109,7 @@ platform.kernel.load = function(file,module,preprocess) {
       preprocessed_code = code;
     }
     //C: saving augmented file to be loaded through require (only for testing environment)
-    if (global.testing === true) {
+    if (global.testing === true || global.development === true) {
       platform.kernel._backend.set.string(file, preprocessed_code);
     }
     //C: caching augmented file
