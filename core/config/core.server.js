@@ -52,7 +52,8 @@ platform.configuration.server.bootloader.preload = [
   'kernel/preprocess.server.js',
   'kernel/preprocessors/code.blocking.server.js',
   'kernel/preprocessors/code.leveling.server.js',
-  'kernel/preprocessors/code.breakpoint.server.js'
+  'kernel/preprocessors/code.breakpoint.server.js',
+  'kernel/preprocessors/code.profiling.server.js'
 ];
 
 //O: Contains Javascript core modules, as array, to be inject after bootstrap to load application server (these are augmented).
@@ -96,6 +97,7 @@ platform.configuration.server.kernel.preprocessors = [
 ];
 
 platform.configuration.server.kernel.runleveling = true;
+platform.configuration.server.kernel.profiling = true;
 
 //O: Contains web server configuration.
 platform.configuration.server.http = {};
@@ -361,6 +363,9 @@ platform.configuration.server.debugging = {
   'fastcgi': false,
   'parser': {
     'js': false
+  },
+  'kernel': {
+    'profile': true
   }
 };
 
