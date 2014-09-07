@@ -61,6 +61,7 @@
     "watch": "*",
     "nodemailer": "*",
     "nodemailer-smtp-pool": "*",
+    "node-zlib-backport": "*",
     "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/master",
     "node-console": "https://github.com/marcominetti/node-console/tarball/master",
     "node-brackets": "https://github.com/marcominetti/node-brackets/tarball/master"
@@ -77,7 +78,6 @@
   "engines" : {
     "node" : ">=0.10"
   },
-  "gypfile": true,
   "preferGlobal": true,
   "private": false,
   "analyze": true,

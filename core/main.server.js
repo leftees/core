@@ -48,7 +48,7 @@ native.args = require('yargs').argv;
 native.cli = {};
 native.cli.color = require('cli-color');
 if (native.semver.satisfies(native.semver.clean(process.version),'0.10.0 - 0.11.11') === true) {
-  native.zlib = require(global.main.path.core + '/core/backport/zlib/zlib.js');
+  native.zlib = require('node-zlib-backport');
 } else {
   native.zlib = require('zlib');
 }
