@@ -122,6 +122,13 @@ if (execArgv.indexOf('--harmony') === -1){
 
 } else {
 
+  //C: detecting whether debugger is running through node args
+  process.execArgv.forEach(function(arg) {
+    if (arg.indexOf('--debug') === 0 || arg.indexOf('debug') === 0){
+      global.debugging = true;
+    }
+  });
+
   //C: loading ljve application server executable module
   try {
     global.require.main._compile('\n'+require('fs').readFileSync(global.main.path.core + '/core/main.server.js', { encoding: 'utf-8' }),'app:///core/main.server.js');
