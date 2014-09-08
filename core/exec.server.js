@@ -27,13 +27,11 @@ global.main.path = {};
 global.main.path.app = process.cwd();
 global.main.path.core = require('path').dirname(require.main.filename);
 
-//C: detecting node debugger enabled (through node arguments)
+//C: detecting whether Node is running as debugging environment
 global.debugging = false;
-process.execArgv.forEach(function(arg) {
-  if (arg.indexOf('--debug') === 0 || arg.indexOf('debug') === 0){
-    global.debugging = true;
-  }
-});
+if (process.env.NODE_ENV === 'debugging') {
+  global.debugging = true;
+}
 
 //C: detecting whether Node is running as development environment
 global.development = false;
@@ -48,15 +46,29 @@ if (process.env.NODE_ENV === 'test') {
   global.development = true;
 }
 
-//C: detecting whether spawned node debugger launch is needed
-if (global.development === true && global.debugging === false){
+//C: getting current node process execArgv
+var execArgv = process.execArgv;
 
-  //C: getting current node process execArgv extended with debug flag
-  var execArgv = ['--debug'].concat(process.execArgv);
+//C: detecting nested process (assuming --harmony is only passed when internally spawning)
+if (execArgv.indexOf('--harmony') === -1){
+  //C: detecting node debugger enabled (through node arguments)
+  var wrong_debug = false;
+  process.execArgv.forEach(function(arg) {
+    if (arg.indexOf('--debug') === 0 || arg.indexOf('debug') === 0){
+      wrong_debug = true;
+    }
+  });
+  if (wrong_debug === true){
+    console.error('debugging must be enabled through NODE_ENV=debugging rather than using node args');
+    return;
+  }
 
   //C: enabling ECMAScript 6 by default
-  if (execArgv.indexOf('--harmony') === -1){
-    execArgv.push('--harmony');
+  execArgv.push('--harmony');
+
+  //C: enabling debugger if needed
+  if (global.debugging === true) {
+    execArgv.unshift('--debug');
   }
 
   //C: getting current script location from process.argv
@@ -87,6 +99,7 @@ if (global.development === true && global.debugging === false){
 
   //C: attaching on child close event to exit main
   node_debug.on('close', function (code,signal) {
+    //T: implement watchdog with restart attempts when exit code is > 0
     process.exit(code);
   });
 
