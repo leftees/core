@@ -45,24 +45,7 @@ platform.kernel._preprocessors.server.code_profile = function(ast,code,file,modu
     }
     if (skip === false) {
       if (node.tags != null && node.tags['profile'] != null) {
-        if (native.parser.js.utils.ast.isStatement(node) === true
-          && (node.type !== 'BlockStatement'
-            || (node.type === 'BlockStatement'
-              && node.parent != null
-              && node.parent.type !== 'FunctionExpression'
-              && node.parent.type !== 'FunctionDeclaration'
-              && node.parent.type !== 'DoWhileStatement'
-              && node.parent.type !== 'ForInStatement'
-              && node.parent.type !== 'ForStatement'
-              && node.parent.type !== 'IfStatement'
-              && node.parent.type !== 'SwitchStatement'
-              && node.parent.type !== 'TryStatement'
-              && node.parent.type !== 'WhileStatement'
-              && node.parent.type !== 'WithStatement'
-              && node.parent.type !== 'CatchClause'
-              )
-            )
-          ){
+        if (node.is_block === true){
           //T: support multiple keys?
           //T: append code to the closest safe node (backward)
           node.prepend.push(prepend_code);

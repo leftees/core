@@ -45,24 +45,7 @@ platform.kernel._preprocessors.server.code_leveling = function(ast,code,file,mod
         node.tags['runlevel'].forEach(function(runlevel){
           platform.kernel.runlevels[runlevel] = platform.kernel.runlevels[runlevel] || false;
         });
-        if (native.parser.js.utils.ast.isStatement(node) === true
-          && (node.type !== 'BlockStatement'
-            || (node.type === 'BlockStatement'
-              && node.parent != null
-              && node.parent.type !== 'FunctionExpression'
-              && node.parent.type !== 'FunctionDeclaration'
-              && node.parent.type !== 'DoWhileStatement'
-              && node.parent.type !== 'ForInStatement'
-              && node.parent.type !== 'ForStatement'
-              && node.parent.type !== 'IfStatement'
-              && node.parent.type !== 'SwitchStatement'
-              && node.parent.type !== 'TryStatement'
-              && node.parent.type !== 'WhileStatement'
-              && node.parent.type !== 'WithStatement'
-              && node.parent.type !== 'CatchClause'
-              )
-            )
-          ){
+        if (node.is_block === true){
           var prepend_code = 'if(';
           prepend_code += '((platform.kernel.runlevels[\'' + node.tags['runlevel'].join('\'] === true || platform.kernel.runlevels[\'') + '\'] === true)';
           prepend_code += ' && platform.configuration.server.kernel.runleveling === true) || platform.configuration.server.kernel.runleveling === false';

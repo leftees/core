@@ -45,51 +45,7 @@ platform.kernel._preprocessors.server.code_blocking = function(ast,code,file,mod
       --level;
     }
     if (skip === false) {
-      var proceed = false;
-      switch(node.type) {
-        case 'BlockStatement':
-          if (node.parent != null
-            && node.parent.type !== 'FunctionExpression'
-            && node.parent.type !== 'FunctionDeclaration'
-            && node.parent.type !== 'DoWhileStatement'
-            && node.parent.type !== 'ForInStatement'
-            && node.parent.type !== 'ForStatement'
-            && node.parent.type !== 'IfStatement'
-            && node.parent.type !== 'SwitchStatement'
-            && node.parent.type !== 'TryStatement'
-            && node.parent.type !== 'WhileStatement'
-            && node.parent.type !== 'WithStatement'
-            && node.parent.type !== 'CatchClause'){
-            proceed = true;
-          }
-          break;
-        case 'VariableDeclaration':
-          if (node.parent != null
-            && node.parent.type !== 'ForInStatement'
-            && node.parent.type !== 'ForStatement'){
-            proceed = true;
-          }
-          break;
-        case 'BreakStatement':
-        case 'ContinueStatement':
-        case 'DebuggerStatement':
-        case 'DoWhileStatement':
-        case 'EmptyStatement':
-        case 'ExpressionStatement':
-        case 'ForInStatement':
-        case 'ForStatement':
-        case 'IfStatement':
-        case 'LabeledStatement':
-        case 'ReturnStatement':
-        case 'SwitchStatement':
-        case 'ThrowStatement':
-        case 'TryStatement':
-        case 'WhileStatement':
-        case 'WithStatement':
-          proceed = true;
-          break;
-      }
-      if (proceed === true){
+      if (node.is_block === true){
           ++counters[level];
           var prepend_code = '';
           if (counters[level] === 1) {

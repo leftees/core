@@ -86,6 +86,51 @@ platform.parser.js.parse = function(code){
   native.parser.js.traverse(ast,{
     'enter': function(node,parent){
       node._id = ++count_id;
+
+      switch(node.type) {
+        case 'BlockStatement':
+          if (parent != null
+            && parent.type !== 'FunctionExpression'
+            && parent.type !== 'FunctionDeclaration'
+            && parent.type !== 'DoWhileStatement'
+            && parent.type !== 'ForInStatement'
+            && parent.type !== 'ForStatement'
+            && parent.type !== 'IfStatement'
+            && parent.type !== 'SwitchStatement'
+            && parent.type !== 'TryStatement'
+            && parent.type !== 'WhileStatement'
+            && parent.type !== 'WithStatement'
+            && parent.type !== 'CatchClause'){
+            node.is_block = true;
+          }
+          break;
+        case 'VariableDeclaration':
+          if (parent != null
+            && parent.type !== 'ForInStatement'
+            && parent.type !== 'ForStatement'){
+            node.is_block = true;
+          }
+          break;
+        case 'BreakStatement':
+        case 'ContinueStatement':
+        case 'DebuggerStatement':
+        case 'DoWhileStatement':
+        case 'EmptyStatement':
+        case 'ExpressionStatement':
+        case 'ForInStatement':
+        case 'ForStatement':
+        case 'IfStatement':
+        case 'LabeledStatement':
+        case 'ReturnStatement':
+        case 'SwitchStatement':
+        case 'ThrowStatement':
+        case 'TryStatement':
+        case 'WhileStatement':
+        case 'WithStatement':
+          node.is_block = true;
+          break;
+      }
+
       if (previous_node != null){
         if (platform.configuration.server.debugging.parser.js === true) {
           console.debug('%s |%s found node #%s type %s',breadcrumb.length,' '.repeat(breadcrumb.length),node._id,node.type);
