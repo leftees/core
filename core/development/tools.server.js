@@ -99,7 +99,7 @@ platform.development.tools.inspector._process_path = '/node_modules/node-inspect
 //F: Starts the specified tool.
 //R: None.
 //H: Throws exception if tool is already running.
-platform.development.tools.inspector.start = platform.development.tools._start.bind(null,'inspector',9091,5858);
+platform.development.tools.inspector.start = platform.development.tools._start.bind(null,'inspector',9091,process.debugPort);
 
 //F: Stops the specified tool.
 //R: None.
