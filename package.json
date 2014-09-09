@@ -61,6 +61,7 @@
     "watch": "*",
     "nodemailer": "*",
     "nodemailer-smtp-pool": "*",
+    "async": "*",
     "node-zlib-backport": "*",
     "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/master",
     "node-console": "https://github.com/marcominetti/node-console/tarball/master",
