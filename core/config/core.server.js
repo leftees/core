@@ -53,7 +53,8 @@ platform.configuration.server.bootloader.preload = [
   'kernel/preprocessors/code.blocking.server.js',
   'kernel/preprocessors/code.leveling.server.js',
   'kernel/preprocessors/code.breakpoint.server.js',
-  'kernel/preprocessors/code.profiling.server.js'
+  'kernel/preprocessors/code.profiling.server.js',
+  'kernel/preprocessors/code.documentation.server.js'
 ];
 
 //O: Contains Javascript core modules, as array, to be inject after bootstrap to load application server (these are augmented).
@@ -63,6 +64,7 @@ platform.configuration.server.bootloader.modules = [
   'stat.server.js',
   'utility.server.js',
   'development/tools.server.js',
+  'development/jsdoc.server.js',
   'kernel/kernel.server.js',
   'kernel/prototype.server.js',
   'kernel/classes.server.js',
@@ -98,6 +100,9 @@ platform.configuration.server.kernel.preprocessors = [
 
 platform.configuration.server.kernel.runleveling = true;
 platform.configuration.server.kernel.profiling = true;
+platform.configuration.server.kernel.documentation = {
+  'generate': true
+};
 
 //O: Contains web server configuration.
 platform.configuration.server.http = {};
