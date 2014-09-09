@@ -50,6 +50,7 @@ platform.configuration.server.bootloader.preload = [
   'io/cache.server.js',
   'parser/js.server.js',
   'kernel/preprocess.server.js',
+  'kernel/preprocessors/function.reflection.server.js',
   'kernel/preprocessors/code.blocking.server.js',
   'kernel/preprocessors/code.leveling.server.js',
   'kernel/preprocessors/code.breakpoint.server.js',
