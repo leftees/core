@@ -63,10 +63,7 @@ platform.kernel._preprocessors.server.function_reflection = function(ast,code,fi
             } else {
               function_vars = '';
             }
-            prepend_code = prepend_code.replace('$+0',function_name);
-            prepend_code = prepend_code.replace('$+1',function_params);
-            prepend_code = prepend_code.replace('$+2',function_vars);
-            node.body.body[0].prepend.push(prepend_code);
+            node.body.body[0].prepend.push(prepend_code.replace('$+0',function_name).replace('$+1',function_params).replace('$+2',function_vars));
           }
           break;
       }
