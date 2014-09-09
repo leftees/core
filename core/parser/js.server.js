@@ -24,7 +24,6 @@ platform.parser = platform.parser || {};
 platform.parser.js = {};
 
 platform.parser.js._tree_ast_ref_enter = function(node,parent,previous){
-  node.tree = node.tree || {};
   if (previous != null) {
     previous.tree.next = node;
   }
@@ -94,8 +93,8 @@ platform.parser.js._name_get = function(node,parent,previous) {
       } else if (node.left.type === 'MemberExpression') {
         var skip = false;
         native.parser.js.traverse(node.left,{
-          'enter': function(node,parent) {
-            switch(node.type){
+          'enter': function(child_node,parent) {
+            switch(child_node.type){
               case 'MemberExpression':
               case 'UnaryExpression':
               case 'UpdateExpression':
@@ -161,7 +160,10 @@ platform.parser.js.parse = function(code){
             };
           }
           break;
-        case 'LabeledStatement':
+        case 'FunctionExpression':
+        case 'ArrowFunctionExpression':
+        case 'ArrowExpression':
+        case 'FunctionDeclaration':
         case 'WithStatement':
         case 'WhileStatement':
         case 'DoWhileStatement':
@@ -178,12 +180,16 @@ platform.parser.js.parse = function(code){
     }
   });
 
+  //C: keeps last function/program object
+  var scopes = [];
+  //C: keeps current function index (level)
+  var level = 0;
+
+  scopes[level] = ast;
+
   native.parser.js.traverse(ast,{
     'enter': function(node,parent){
-      node._id = ++count_id;
 
-      platform.parser.js._block_check(node,parent,previous);
-      platform.parser.js._name_get(node,parent,previous);
 
       if (previous != null){
         if (platform.configuration.server.debugging.parser.js === true) {
@@ -191,7 +197,25 @@ platform.parser.js.parse = function(code){
         }
       }
       breadcrumb.push(node);
-      node.parent = parent;
+
+      node._id = ++count_id;
+      node.tree = node.tree || {};
+      node.tree.parent = parent;
+
+      switch(node.type){
+        case 'FunctionDeclaration':
+        case 'FunctionExpression':
+        case 'ArrowFunctionExpression':
+        case 'ArrowExpression':
+          ++level;
+          scopes[level] = node;
+          break;
+      }
+      node.tree.scope = scopes[level];
+
+      platform.parser.js._block_check(node,parent,previous);
+      platform.parser.js._name_get(node,parent,previous);
+
       node.prepend = [];
       node.append = [];
       platform.parser.js._tree_ast_ref_enter(node,parent,previous);
@@ -222,6 +246,11 @@ platform.parser.js.parse = function(code){
     },
     'leave': function(node,parent){
       breadcrumb.pop();
+
+      if (scopes[level] != null && node === scopes[level].tree.end) {
+        --level;
+      }
+
       platform.parser.js._tree_ast_ref_leave(node,parent,previous);
       if (platform.configuration.server.debugging.parser.js === true) {
         console.debug('%s |%s found node #%s type %s',breadcrumb.length,' '.repeat(breadcrumb.length),node._id,node.type);
