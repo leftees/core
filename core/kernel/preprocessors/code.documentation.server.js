@@ -23,25 +23,12 @@ platform.kernel._preprocessors.server.code_documentation = function(ast,code,fil
   if(platform.configuration.server.kernel.documentation.generate === false){
     return;
   }
-    //C: keeps last function/program object
-  var scopes = [];
-  //C: keeps current function index (level)
-  var level = 0;
-
-  scopes[level] = ast;
 
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (scopes[level] != null && scopes[level]._tags != null && scopes[level]._tags['preprocessor.disable'] != null && scopes[level]._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
+    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
       skip = true;
-    }
-    if (node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression') {
-      ++level;
-      scopes[level] = node;
-    }
-    if (scopes[level] != null && node === scopes[level].tree.end) {
-      --level;
     }
     if (skip === false) {
       var target = node;
@@ -49,7 +36,7 @@ platform.kernel._preprocessors.server.code_documentation = function(ast,code,fil
       switch (node.type) {
         case 'AssignmentExpression':
           target = node.left;
-          comments = node.parent.leadingComments;
+          comments = node.tree.parent.leadingComments;
           break;
         case 'FunctionDeclaration':
         case 'VariableDeclarator':
@@ -74,7 +61,7 @@ platform.kernel._preprocessors.server.code_documentation = function(ast,code,fil
                   documentation_object.description = comment.value.slice(2).trim();
                   break;
                 case 0x41:  // 'A'
-                  documentation_object.arguments = documentation_object.arguments || {};
+                  documentation_object.params = documentation_object.params || {};
                   var argument_position = comment.value.slice(2).indexOf(':');
                   if (argument_position > -1) {
                     var argument_name = comment.value.slice(2,argument_position+2).trim();
@@ -84,7 +71,7 @@ platform.kernel._preprocessors.server.code_documentation = function(ast,code,fil
                       argument_optional = true;
                     }
                     var argument_description = comment.value.slice(argument_position+2+1).trim();
-                    documentation_object.arguments[argument_name] = {
+                    documentation_object.params[argument_name] = {
                       'description': argument_description,
                       'optional': argument_optional
                     };

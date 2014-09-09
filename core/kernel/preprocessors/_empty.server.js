@@ -20,25 +20,11 @@
  */
 
 platform.kernel._preprocessors.server.change_me = function(ast,code,file,module,preprocessor){
-  //C: keeps last function/program object
-  var scopes = [];
-  //C: keeps current function index (level)
-  var level = 0;
-
-  scopes[level] = ast;
-
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (scopes[level] != null && scopes[level]._tags != null && scopes[level]._tags['preprocessor.disable'] != null && scopes[level]._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
+    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
       skip = true;
-    }
-    if (node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression') {
-      ++level;
-      scopes[level] = node;
-    }
-    if (scopes[level] != null && node === scopes[level].tree.end) {
-      --level;
     }
     if (skip === false) {
 

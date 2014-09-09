@@ -20,28 +20,14 @@
  */
 
 platform.kernel._preprocessors.server.code_profile = function(ast,code,file,module,preprocessor){
-  //C: keeps last function/program object
-  var scopes = [];
-  //C: keeps current function index (level)
-  var level = 0;
-
-  scopes[level] = ast;
-
-  var prepend_code = Function.info.code(_code_profile_start_monitor);
-  var append_code = Function.info.code(_code_profile_stop_monitor);
+  var prepend_code = Function.info.code(_code_profile_start_monitor, true);
+  var append_code = Function.info.code(_code_profile_stop_monitor, true);
 
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (scopes[level] != null && scopes[level]._tags != null && scopes[level]._tags['preprocessor.disable'] != null && scopes[level]._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
+    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
       skip = true;
-    }
-    if (node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression') {
-      ++level;
-      scopes[level] = node;
-    }
-    if (scopes[level] != null && node === scopes[level].tree.end) {
-      --level;
     }
     if (skip === false) {
       if (node._tags != null && node._tags['profile'] != null) {
@@ -49,7 +35,7 @@ platform.kernel._preprocessors.server.code_profile = function(ast,code,file,modu
           //T: support multiple keys?
           //T: append code to the closest safe node (backward)
           node.prepend.push(prepend_code);
-          node.append.unshift(append_code.replace('$0',node._tags['profile'][0]));
+          node.append.unshift(append_code.replace('$+0',node._tags['profile'][0]));
         } else {
           console.warn('profile tag ignored for node at line %s in %s',node.loc.start.line,(file == null) ? 'eval code' : ('file ' + file));
         }
@@ -80,7 +66,7 @@ var _code_profile_start_monitor = function() {
 var _code_profile_stop_monitor = function() {
   if (platform.configuration.server.kernel.profiling === true) {
     (function(){
-      var key = '$0';
+      var key = '$+0';
       var time_stop = Date.now();
       var time_start = platform.kernel._preprocessors.server.code_profile._data.pop();
       var time_elapsed =  time_stop - time_start;
