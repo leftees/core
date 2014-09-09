@@ -123,6 +123,14 @@ platform.parser.js._name_get = function(node,parent,previous) {
         node.init._name = node._name;
       }
       break;
+    case 'Property':
+      if (parent != null && parent._name != null){
+        node.value._name = parent._name + '.' + node.key.name;
+      } else {
+        node.value._name = '{}.' + node.key.name;
+      }
+      node._name = node.value._name;
+      break;
   }
 };
 
