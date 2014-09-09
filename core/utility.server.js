@@ -106,10 +106,15 @@ Function.info.arguments = function(target) {
 
 //F: Get the inner code of this function.
 //A: target: Specifies the function object from which to retrieve the code.
+//A: [compact]: Specifies whether to return compacted (single line).
 //R: Returns the inner code of a function, as string.
-Function.info.code = function(target) {
+Function.info.code = function(target, compact) {
   var code = target.toString();
-  return code.slice(code.indexOf('{')+1,code.lastIndexOf('}')-1);
+  code = code.slice(code.indexOf('{')+1,code.lastIndexOf('}')-1);
+  if (compact === true){
+    code = code.replace(/[\n\r]/gi,'');
+  }
+  return code;
 };
 
 //F: Creates a new object using a string as JSON representation with type-guessing. [Functions are not processed by default for security reasons.]
