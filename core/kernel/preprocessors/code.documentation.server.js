@@ -53,6 +53,7 @@ platform.kernel._preprocessors.server.code_documentation = function(ast,code,fil
           break;
         case 'FunctionDeclaration':
         case 'VariableDeclarator':
+        case 'Property':
           comments = node.leadingComments;
           break;
       }
