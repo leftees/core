@@ -30,7 +30,7 @@ platform.kernel._preprocessors.server.code_breakpoint = function(ast,code,file,m
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (scopes[level] != null && scopes[level].tags != null && scopes[level].tags['preprocessor.disable'] != null && scopes[level].tags['preprocessor.disable'].indexOf(preprocessor) > -1){
+    if (scopes[level] != null && scopes[level]._tags != null && scopes[level]._tags['preprocessor.disable'] != null && scopes[level]._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
       skip = true;
     }
     if (node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression') {
@@ -41,8 +41,8 @@ platform.kernel._preprocessors.server.code_breakpoint = function(ast,code,file,m
       --level;
     }
     if (skip === false) {
-      if (node.tags != null && node.tags['b'] != null) {
-        if (node.is_block === true){
+      if (node._tags != null && node._tags['b'] != null) {
+        if (node._is_block === true){
           //T: append code to the closest safe node (backward)
           var prepend_code = 'if (platform.runtime.debugging === true) { debugger; }';
           node.prepend.push(prepend_code);

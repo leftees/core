@@ -40,6 +40,92 @@ platform.parser.js._tree_ast_ref_leave = function(node,parent,previous){
   }
 };
 
+platform.parser.js._block_check = function(node,parent,previous){
+  switch(node.type) {
+    case 'BlockStatement':
+      if (parent != null
+        && parent.type !== 'FunctionExpression'
+        && parent.type !== 'FunctionDeclaration'
+        && parent.type !== 'DoWhileStatement'
+        && parent.type !== 'ForInStatement'
+        && parent.type !== 'ForStatement'
+        && parent.type !== 'IfStatement'
+        && parent.type !== 'SwitchStatement'
+        && parent.type !== 'TryStatement'
+        && parent.type !== 'WhileStatement'
+        && parent.type !== 'WithStatement'
+        && parent.type !== 'CatchClause'){
+        node._is_block = true;
+      }
+      break;
+    case 'VariableDeclaration':
+      if (parent != null
+        && parent.type !== 'ForInStatement'
+        && parent.type !== 'ForStatement'){
+        node._is_block = true;
+      }
+      break;
+    case 'BreakStatement':
+    case 'ContinueStatement':
+    case 'DebuggerStatement':
+    case 'DoWhileStatement':
+    case 'EmptyStatement':
+    case 'ExpressionStatement':
+    case 'ForInStatement':
+    case 'ForStatement':
+    case 'IfStatement':
+    case 'LabeledStatement':
+    case 'ReturnStatement':
+    case 'SwitchStatement':
+    case 'ThrowStatement':
+    case 'TryStatement':
+    case 'WhileStatement':
+    case 'WithStatement':
+      node._is_block = true;
+      break;
+  }
+};
+
+platform.parser.js._name_get = function(node,parent,previous) {
+  switch(node.type) {
+    case 'AssignmentExpression':
+      if (node.left.type === 'Identifier'){
+        node.left._name = node.left.name;
+      } else if (node.left.type === 'MemberExpression') {
+        var skip = false;
+        native.parser.js.traverse(node.left,{
+          'enter': function(node,parent) {
+            switch(node.type){
+              case 'MemberExpression':
+              case 'UnaryExpression':
+              case 'UpdateExpression':
+              case 'Literal':
+              case 'Identifier':
+                break;
+              default:
+                skip = true;
+                break;
+            }
+          }
+        });
+        if (skip === false) {
+          node.left._name = native.parser.js.codegen(node.left);
+        }
+      }
+      node.right._name = node.left._name;
+      break;
+    case 'FunctionDeclaration':
+      node._name = node.id.name;
+      break;
+    case 'VariableDeclarator':
+      node._name = node.id.name;
+      if (node.init != null) {
+        node.init._name = node._name;
+      }
+      break;
+  }
+};
+
 platform.parser.js.parse = function(code){
   var ast = native.parser.js.parse(code,{ 'attachComment': true, 'range': true, 'comment': true, 'loc': true, 'tag': true });
   delete ast.comments;
@@ -47,7 +133,7 @@ platform.parser.js.parse = function(code){
 
   var breadcrumb = [];
   var count_id = 0;
-  var previous_node = null;
+  var previous = null;
 
   native.parser.js.traverse(ast, {
     'enter': function (node, parent) {
@@ -87,51 +173,10 @@ platform.parser.js.parse = function(code){
     'enter': function(node,parent){
       node._id = ++count_id;
 
-      switch(node.type) {
-        case 'BlockStatement':
-          if (parent != null
-            && parent.type !== 'FunctionExpression'
-            && parent.type !== 'FunctionDeclaration'
-            && parent.type !== 'DoWhileStatement'
-            && parent.type !== 'ForInStatement'
-            && parent.type !== 'ForStatement'
-            && parent.type !== 'IfStatement'
-            && parent.type !== 'SwitchStatement'
-            && parent.type !== 'TryStatement'
-            && parent.type !== 'WhileStatement'
-            && parent.type !== 'WithStatement'
-            && parent.type !== 'CatchClause'){
-            node.is_block = true;
-          }
-          break;
-        case 'VariableDeclaration':
-          if (parent != null
-            && parent.type !== 'ForInStatement'
-            && parent.type !== 'ForStatement'){
-            node.is_block = true;
-          }
-          break;
-        case 'BreakStatement':
-        case 'ContinueStatement':
-        case 'DebuggerStatement':
-        case 'DoWhileStatement':
-        case 'EmptyStatement':
-        case 'ExpressionStatement':
-        case 'ForInStatement':
-        case 'ForStatement':
-        case 'IfStatement':
-        case 'LabeledStatement':
-        case 'ReturnStatement':
-        case 'SwitchStatement':
-        case 'ThrowStatement':
-        case 'TryStatement':
-        case 'WhileStatement':
-        case 'WithStatement':
-          node.is_block = true;
-          break;
-      }
+      platform.parser.js._block_check(node,parent,previous);
+      platform.parser.js._name_get(node,parent,previous);
 
-      if (previous_node != null){
+      if (previous != null){
         if (platform.configuration.server.debugging.parser.js === true) {
           console.debug('%s |%s found node #%s type %s',breadcrumb.length,' '.repeat(breadcrumb.length),node._id,node.type);
         }
@@ -140,14 +185,14 @@ platform.parser.js.parse = function(code){
       node.parent = parent;
       node.prepend = [];
       node.append = [];
-      platform.parser.js._tree_ast_ref_enter(node,parent,previous_node);
-      previous_node = node;
+      platform.parser.js._tree_ast_ref_enter(node,parent,previous);
+      previous = node;
       delete node.trailingComments;
       if (node.leadingComments != null){
         node.leadingComments.forEach(function(comment){
           if (comment.type === 'Tag') {
-            if (node.tags == null) {
-              node.tags = {};
+            if (node._tags == null) {
+              node._tags = {};
             }
             var name = null;
             var data = null;
@@ -158,9 +203,9 @@ platform.parser.js.parse = function(code){
               name = comment.value.slice(0, params_position);
               data = comment.value.slice(params_position + 1, comment.value.lastIndexOf(')'));
             }
-            node.tags[name] = node.tags[name] || [];
+            node._tags[name] = node._tags[name] || [];
             if (data != null){
-              node.tags[name].push(data);
+              node._tags[name].push(data);
             }
           }
         });
@@ -168,7 +213,7 @@ platform.parser.js.parse = function(code){
     },
     'leave': function(node,parent){
       breadcrumb.pop();
-      platform.parser.js._tree_ast_ref_leave(node,parent,previous_node);
+      platform.parser.js._tree_ast_ref_leave(node,parent,previous);
       if (platform.configuration.server.debugging.parser.js === true) {
         console.debug('%s |%s found node #%s type %s',breadcrumb.length,' '.repeat(breadcrumb.length),node._id,node.type);
       }
@@ -178,15 +223,15 @@ platform.parser.js.parse = function(code){
   if (platform.configuration.server.debugging.parser.js === true) {
     native.parser.js.traverse(ast, {
       'enter': function (node, parent) {
-        var tags_label = '0 tags';
+        var _tags_label = '0 _tags';
         var comments_label = '0 comments';
-        if (node.tags != null){
-          tags_label = Object.keys(node.tags).length + ' tags: ' + Object.keys(node.tags).join(', ');
+        if (node._tags != null){
+          _tags_label = Object.keys(node._tags).length + ' _tags: ' + Object.keys(node._tags).join(', ');
         }
         if (node.comments != null){
           comments_label = Object.keys(node.comments).length + ' comments';
         }
-        console.debug('node #%s type %s:\n\ttree: start #%s, end #%s, previous #%s, next #%s\n\t%s\n\t%s',node._id,node.type,((node.tree.start!=null)?node.tree.start._id:'n/a'),((node.tree.end!=null)?node.tree.end._id:'n/a'),((node.tree.previous!=null)?node.tree.previous._id:'n/a'),((node.tree.next!=null)?node.tree.next._id:'n/a'),comments_label,tags_label);
+        console.debug('node #%s type %s:\n\ttree: start #%s, end #%s, previous #%s, next #%s\n\t%s\n\t%s',node._id,node.type,((node.tree.start!=null)?node.tree.start._id:'n/a'),((node.tree.end!=null)?node.tree.end._id:'n/a'),((node.tree.previous!=null)?node.tree.previous._id:'n/a'),((node.tree.next!=null)?node.tree.next._id:'n/a'),comments_label,_tags_label);
       }
     });
   }

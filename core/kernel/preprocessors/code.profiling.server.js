@@ -33,7 +33,7 @@ platform.kernel._preprocessors.server.code_profile = function(ast,code,file,modu
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (scopes[level] != null && scopes[level].tags != null && scopes[level].tags['preprocessor.disable'] != null && scopes[level].tags['preprocessor.disable'].indexOf(preprocessor) > -1){
+    if (scopes[level] != null && scopes[level]._tags != null && scopes[level]._tags['preprocessor.disable'] != null && scopes[level]._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
       skip = true;
     }
     if (node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression') {
@@ -44,12 +44,12 @@ platform.kernel._preprocessors.server.code_profile = function(ast,code,file,modu
       --level;
     }
     if (skip === false) {
-      if (node.tags != null && node.tags['profile'] != null) {
-        if (node.is_block === true){
+      if (node._tags != null && node._tags['profile'] != null) {
+        if (node._is_block === true){
           //T: support multiple keys?
           //T: append code to the closest safe node (backward)
           node.prepend.push(prepend_code);
-          node.append.unshift(append_code.replace('$0',node.tags['profile'][0]));
+          node.append.unshift(append_code.replace('$0',node._tags['profile'][0]));
         } else {
           console.warn('profile tag ignored for node at line %s in %s',node.loc.start.line,(file == null) ? 'eval code' : ('file ' + file));
         }

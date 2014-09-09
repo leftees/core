@@ -30,7 +30,7 @@ platform.kernel._preprocessors.server.code_leveling = function(ast,code,file,mod
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (scopes[level] != null && scopes[level].tags != null && scopes[level].tags['preprocessor.disable'] != null && scopes[level].tags['preprocessor.disable'].indexOf(preprocessor) > -1){
+    if (scopes[level] != null && scopes[level]._tags != null && scopes[level]._tags['preprocessor.disable'] != null && scopes[level]._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
       skip = true;
     }
     if (node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression') {
@@ -41,13 +41,13 @@ platform.kernel._preprocessors.server.code_leveling = function(ast,code,file,mod
       --level;
     }
     if (skip === false) {
-      if (node.tags != null && node.tags['runlevel'] != null && node.tags['runlevel'].length > 0) {
-        node.tags['runlevel'].forEach(function(runlevel){
+      if (node._tags != null && node._tags['runlevel'] != null && node._tags['runlevel'].length > 0) {
+        node._tags['runlevel'].forEach(function(runlevel){
           platform.kernel.runlevels[runlevel] = platform.kernel.runlevels[runlevel] || false;
         });
-        if (node.is_block === true){
+        if (node._is_block === true){
           var prepend_code = 'if(';
-          prepend_code += '((platform.kernel.runlevels[\'' + node.tags['runlevel'].join('\'] === true || platform.kernel.runlevels[\'') + '\'] === true)';
+          prepend_code += '((platform.kernel.runlevels[\'' + node._tags['runlevel'].join('\'] === true || platform.kernel.runlevels[\'') + '\'] === true)';
           prepend_code += ' && platform.configuration.server.kernel.runleveling === true) || platform.configuration.server.kernel.runleveling === false';
           prepend_code += ')';
           node.prepend.push(prepend_code);
