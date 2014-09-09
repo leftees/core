@@ -32,6 +32,12 @@ if (!String.prototype.repeat) {
   }
 }
 
+if (!String.prototype.trim) {
+  String.prototype.trim = function () {
+    return this.replace(/^\s+|\s+$/g, '');
+  };
+}
+
 if (!String.prototype.startsWith) {
   Object.defineProperty(String.prototype, 'startsWith', {
     enumerable: false,
