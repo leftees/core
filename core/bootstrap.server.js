@@ -91,6 +91,7 @@ bootstrap.post = function(){
 
   //T: switch to PXE (pre execution environment)
   //T: PXE test http ports to prevent EADDRINUSE exception later
+  delete global.bootstrap;
 };
 
 //C: defining function to resolve relative paths against app or custom root
