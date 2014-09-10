@@ -277,28 +277,31 @@ platform.parser.js.parse = function(code){
   return ast;
 };
 
-platform.parser.js.stringify = function(ast,tag){
+platform.parser.js.stringify = function(ast,compact,tag){
+  if (compact == null){
+    compact = true;
+  }
   return native.parser.js.codegen(ast,{
     format: {
       indent: {
-        style: (platform.runtime.development) ? '  ' : '',
+        style: (compact) ? '  ' : '',
         base: 0,
         adjustMultilineComment: false
       },
       newline: '\n',
       space: ' ',
       json: false,
-      renumber: !platform.runtime.development,
-      hexadecimal: !platform.runtime.development,
+      renumber: compact,
+      hexadecimal: compact,
       quotes: 'single',
-      escapeless: !platform.runtime.development,
-      compact: !platform.runtime.development,
-      parentheses: platform.runtime.development,
-      semicolons: platform.runtime.development,
+      escapeless: compact,
+      compact: compact,
+      parentheses: !compact,
+      semicolons: !compact,
       safeConcatenation: true
     },
     parse: null,
-    comment: platform.runtime.development,
+    comment: !compact,
     tag: tag || false,
     //sourceMap: undefined,
     //sourceMapRoot: null,

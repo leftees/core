@@ -61,7 +61,11 @@ platform.kernel.preprocess = function(code, file, module){
     }
   });
 
-  var augmented_code = platform.parser.js.stringify(ast);
+  var augmented_code = platform.parser.js.stringify(ast,!platform.runtime.development,platform.runtime.development);
+
+  if (augmented_code.charCodeAt(0) === 0x10){
+    augmented_code = augmented_code.slice(1);
+  }
 
   //T: migrate preprocessor stack from 0.3.x branch
   return augmented_code;
