@@ -120,26 +120,30 @@ Function.info.code = function(target, compact) {
 //F: Creates a new object using a string as JSON representation with type-guessing. [Functions are not processed by default for security reasons.]
 //A: json_string: Specifies the string object to use for JSON object creation.
 //A: [safe]: Specifies whether functions should be parsed. Default is true.
+//A: [outer]: Specifies whether the string can be contained in apexes. Default is false.
 //R: Returns object created by JSON string.
-JSON._parseNormalize = function(json_string,safe) {
+JSON._parseNormalize = function(json_string,safe,outer) {
   json_string = json_string.replace(/\n|\t/gi, '');
-  if ((/^\"{0,1}function[^\051]*?\050{1}[^\0]*?\051{1}\040*?\173{1}.*\175{1}$/g).test(json_string) === true) {
+  if (outer === true && (/^[\"\']{1}.*[\"\']{1}$/g).test(json_string) === true){
+    json_string = json_string.slice(1,json_string.length-1);
+  }
+  if ((/^[\"\']{0,1}function[^\051]*?\050{1}[^\0]*?\051{1}\040*?\173{1}.*\175{1}$/g).test(json_string) === true) {
     if (safe === false) {
       var function_arguments = json_string.match(/^function[^\051]*?\050{1}[^\0]*?\051{1}\040*/)[0].replace(/^function[^\051]*?\050{1}/, '').replace(/\040*$/, '').slice(0, -1);
       var function_body = json_string.replace(/^function[^\051]*?\050{1}[^\0]*?\051{1}\040*?\173{1}\040*/, '').slice(0, -1);
       return new Function(function_arguments, function_body);
     }
-  } else if ((/^\"{0,1}\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\"{0,1}$/g).test(json_string) === true) {
-    return new Date(json_string.replace(/\"/gi, ''));
-  } else if (json_string === '\"undefined\"' || json_string === 'undefined') {
+  } else if ((/^[\"\']{0,1}\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z[\"\']{0,1}$/g).test(json_string) === true) {
+    return new Date(json_string.replace(/\"|\'/gi, ''));
+  } else if (json_string === '\"undefined\"' || json_string === '\'undefined\'' || json_string === 'undefined') {
     return undefined;
-  } else if (json_string === '\"null\"' || json_string == 'null') {
+  } else if (json_string === '\"null\"' || json_string === '\'null\'' || json_string == 'null') {
     return null;
-  } else if (json_string === '\"true\"' || json_string == 'true') {
+  } else if (json_string === '\"true\"' || json_string === '\'true\'' || json_string == 'true') {
     return true;
-  } else if (json_string === '\"false\"' || json_string == 'false') {
+  } else if (json_string === '\"false\"' || json_string === '\'false\'' || json_string == 'false') {
     return false;
-  } else if ((/^\"{0,1}\/.*\/[gmix]*\"{0,1}$/).test(json_string) === true) {
+  } else if ((/^[\"\']{0,1}\/.*\/[gmix]*[\"\']{0,1}$/).test(json_string) === true) {
     var regexp_body = json_string.slice(2).slice(0, -2);
     var regexp_modifiers = (regexp_body.match(/[gmi]*$/) != null) ? regexp_body.match(/[gmi]*$/)[0] : '';
     var regexp_patterns = regexp_body.replace(/[gmi]*$/, '');
@@ -167,22 +171,26 @@ JSON.normalize = function(target,safe){
   return target;
 };
 
-JSON.parseAndNormalize = function(json_string,safe,useEval) {
-  //eval = true;
-  var json_normalized = JSON._parseNormalize(json_string,safe);
+JSON.parseAndNormalize = function(json_string,safe,evaluate) {
+  //evaluate = true;
+  var json_normalized = JSON._parseNormalize(json_string,safe,true);
   if (typeof json_normalized !== 'string'){
     return json_normalized;
   }
-  var result;
-  if (eval === true) {
-    result = eval("(" + json_normalized + ")");
-    return result;
+  if ((/^\s*\{.*\}\s*$/g).test(json_normalized) === false){
+    return json_normalized;
   } else {
-    result = JSON.parse(json_normalized);
-    //T: try-catch to use custom json parser?
+    var result;
+    if (evaluate === true) {
+      result = eval("(" + json_normalized + ")");
+      return result;
+    } else {
+      result = JSON.parse(json_normalized);
+      //T: try-catch to use custom json parser?
+    }
+    result = JSON.normalize(result, safe);
+    return result;
   }
-  result = JSON.normalize(result,safe);
-  return result;
 };
 
 //F: Returns a human readable timespan.
@@ -190,12 +198,12 @@ Number.toHumanTime = function (elapsed) {
   var labels = ['ms', 's', 'm', 'h', 'd'];
   var sizes = [1000, 60, 60, 24 ];
   var data = [];
-  sizes.forEach(function(value){
+  sizes.forEach(/*#preprocessor.disable:*/function(value){
     data.push(elapsed % value);
     elapsed = parseInt(elapsed/value);
   });
   var pos = 0;
-  data.forEach(function(value,index){
+  data.forEach(/*#preprocessor.disable:*/function(value,index){
     if(value > 0){
       pos = index;
     }
@@ -213,5 +221,5 @@ Number.toHumanSize = function (bytes) {
   var labels = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   if (bytes === 0) return 'n/a';
   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-  return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + labels[i];
+  return Math.round(bytes / Math.pow(1024, i), 2) + labels[i];
 };
