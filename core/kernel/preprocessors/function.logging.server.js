@@ -21,7 +21,7 @@
 
 platform.kernel._preprocessors.server.function_logging = function(ast,code,file,module,preprocessor){
 
-  var prepend_code = Function.info.code(__code_call_log_create_object, true);
+  var prepend_code = Function.info.code(_code_call_log_create_object, true);
 
   var node = ast;
   while (node != null) {
@@ -47,7 +47,7 @@ platform.kernel._preprocessors.server.function_logging = function(ast,code,file,
 
 //T: add support log level for function logging
 
-var __code_call_log_create_object = function() {
+var _code_call_log_create_object = function() {
   if (global.bootstrap == null && platform.configuration.server.debugging.kernel.function === true){
     if ((platform.configuration.server.kernel.function.logging.unknown === true
       || (platform.configuration.server.kernel.function.logging.unknown === false

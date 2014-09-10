@@ -20,8 +20,8 @@
  */
 
 platform.kernel._preprocessors.server.code_leveling = function(ast,code,file,module,preprocessor){
-  var prepend_code = Function.info.code(__code_level_check, true).replace('$1','') + '{';
-  var append_code = '}else{' + Function.info.code(__code_level_debug, true) + '}';
+  var prepend_code = Function.info.code(_code_level_check, true).replace('$1','') + '{';
+  var append_code = '}else{' + Function.info.code(_code_level_debug, true) + '}';
 
   var node = ast;
   while (node != null) {
@@ -46,12 +46,12 @@ platform.kernel._preprocessors.server.code_leveling = function(ast,code,file,mod
   }
 };
 
-var __code_level_check = function() {
+var _code_level_check = function() {
   if(((platform.kernel.runlevels['$0'] === true) && platform.configuration.server.kernel.runlevel === true) || platform.configuration.server.kernel.runlevel === false)
     $1
 };
 
-var __code_level_debug = function() {
+var _code_level_debug = function() {
   if (platform.configuration.server.debugging.kernel.runlevel === true) {
     (function () {
       var disabled_runlevels = ['$0'];

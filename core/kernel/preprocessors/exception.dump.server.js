@@ -71,6 +71,7 @@ var _exception_dump_code = function() {
     __exception_.date = new Date();
     __exception_.dump = $0;
     __exception_.called = arguments.called;
+    //T: push/store exception data somewhere
     throw __exception_;
   })();
 };
