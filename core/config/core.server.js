@@ -50,7 +50,9 @@ platform.configuration.server.bootloader.preload = [
   'io/cache.server.js',
   'parser/js.server.js',
   'kernel/preprocess.server.js',
+  'kernel/preprocessors/node.naming.server.js',
   'kernel/preprocessors/function.reflection.server.js',
+  'kernel/preprocessors/function.logging.server.js',
   'kernel/preprocessors/code.blocking.server.js',
   'kernel/preprocessors/code.leveling.server.js',
   'kernel/preprocessors/code.breakpoint.server.js',
@@ -91,6 +93,12 @@ platform.configuration.server.bootloader.modules = [
   'http/http.server.js'
 ];
 
+platform.configuration.server.cache = {
+  'startup': {
+    'clean': true
+  }
+};
+
 //O: Contains kernel configuration (server-side).
 platform.configuration.server.kernel = {};
 
@@ -99,8 +107,14 @@ platform.configuration.server.kernel = {};
 platform.configuration.server.kernel.preprocessors = [
 ];
 
-platform.configuration.server.kernel.runleveling = true;
-platform.configuration.server.kernel.profiling = true;
+platform.configuration.server.kernel.runlevel = true;
+platform.configuration.server.kernel.profile = true;
+platform.configuration.server.kernel.function = {
+  'logging': {
+    'unknown': true,
+    'object': true
+  }
+};
 platform.configuration.server.kernel.documentation = {
   'generate': true
 };
@@ -371,7 +385,9 @@ platform.configuration.server.debugging = {
     'js': false
   },
   'kernel': {
-    'profile': true
+    'runlevel': true,
+    'profile': true,
+    'function': true
   }
 };
 
@@ -415,12 +431,6 @@ platform.configuration.client.bootstrap = {};
 platform.configuration.client.bootstrap.root = 'platform._bootstrap.seed';
 platform.configuration.client.bootstrap.loader = 'platform._bootstrap.load';
 
-platform.configuration.cache = {
-  'startup': {
-    'clean': true
-  }
-};
-
 platform.configuration.engine = {};
 
 platform.configuration.engine.session = {};
@@ -429,7 +439,7 @@ platform.configuration.engine.session.gc = {
   'generational': true,
   'poll': 5000,
   'state': {
-    'socket': 5000,
+    'socket': 10000,
     'http': 10000,
     'dispose': 10000,
     'time': 60000,

@@ -30,7 +30,7 @@ platform.kernel._preprocessors.server.code_blocking = function(ast,code,file,mod
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
+    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && (node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node.tree.scope._tags['preprocessor.disable'].length === 0 || node.tree.scope._tags['preprocessor.disable'].indexOf('all') > -1)){
         skip = true;
     }
     switch(node.type){
@@ -46,7 +46,7 @@ platform.kernel._preprocessors.server.code_blocking = function(ast,code,file,mod
       --level;
     }
     if (skip === false) {
-      if (node._is_block === true){
+      if (node._is_exec_block === true){
           ++counters[level];
           var prepend_code = '';
           if (counters[level] === 1) {

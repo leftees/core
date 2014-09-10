@@ -747,6 +747,6 @@ platform.io.store.register('cache',platform.kernel.new('core.io.store.file',[ na
 //V: Stores the 'cache' store backend.
 platform.io.cache._backend = platform.io.store.getByName('cache');
 
-if (platform.configuration.cache.startup.clean === true){
+if (platform.configuration.server.cache.startup.clean === true){
   platform.io.cache.clean();
 }

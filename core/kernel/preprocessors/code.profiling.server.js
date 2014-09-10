@@ -26,12 +26,12 @@ platform.kernel._preprocessors.server.code_profile = function(ast,code,file,modu
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1){
+    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && (node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node.tree.scope._tags['preprocessor.disable'].length === 0 || node.tree.scope._tags['preprocessor.disable'].indexOf('all') > -1)){
       skip = true;
     }
     if (skip === false) {
       if (node._tags != null && node._tags['profile'] != null) {
-        if (node._is_block === true){
+        if (node._is_exec_block === true){
           //T: support multiple keys?
           //T: append code to the closest safe node (backward)
           node.prepend.push(prepend_code);
@@ -54,7 +54,7 @@ platform.metrics.code = platform.metrics.code || {};
 //F: Start performance monitor for code metrics. [The code of this function is propagated by this preprocessor.]
 //A: $0: Specifies the key to be pushed with profiled metrics.
 var _code_profile_start_monitor = function() {
-  if (platform.configuration.server.kernel.profiling === true) {
+  if (platform.configuration.server.kernel.profile === true) {
     (function () {
       var time_start = Date.now();
       platform.kernel._preprocessors.server.code_profile._data.push(time_start);
@@ -64,7 +64,7 @@ var _code_profile_start_monitor = function() {
 
 //F: Stop performance monitor and log data for code metrics. [The code of this function is propagated by this preprocessor.]
 var _code_profile_stop_monitor = function() {
-  if (platform.configuration.server.kernel.profiling === true) {
+  if (platform.configuration.server.kernel.profile === true) {
     (function(){
       var key = '$+0';
       var time_stop = Date.now();

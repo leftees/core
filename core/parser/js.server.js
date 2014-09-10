@@ -54,14 +54,14 @@ platform.parser.js._block_check = function(node,parent,previous){
         && parent.type !== 'WhileStatement'
         && parent.type !== 'WithStatement'
         && parent.type !== 'CatchClause'){
-        node._is_block = true;
+        node._is_exec_block = true;
       }
       break;
     case 'VariableDeclaration':
       if (parent != null
         && parent.type !== 'ForInStatement'
         && parent.type !== 'ForStatement'){
-        node._is_block = true;
+        node._is_exec_block = true;
       }
       break;
     case 'BreakStatement':
@@ -80,7 +80,7 @@ platform.parser.js._block_check = function(node,parent,previous){
     case 'TryStatement':
     case 'WhileStatement':
     case 'WithStatement':
-      node._is_block = true;
+      node._is_exec_block = true;
       break;
   }
 };
@@ -234,7 +234,7 @@ platform.parser.js.parse = function(code){
               name = comment.value;
             } else {
               name = comment.value.slice(0, params_position);
-              data = comment.value.slice(params_position + 1, comment.value.lastIndexOf(')'));
+              data = JSON.parseAndNormalize(comment.value.slice(params_position + 1, comment.value.lastIndexOf(')')));
             }
             node._tags[name] = node._tags[name] || [];
             if (data != null){

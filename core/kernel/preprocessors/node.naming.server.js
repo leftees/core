@@ -19,7 +19,7 @@
 
  */
 
-platform.kernel._preprocessors.server.code_breakpoint = function(ast,code,file,module,preprocessor){
+platform.kernel._preprocessors.server.node_naming = function(ast,code,file,module,preprocessor){
   var node = ast;
   while (node != null) {
     var skip = false;
@@ -27,14 +27,8 @@ platform.kernel._preprocessors.server.code_breakpoint = function(ast,code,file,m
       skip = true;
     }
     if (skip === false) {
-      if (node._tags != null && node._tags['b'] != null) {
-        if (node._is_exec_block === true){
-          //T: append code to the closest safe node (backward)
-          var prepend_code = 'if (platform.runtime.debugging === true) { debugger; }';
-          node.prepend.push(prepend_code);
-        } else {
-          console.warn('breakpoint tag ignored for node at line %s in %s',node.loc.start.line,(file == null) ? 'eval code' : ('file ' + file));
-        }
+      if (node._tags != null && node._tags['name'] != null && node._tags['name'].length > 0) {
+        node._name = node._tags['name'][0];
       }
     }
     node = node.tree.next;

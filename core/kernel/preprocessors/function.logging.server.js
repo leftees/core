@@ -19,9 +19,9 @@
 
  */
 
-platform.kernel._preprocessors.server.function_reflection = function(ast,code,file,module,preprocessor){
+platform.kernel._preprocessors.server.function_logging = function(ast,code,file,module,preprocessor){
 
-  var prepend_code = Function.info.code(_code_reflection_create_object, true);
+  var prepend_code = Function.info.code(__code_call_log_create_object, true);
 
   var node = ast;
   while (node != null) {
@@ -36,34 +36,7 @@ platform.kernel._preprocessors.server.function_reflection = function(ast,code,fi
         case 'ArrowFunctionExpression':
         case 'ArrowExpression':
           if (node.body.type === 'BlockStatement' && node.body.body.length > 0){
-            var function_name = node._name || 'unknown';
-            var function_params = [];
-            node.params.forEach(function(param){
-              function_params.push(param.name);
-            });
-            if (function_params.length > 0){
-              function_params = '\'' + function_params.join('\', \'') + '\'';
-            } else {
-              function_params = '';
-            }
-            var function_vars = [];
-            native.parser.js.traverse(node,{
-              'enter': function(child_node,parent) {
-                if (child_node.tree.scope === node) {
-                  switch (child_node.type) {
-                    case 'VariableDeclarator':
-                      function_vars.push(child_node.id.name);
-                      break;
-                  }
-                }
-              }
-            });
-            if (function_vars.length > 0){
-              function_vars = '\'' + function_vars.join('\', \'') + '\'';
-            } else {
-              function_vars = '';
-            }
-            node.body.body[0].prepend.push(prepend_code.replace('$+0',function_name).replace('$+1',function_params).replace('$+2',function_vars));
+            node.body.body[0].prepend.push(prepend_code);
           }
           break;
       }
@@ -72,10 +45,17 @@ platform.kernel._preprocessors.server.function_reflection = function(ast,code,fi
   }
 };
 
-var _code_reflection_create_object = function() {
-  arguments.called = {
-    'name': '$+0',
-    'params': [ $+1 ],
-    'vars': [ $+2 ]
-  };
+//T: add support log level for function logging
+
+var __code_call_log_create_object = function() {
+  if (global.bootstrap == null && platform.configuration.server.debugging.kernel.function === true){
+    if ((platform.configuration.server.kernel.function.logging.unknown === true
+      || (platform.configuration.server.kernel.function.logging.unknown === false
+      && (arguments.called != null && arguments.called.name !== 'unknown')))
+      && (platform.configuration.server.kernel.function.logging.object === true
+        || (platform.configuration.server.kernel.function.logging.object === false
+          && (arguments.called != null && arguments.called.name.startsWith('{}') === false)))) {
+      console.debug('function %s() called', (arguments.called != null) ? arguments.called.name : 'unknown');
+    }
+  }
 };

@@ -43,6 +43,7 @@ global.main.commands.run = function(base){
 
   //C: loading ljve application server
   global.require.main._compile('\n'+require('fs').readFileSync(global.main.path.core + '/core/bootstrap.server.js', { encoding: 'utf-8' }),'app:///core/bootstrap.server.js');
+
   //C: power-on-self-test, initializing application server
   bootstrap.post();
 
