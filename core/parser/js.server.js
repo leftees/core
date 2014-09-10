@@ -190,7 +190,6 @@ platform.parser.js.parse = function(code){
   native.parser.js.traverse(ast,{
     'enter': function(node,parent){
 
-
       if (previous != null){
         if (platform.configuration.server.debugging.parser.js === true) {
           console.debug('%s |%s found node #%s type %s',breadcrumb.length,' '.repeat(breadcrumb.length),node._id,node.type);
@@ -247,11 +246,12 @@ platform.parser.js.parse = function(code){
     'leave': function(node,parent){
       breadcrumb.pop();
 
-      if (scopes[level] != null && node === scopes[level].tree.end) {
+      platform.parser.js._tree_ast_ref_leave(node,parent,previous);
+
+      if (scopes[level] != null && node === scopes[level]) {
         --level;
       }
 
-      platform.parser.js._tree_ast_ref_leave(node,parent,previous);
       if (platform.configuration.server.debugging.parser.js === true) {
         console.debug('%s |%s found node #%s type %s',breadcrumb.length,' '.repeat(breadcrumb.length),node._id,node.type);
       }
