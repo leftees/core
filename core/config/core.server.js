@@ -58,7 +58,7 @@ platform.configuration.server.bootloader.preload = [
   'kernel/preprocessors/code.breakpoint.server.js',
   'kernel/preprocessors/code.profiling.server.js',
   'kernel/preprocessors/code.documentation.server.js',
-  'kernel/preprocessors/exception.catch.server.js'
+  'kernel/preprocessors/exception.dump.server.js'
 ];
 
 //O: Contains Javascript core modules, as array, to be inject after bootstrap to load application server (these are augmented).

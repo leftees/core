@@ -31,6 +31,30 @@ platform.kernel._preprocessors.server.exception_dump = function(ast,code,file,mo
     }
     if (skip === false) {
       switch(node.type){
+        //T: avoid code duplication
+        case 'Program':
+          if (node.body.length > 0) {
+            var function_dump = [];
+            native.parser.js.traverse(node, {
+              'enter': function (child_node, parent) {
+                if (child_node.tree.scope === node) {
+                  switch (child_node.type) {
+                    case 'VariableDeclarator':
+                      function_dump.push('\'' + child_node.id.name + '\': ' + child_node.id.name);
+                      break;
+                  }
+                }
+              }
+            });
+            if (function_dump.length > 0) {
+              function_dump = '{' + function_dump.join(', ') + '}';
+            } else {
+              function_dump = '{}';
+            }
+            node.body[0].prepend.push(prepend_code);
+            node.body[node.body.length - 1].append.push(append_code.replace('$0', function_dump));
+          }
+          break;
         case 'FunctionExpression':
         case 'FunctionDeclaration':
         case 'ArrowFunctionExpression':
@@ -66,12 +90,13 @@ platform.kernel._preprocessors.server.exception_dump = function(ast,code,file,mo
   }
 };
 
+//T: push/store exception data somewhere
 var _exception_dump_code = function() {
   (function(){
     __exception_.date = new Date();
     __exception_.dump = $0;
     __exception_.called = arguments.called;
-    //T: push/store exception data somewhere
+    console.error(__exception_);
     throw __exception_;
   })();
 };
