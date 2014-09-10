@@ -126,11 +126,11 @@ platform.system.memory.log = function(always,rebase){
 //C: starting memory watcher (only if debug is enabled)
 //T: add platform event for memory leak/stats
 //C: attaching to memwatch leak event
-platform.system.memory._memwatch.on('leak', function (info) {
+platform.system.memory._memwatch.on('leak', #name('memwatch.on.info'):function (info) {
   console.warn('possible memory leak detected: %s', info.reason);
 });
 //C: attaching to memwatch stats event
-platform.system.memory._memwatch.on('stats', function (stats) {
+platform.system.memory._memwatch.on('stats', #name('memwatch.on.stats'):function (stats) {
   if (platform.configuration.server.debugging.memory === true) {
     platform.system.memory.log();
   }
