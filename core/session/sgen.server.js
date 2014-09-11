@@ -55,14 +55,14 @@ platform.sessions.gc.collect = function(){
     }
   });
 
-  if (platform._bootstrap != null) {
+  if (platform.client.bootstrap != null) {
 
-    var fake_session_list = platform._bootstrap.list();
+    var fake_session_list = platform.client.bootstrap.list();
 
     fake_session_list.forEach(function (bootstrap_id) {
-      var fake_session = platform._bootstrap.get(bootstrap_id);
+      var fake_session = platform.client.bootstrap.get(bootstrap_id);
       if (fake_session._session.lease < lease && fake_session._session.working === 0) {
-        platform._bootstrap.unregister(bootstrap_id);
+        platform.client.bootstrap.unregister(bootstrap_id);
       }
     });
   }

@@ -116,9 +116,9 @@ platform.engine.process.http = function () {
   }
   if (session == null && context.request.headers ["x-platform-bootstrap"] != null) {
     var bootstrap_id = request.headers['x-platform-bootstrap'] || call.arguments['auth_bootstrap'];
-    if (platform._bootstrap.isValid(bootstrap_id) === true) {
-      if (platform._bootstrap.exist(bootstrap_id) === true) {
-        session = platform._bootstrap.get(bootstrap_id);
+    if (platform.client.bootstrap.isValid(bootstrap_id) === true) {
+      if (platform.client.bootstrap.exist(bootstrap_id) === true) {
+        session = platform.client.bootstrap.get(bootstrap_id);
         if (session != null){
           session._session.lease = Date.now() + session._session.timeout;
         }

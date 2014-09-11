@@ -19,9 +19,11 @@
 
  */
 
-//N: Provides client bootstrap helper methods and classes.
-platform._bootstrap = platform._bootstrap || {};
+platform.client = platform.client || {};
 
-platform._bootstrap.isSupported = function(browser){
+//N: Provides client bootstrap helper methods and classes.
+platform.client.bootstrap = platform.client.bootstrap || {};
+
+platform.client.bootstrap.isSupported = function(browser){
   return true;
 };

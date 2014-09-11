@@ -19,24 +19,26 @@
 
  */
 
+platform.client = platform.client || {};
+
 //N: Provides client bootstrap helper methods and classes.
-platform._bootstrap = platform._bootstrap || {};
+platform.client.bootstrap = platform.client.bootstrap || {};
 
 //O: Stores session-fake bootstrap objects.
-platform._bootstrap._store = {};
+platform.client.bootstrap._store = {};
 
 //V: Specifies the regular expression for validating bootstrap id.
-platform._bootstrap._validate_id_check = /^[a-zA-Z0-9]{8}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{12}$/;
+platform.client.bootstrap._validate_id_check = /^[a-zA-Z0-9]{8}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{12}$/;
 
 //F: Registers a new bootstrap session.
 //R: Returns the bootstrap id.
-platform._bootstrap.register = function() {
+platform.client.bootstrap.register = function() {
   platform.statistics.counter('bootstraps.total').inc();
   platform.statistics.counter('bootstraps.active').inc();
 
   //C: create new bootstrap id and object
   var bootstrap_id = native.uuid.v4();
-  while(platform._bootstrap._store.hasOwnProperty(bootstrap_id) === true) {
+  while(platform.client.bootstrap._store.hasOwnProperty(bootstrap_id) === true) {
     bootstrap_id = native.uuid.v4();
   }
 
@@ -62,7 +64,7 @@ platform._bootstrap.register = function() {
     }
   };
 
-  platform._bootstrap._store[bootstrap_id] = session;
+  platform.client.bootstrap._store[bootstrap_id] = session;
 
   if(platform.configuration.server.debugging.bootstrap === true) {
     console.debug('new bootstrap %s (%s) registered',session.id,session.identity.client.address);
@@ -73,10 +75,10 @@ platform._bootstrap.register = function() {
 
 //F: Unregisters a bootstrap session (invoked when bootstrap expires with no release).
 //A: bootstrap_id: Specifies the bootstrap id to unregister.
-platform._bootstrap.unregister = function(bootstrap_id) {
-  if (platform._bootstrap.isValid(bootstrap_id) === true) {
-    if (platform._bootstrap.exist(bootstrap_id) === true) {
-      var session = platform._bootstrap._store[bootstrap_id];
+platform.client.bootstrap.unregister = function(bootstrap_id) {
+  if (platform.client.bootstrap.isValid(bootstrap_id) === true) {
+    if (platform.client.bootstrap.exist(bootstrap_id) === true) {
+      var session = platform.client.bootstrap._store[bootstrap_id];
 
       if(platform.configuration.server.debugging.bootstrap === true) {
         console.debug('bootstrap %s unregistered after %s',session.id,Number.toHumanTime(Date.now()-session._session.start));
@@ -87,7 +89,7 @@ platform._bootstrap.unregister = function(bootstrap_id) {
       platform.statistics.counter('bootstraps.active').dec();
       platform.statistics.counter('bootstraps.expired').inc();
 
-      return delete platform._bootstrap._store[bootstrap_id];
+      return delete platform.client.bootstrap._store[bootstrap_id];
     } else {
       throw new Exception('bootstrap %s does not exist',bootstrap_id);
     }
@@ -100,24 +102,24 @@ platform._bootstrap.unregister = function(bootstrap_id) {
 //F: Checks if bootstrap id is valid.
 //A: bootstrap_id: Specifies the bootstrap id to validate.
 //R: Returns true if the bootstrap id is valid, false otherwise.
-platform._bootstrap.isValid = function (bootstrap_id){
-  return (platform._bootstrap._validate_id_check.test(bootstrap_id) && (platform._bootstrap._validate_id_check.lastIndex = 0) === 0);
+platform.client.bootstrap.isValid = function (bootstrap_id){
+  return (platform.client.bootstrap._validate_id_check.test(bootstrap_id) && (platform.client.bootstrap._validate_id_check.lastIndex = 0) === 0);
 };
 
 //F: Checks whether a session is registered in current environment.
 //A: bootstrap_id: Specifies name of new class to check.
 //R: Returns true if session is registered.
-platform._bootstrap.exist = function(bootstrap_id){
-  return (platform._bootstrap._store.hasOwnProperty(bootstrap_id));
+platform.client.bootstrap.exist = function(bootstrap_id){
+  return (platform.client.bootstrap._store.hasOwnProperty(bootstrap_id));
 };
 
 //F: Gets bootstrap object by bootstrap id.
 //A: bootstrap_id: Specifies bootstrap id to return.
 //R: Returns the bootstrap object.
-platform._bootstrap.get = function(bootstrap_id) {
-  if (platform._bootstrap.isValid(bootstrap_id) === true) {
-    if (platform._bootstrap.exist(bootstrap_id) === true) {
-      return platform._bootstrap._store[bootstrap_id];
+platform.client.bootstrap.get = function(bootstrap_id) {
+  if (platform.client.bootstrap.isValid(bootstrap_id) === true) {
+    if (platform.client.bootstrap.exist(bootstrap_id) === true) {
+      return platform.client.bootstrap._store[bootstrap_id];
     } else {
       throw new Exception('bootstrap %s does not exist',bootstrap_id);
     }
@@ -126,14 +128,14 @@ platform._bootstrap.get = function(bootstrap_id) {
   }
 };
 
-platform._bootstrap.seed = function() {
+platform.client.bootstrap.seed = function() {
   platform.statistics.counter('bootstraps.seed').inc();
 
   context.response.setHeader('Content-Type', 'text/html');
 
   if (platform.configuration.application.available === false) {
    platform.statistics.counter('bootstraps.unavailable').inc();
-   platform._bootstrap.sendpage('/core/client/unavailable.html',"ga('send', 'event', { 'eventCategory': 'app', 'eventAction': 'unavailable' });");
+   platform.client.bootstrap.sendpage('/core/client/unavailable.html',"ga('send', 'event', { 'eventCategory': 'app', 'eventAction': 'unavailable' });");
    return;
   }
 
@@ -142,16 +144,15 @@ platform._bootstrap.seed = function() {
   var browser = native.useragent.parse(context.request.headers['user-agent']);
 
   //C: checking if browser is supported
-  if (platform._bootstrap.isSupported(browser) === false) {
+  if (platform.client.bootstrap.isSupported(browser) === false) {
     platform.statistics.counter('bootstraps.unsupported').inc();
     //C: redirecting unsupported page
-    platform._bootstrap.sendpage('/core/client/unsupported.html',"ga('send', 'event', { 'eventCategory': 'app', 'eventAction': 'unsupported' });");
+    platform.client.bootstrap.sendpage('/core/client/unsupported.html',"ga('send', 'event', { 'eventCategory': 'app', 'eventAction': 'unsupported' });");
     //T: store statistics for unsupported browsers
     return;
   }
 
   //T: delete cache if configuration changed...
-
   if (platform.io.cache.is('/bootloader.html') === false) {
     //C: preparing bootstrap page
     var content = '';
@@ -244,12 +245,12 @@ platform._bootstrap.seed = function() {
 //A: oldsession_data: Specifies the session data to join existing session (if any).
 //A: relogin_data: Specifies the auto relogin info.
 //R: Returns release data separated by ':' (session_id,session_token,engine_id,logged_in:[0|1]).
-platform._bootstrap.release = function(statistics_data,oldsession_data,relogin_data) {
+platform.client.bootstrap.release = function(statistics_data,oldsession_data,relogin_data) {
   var bootstrap_id = context.session.id;
 
-  if (platform._bootstrap.isValid(bootstrap_id) === true) {
-    if (platform._bootstrap.exist(bootstrap_id) === true) {
-      var early_session = platform._bootstrap._store[bootstrap_id];
+  if (platform.client.bootstrap.isValid(bootstrap_id) === true) {
+    if (platform.client.bootstrap.exist(bootstrap_id) === true) {
+      var early_session = platform.client.bootstrap._store[bootstrap_id];
 
       //T: store statistics somewhere (with client stats too)...
 
@@ -319,7 +320,7 @@ platform._bootstrap.release = function(statistics_data,oldsession_data,relogin_d
 
       platform.statistics.counter('bootstraps.active').dec();
       platform.statistics.counter('bootstraps.succeed').inc();
-      delete (platform._bootstrap._store[bootstrap_id]);
+      delete (platform.client.bootstrap._store[bootstrap_id]);
 
       if (platform.configuration.server.debugging.bootstrap === true) {
         console.debug('bootstrap %s released to session %s after %s',bootstrap_id,session.name,Number.toHumanTime(Date.now()-session._session.start));
@@ -334,7 +335,7 @@ platform._bootstrap.release = function(statistics_data,oldsession_data,relogin_d
   }
 };
 
-platform._bootstrap.sendpage = function(path,ga_code) {
+platform.client.bootstrap.sendpage = function(path,ga_code) {
   if (platform.io.cache.is(path) === false) {
     var content = platform.io.get.string(path);
     var ga_script = '';
@@ -351,7 +352,7 @@ platform._bootstrap.sendpage = function(path,ga_code) {
 };
 
 //F: Starts a bootstrap for new connection requests.
-platform._bootstrap.load = function() {
+platform.client.bootstrap.load = function() {
   //T: delete cache if configuration changed...
 
   if (platform.io.cache.is('/bootloader.js') === false) {
@@ -370,14 +371,14 @@ platform._bootstrap.load = function() {
     platform.io.cache.set.string('/bootloader.js',null,bootloader_code);
   }
 
-  var bootstrap_id = platform._bootstrap.register();
+  var bootstrap_id = platform.client.bootstrap.register();
   context.response.setHeader('X-Platform-Bootstrap', bootstrap_id);
 
   platform.engine.send.cache('/bootloader.js');
 };
 
-platform._bootstrap.list = function() {
-  return Object.keys(platform._bootstrap._store);
+platform.client.bootstrap.list = function() {
+  return Object.keys(platform.client.bootstrap._store);
 };
 
 platform.io.cache.unset('/bootloader.html');

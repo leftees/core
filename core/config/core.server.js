@@ -429,8 +429,8 @@ platform.configuration.client = {};
 
 platform.configuration.client.bootstrap = {};
 
-platform.configuration.client.bootstrap.root = 'platform._bootstrap.seed';
-platform.configuration.client.bootstrap.loader = 'platform._bootstrap.load';
+platform.configuration.client.bootstrap.root = 'platform.client.bootstrap.seed';
+platform.configuration.client.bootstrap.loader = 'platform.client.bootstrap.load';
 
 platform.configuration.engine = {};
 
