@@ -30,10 +30,12 @@ global.main.commands.version = function(){
 //C: prints the app, node and other significant versions
 global.main.commands.version.print = function(){
   //T: print versions through component list
-  console.log('ljve.io: %s\nnode.js: %s',
-    global.require('./package.json').version,
-    process.version.replace(/^v/,'')
-  );
+  console.log('ljve: %s', global.require('./package.json').version);
+  console.log('node: %s',process.versions.node);
+  console.log('v8: %s',process.versions.v8);
+  console.log('uv: %s',process.versions.uv);
+  console.log('openssl: %s',process.versions.openssl);
+  console.log('zlib: %s',process.versions.zlib);
 };
 
 //C: defining version CLI command manual
