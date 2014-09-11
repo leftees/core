@@ -96,7 +96,6 @@ var _exception_dump_code = function() {
     __exception_.date = new Date();
     __exception_.dump = $0;
     __exception_.called = arguments.called;
-    console.error(__exception_);
     throw __exception_;
   })();
 };
