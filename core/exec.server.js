@@ -67,7 +67,7 @@ if (execArgv.indexOf('--harmony') === -1){
   execArgv.push('--harmony');
 
   //C: enabling debugger if needed
-  if (global.debugging === true) {
+  if (global.debugging === true || global.development === true) {
     execArgv.unshift('--debug');
   }
 
