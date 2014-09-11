@@ -99,7 +99,7 @@ platform.kernel._preprocessors.server.code_documentation = function(ast,code,fil
               }
             }
           });
-          platform.development.jsdoc[documentation_name] = documentation_object;
+          platform.development.jsdoc._store[documentation_name] = documentation_object;
         }
       }
     }
@@ -109,3 +109,4 @@ platform.kernel._preprocessors.server.code_documentation = function(ast,code,fil
 
 platform.development = platform.development || {};
 platform.development.jsdoc = platform.development.jsdoc || {};
+platform.development.jsdoc._store = platform.development.jsdoc._store || {};
