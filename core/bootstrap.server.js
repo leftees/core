@@ -35,6 +35,14 @@ Object.defineProperty(global,"platform",{
   value: {}
 });
 
+global.platform.side = 'server';
+Object.defineProperty(platform,"side",{
+  configurable: false,
+  enumerable : true,
+  writable: false,
+  value: 'server'
+});
+
 //C: defining post power-on-self-test bootstrap function
 bootstrap.post = function(){
   var time_start = Date.now();
