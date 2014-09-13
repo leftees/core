@@ -90,6 +90,7 @@ native.uuid = require('node-uuid');
 native.metrics = require('measured');
 native.mail = require('nodemailer');
 native.async = require('async');
+native.watch = require('node-watch');
 
 //C: injecting core HTML5 classes implementation (we like a mirrored environment)
 //T: test W3C compliance for Worker
