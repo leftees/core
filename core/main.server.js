@@ -196,11 +196,9 @@ global.main.commands.test = function(){
 if (native.fs.existsSync(native.path.join(global.main.path.core,'/core/main')) === true) {
   //C: getting files available in /core/main folder
   var exec_files = native.fs.readdirSync(native.path.join(global.main.path.core,'/core/main'));
-  //C: caching .js extension check regex
-  var js_file_check = /.js$/;
   //C: loading every .js files available in /core/main folder
   exec_files.forEach(function (file) {
-    if (js_file_check.test(file) === true && (js_file_check.lastIndex = 0) === 0) {
+    if (file.endsWith('.js') === true) {
       global.require.main._compile('\n' + native.fs.readFileSync(global.main.path.core + '/core/main/' + file, { encoding: 'utf-8' }), 'app:///core/main/' + file);
     }
   });
