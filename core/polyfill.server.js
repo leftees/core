@@ -69,3 +69,30 @@ if (!String.prototype.contains) {
     return String.prototype.indexOf.apply( this, arguments ) !== -1;
   };
 }
+
+if (Function.prototype.bind == null) {
+  Function.prototype.bind = function(scope) {
+    if (arguments.length == 0 || (arguments.length == 1 && arguments[0] == null))
+      return this;
+    var FunctionToBind = this;
+    var ArgumentsToBind = null;
+    if (arguments.length > 1) {
+      ArgumentsToBind = Array.prototype.slice.call(arguments);
+      ArgumentsToBind.shift();
+    } else {
+      ArgumentsToBind = [];
+    }
+    return (function() {
+      return FunctionToBind.apply(scope,ArgumentsToBind.concat(Array.prototype.slice.call(arguments)));
+    });
+  };
+}
+
+if (Array.prototype.indexOf == null) {
+  Array.prototype.indexOf = function(obj,start) {
+    for (var Index = (start || 0); Index < this.length; Index++) {
+      if (this[Index] === obj) { return Index; }
+    }
+    return -1;
+  };
+}
