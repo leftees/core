@@ -223,3 +223,66 @@ Number.toHumanSize = function (bytes) {
   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
   return Math.round(bytes / Math.pow(1024, i), 2) + labels[i];
 };
+
+String.hash = {};
+
+//F: Returns hash with Jenkins algorithm.
+//A: data: Specifies the string to be hashed.
+String.hash.jenkins = function(data) {
+  var data_buffer = new Uint32Array(new Buffer(data));
+
+  var uint_slots = new Uint32Array(3);
+
+  var len = data_buffer.length;
+  uint_slots[0] = uint_slots[1] = 0x9e3779b9;
+  uint_slots[2] = 0;
+  var i = 0;
+  while (i + 12 <= len)
+  {
+    uint_slots[0] += data[i++] | (data[i++] << 8) | (data[i++] << 16) | (data[i++] << 24);
+    uint_slots[1] += data[i++] | (data[i++] << 8) | (data[i++] << 16) | (data[i++] << 24);
+    uint_slots[2] += data[i++] | (data[i++] << 8) | (data[i++] << 16) | (data[i++] << 24);
+    uint_slots[0] -= uint_slots[1]; uint_slots[0] -= uint_slots[2]; uint_slots[0] ^= (uint_slots[2]>>13);
+    uint_slots[1] -= uint_slots[2]; uint_slots[1] -= uint_slots[0]; uint_slots[1] ^= (uint_slots[0]<<8);
+    uint_slots[2] -= uint_slots[0]; uint_slots[2] -= uint_slots[1]; uint_slots[2] ^= (uint_slots[1]>>13);
+    uint_slots[0] -= uint_slots[1]; uint_slots[0] -= uint_slots[2]; uint_slots[0] ^= (uint_slots[2]>>12);
+    uint_slots[1] -= uint_slots[2]; uint_slots[1] -= uint_slots[0]; uint_slots[1] ^= (uint_slots[0]<<16);
+    uint_slots[2] -= uint_slots[0]; uint_slots[2] -= uint_slots[1]; uint_slots[2] ^= (uint_slots[1]>>5);
+    uint_slots[0] -= uint_slots[1]; uint_slots[0] -= uint_slots[2]; uint_slots[0] ^= (uint_slots[2]>>3);
+    uint_slots[1] -= uint_slots[2]; uint_slots[1] -= uint_slots[0]; uint_slots[1] ^= (uint_slots[0]<<10);
+    uint_slots[2] -= uint_slots[0]; uint_slots[2] -= uint_slots[1]; uint_slots[2] ^= (uint_slots[1]>>15);
+  }
+  uint_slots[2] += len;
+  if (i < len)
+    uint_slots[0] += data[i++];
+  if (i < len)
+    uint_slots[0] += data[i++] << 8;
+  if (i < len)
+    uint_slots[0] += data[i++] << 16;
+  if (i < len)
+    uint_slots[0] += data[i++] << 24;
+  if (i < len)
+    uint_slots[1] += data[i++];
+  if (i < len)
+    uint_slots[1] += data[i++] << 8;
+  if (i < len)
+    uint_slots[1] += data[i++] << 16;
+  if (i < len)
+    uint_slots[1] += data[i++] << 24;
+  if (i < len)
+    uint_slots[2] += data[i++] << 8;
+  if (i < len)
+    uint_slots[2] += data[i++] << 16;
+  if (i < len)
+    uint_slots[2] += data[i++] << 24;
+  uint_slots[0] -= uint_slots[1]; uint_slots[0] -= uint_slots[2]; uint_slots[0] ^= (uint_slots[2]>>13);
+  uint_slots[1] -= uint_slots[2]; uint_slots[1] -= uint_slots[0]; uint_slots[1] ^= (uint_slots[0]<<8);
+  uint_slots[2] -= uint_slots[0]; uint_slots[2] -= uint_slots[1]; uint_slots[2] ^= (uint_slots[1]>>13);
+  uint_slots[0] -= uint_slots[1]; uint_slots[0] -= uint_slots[2]; uint_slots[0] ^= (uint_slots[2]>>12);
+  uint_slots[1] -= uint_slots[2]; uint_slots[1] -= uint_slots[0]; uint_slots[1] ^= (uint_slots[0]<<16);
+  uint_slots[2] -= uint_slots[0]; uint_slots[2] -= uint_slots[1]; uint_slots[2] ^= (uint_slots[1]>>5);
+  uint_slots[0] -= uint_slots[1]; uint_slots[0] -= uint_slots[2]; uint_slots[0] ^= (uint_slots[2]>>3);
+  uint_slots[1] -= uint_slots[2]; uint_slots[1] -= uint_slots[0]; uint_slots[1] ^= (uint_slots[0]<<10);
+  uint_slots[2] -= uint_slots[0]; uint_slots[2] -= uint_slots[1]; uint_slots[2] ^= (uint_slots[1]>>15);
+  return uint_slots[2];
+};
