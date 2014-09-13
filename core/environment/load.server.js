@@ -23,3 +23,10 @@ platform.environment = platform.environment || {};
 
 platform.environment._files = platform.environment._files || [];
 
+platform.environment.load = function(path,module){
+  if (platform.environment._files.indexOf(path) === -1) {
+    platform.environment._files.push(path);
+  }
+
+  return platform.kernel.load(path,module);
+};

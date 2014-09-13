@@ -21,31 +21,66 @@
 
 platform.development.change = platform.development.change || {};
 
-platform.development.change._watcher = null;
-
-platform.development.change.process = function(path){
+platform.development.change.process = function(file){
   var type;
-  if (platform.io.system.exist(path) === true) {
+  if (platform.io.system.exist(file) === true) {
     type = 'change';
   } else {
     type = 'delete';
   }
 
-  platform.development.change.process[type](path);
-
+  var path = file.replace(platform.runtime.path.core,'');
   var file_is_loaded = platform.environment._files.indexOf(path);
   if((file_is_loaded > -1 && platform.configuration.server.debugging.filesystem.change.loaded === true)
     || (file_is_loaded === -1 && platform.configuration.server.debugging.filesystem.change.other === true)) {
-    console.debug('filesystem %s %sd', path, type);
+    console.debug('file %s %sd', path, type);
+  }
+
+  if (file_is_loaded > -1) {
+    platform.development.change.process[type](path);
   }
 };
 
 platform.development.change.process.change = function(path){
-
+  return;
+  if(platform.io.cache.was(path,'built') === true){
+    var old_data = platform.io.cache.got.string(path,'built');
+    var new_data = platform.io.get.string(path);
+    console.log(_compute_change(old_data,new_data));
+  }
 };
 
 platform.development.change.process.delete = function(path){
 
+};
+
+var _compute_change = function(old_data, new_data){
+  var old_split_data = old_data.split('\n');
+  var new_split_data = new_data.split('\n');
+
+  var old_split_hash = old_split_data.map(function(line){
+    return String.hash.jenkins(line);
+  });
+  var new_split_hash = new_split_data.map(function(line){
+    return String.hash.jenkins(line);
+  });
+
+  var leftovers = [];
+
+  old_split_hash = old_split_hash.filter(function(old_hash){
+    var new_index = new_split_hash.indexOf(old_hash);
+    if (new_index > -1) {
+      new_split_hash.splice(new_index,1);
+      return false;
+    } else {
+      return true;
+    }
+  });
+
+  return {
+    'remove': old_split_data,
+    'add': new_split_data
+  };
 };
 
 if (platform.runtime.development === true) {

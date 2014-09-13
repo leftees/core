@@ -89,51 +89,51 @@ platform.kernel.inject = function (code,file,module,preprocess) {
 };
 
 //F: Loads Javascript file into current environment.
-//A: file: Specifies the file name containing code to be injected.
+//A: path: Specifies the file name containing code to be injected.
 //A: [module]: Specifies name of the module that is injecting code
 //A: [preprocess]: Specifies whether the code should be augmented before injection. Default is true.
 //R: Returns the return value from loaded code.
 //H: This function will resolve paths, augment code if requested, cache and inject into current environment.
-platform.kernel.load = function(file,module,preprocess) {
+platform.kernel.load = function(path,module,preprocess) {
   //preprocess = false;
   //C: checking whether the file exists
-  if (platform.io.exist(file) === false) {
-    throw new Exception('resource %s not found', file);
+  if (platform.io.exist(path) === false) {
+    throw new Exception('resource %s not found', path);
   }
   //C: detecting if file is already cached
-  var is_cached = platform.io.cache.is(file, 'built');
+  var is_cached = platform.io.cache.is(path, 'built');
   var preprocessed_code;
   if (is_cached === false) {
     //C: getting file content
-    var code = platform.io.get.string(file);
+    var code = platform.io.get.string(path);
     //C: preprocessing code if required
     if ((preprocess == null || preprocess === true) && typeof platform.kernel.preprocess === 'function') {
-      preprocessed_code = platform.kernel.preprocess(code,file,module);
+      preprocessed_code = platform.kernel.preprocess(code,path,module);
     } else {
       preprocessed_code = code;
     }
     //C: saving augmented file to be loaded through require (only for testing environment)
     if (global.testing === true || global.development === true) {
-      platform.kernel._backend.set.string(file, preprocessed_code);
+      platform.kernel._backend.set.string(path, preprocessed_code);
     }
     //C: caching augmented file
     //T: replace with sync  set call
-    platform.io.cache.set.string(file, 'built', preprocessed_code);
+    platform.io.cache.set.string(path, 'built', preprocessed_code);
   } else {
     //C: getting file from cache
-    preprocessed_code = platform.io.cache.get.string(file, 'built', true);
+    preprocessed_code = platform.io.cache.get.string(path, 'built', true);
   }
   //C: loading file through require
   if (global.testing === true) {
     if(platform.configuration.server.debugging.load === true){
-      console.debug('loading %s', file);
+      console.debug('loading %s', path);
     }
-    return global.require(native.path.join(platform.kernel._backend.base,file));
+    return global.require(native.path.join(platform.kernel._backend.base,path));
   } else {
     if(platform.configuration.server.debugging.load === true) {
-      console.debug('loading %s' + ((is_cached === false) ? '' : ' from cache'), file);
+      console.debug('loading %s' + ((is_cached === false) ? '' : ' from cache'), path);
     }
-    return global.require.main._compile(preprocessed_code,'app://'+file);
+    return global.require.main._compile(preprocessed_code,'app://'+path);
   }
 };
 
