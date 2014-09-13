@@ -46,7 +46,7 @@
     "moment": "*",
     "multiparty": "*",
     "node-brackets": "https://github.com/marcominetti/node-brackets/tarball/master",
-    "node-console": "https://github.com/marcominetti/node-console/tarball/master",
+    "node-console": "*",
     "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/master",
     "node-uuid": "*",
     "node-zlib-backport": "*",
