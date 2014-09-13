@@ -48,12 +48,15 @@ platform.kernel._preprocessors.server.function_logging = function(ast,code,file,
 //T: add support log level for function logging
 
 var _code_call_log_create_object = function() {
-  if (global.bootstrap == null && platform.configuration.server.debugging.kernel.function === true){
-    if ((platform.configuration.server.kernel.function.logging.unknown === true
-      || (platform.configuration.server.kernel.function.logging.unknown === false
-      && (arguments.called != null && arguments.called.name !== 'unknown')))
-      && (platform.configuration.server.kernel.function.logging.object === true
-        || (platform.configuration.server.kernel.function.logging.object === false
+  if (global.bootstrap == null){
+    if ((platform.configuration.server.debugging.kernel.function.named === true
+      || (platform.configuration.server.debugging.kernel.function.named === false
+      && (arguments.called != null && (arguments.called.name === 'unknown' || arguments.called.name.startsWith('{}') === true))))
+      && (platform.configuration.server.debugging.kernel.function.unknown === true
+        || (platform.configuration.server.debugging.kernel.function.unknown === false
+          && (arguments.called != null && arguments.called.name !== 'unknown')))
+      && (platform.configuration.server.debugging.kernel.function.object === true
+        || (platform.configuration.server.debugging.kernel.function.object === false
           && (arguments.called != null && arguments.called.name.startsWith('{}') === false)))) {
       console.debug('function %s() called', (arguments.called != null) ? arguments.called.name : 'unknown');
     }

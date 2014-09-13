@@ -69,6 +69,7 @@ platform.configuration.server.bootloader.modules = [
   'utility.server.js',
   'development/tools.server.js',
   'development/jsdoc.server.js',
+  'development/change.server.js',
   'kernel/kernel.server.js',
   'kernel/prototype.server.js',
   'kernel/classes.server.js',
@@ -91,7 +92,9 @@ platform.configuration.server.bootloader.modules = [
   'session/pool.store.server.js',
   'messaging/mail/mail.server.js',
   'http/context.server.js',
-  'http/http.server.js'
+  'http/http.server.js',
+  'environment/load.server.js',
+  'environment/module.server.js'
 ];
 
 platform.configuration.server.cache = {
@@ -110,12 +113,7 @@ platform.configuration.server.kernel.preprocessors = [
 
 platform.configuration.server.kernel.runlevel = true;
 platform.configuration.server.kernel.profile = true;
-platform.configuration.server.kernel.function = {
-  'logging': {
-    'unknown': true,
-    'object': true
-  }
-};
+
 platform.configuration.server.kernel.documentation = {
   'generate': true
 };
@@ -388,7 +386,26 @@ platform.configuration.server.debugging = {
   'kernel': {
     'runlevel': true,
     'profile': true,
-    'function': false
+    'function': {
+      'named': false,
+      'unknown': false,
+      'object': false
+    }
+  },
+  'object':{
+    'property': {
+      'define': true,
+      'set': true,
+      'get': true,
+      'persist': true,
+      'prelink': true
+    }
+  },
+  'filesystem': {
+    'change': {
+      'loaded': true,
+      'other': true
+    }
   }
 };
 
