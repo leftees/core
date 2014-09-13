@@ -58,7 +58,8 @@ platform.configuration.server.bootloader.preload = [
   'kernel/preprocessors/code.breakpoint.server.js',
   'kernel/preprocessors/code.profiling.server.js',
   'kernel/preprocessors/code.documentation.server.js',
-  'kernel/preprocessors/exception.dump.server.js'
+  'kernel/preprocessors/exception.dump.server.js',
+  'environment/load.server.js'
 ];
 
 //O: Contains Javascript core modules, as array, to be inject after bootstrap to load application server (these are augmented).
@@ -79,6 +80,7 @@ platform.configuration.server.bootloader.modules = [
   'io/cache.server.js',
   'parser/js.server.js',
   'kernel/preprocess.server.js',
+  'environment/load.server.js',
   'system/memory.server.js',
   'net/fastcgi.server.js',
   'engine/engine.server.js',
@@ -93,7 +95,6 @@ platform.configuration.server.bootloader.modules = [
   'messaging/mail/mail.server.js',
   'http/context.server.js',
   'http/http.server.js',
-  'environment/load.server.js',
   'environment/module.server.js'
 ];
 
@@ -404,7 +405,7 @@ platform.configuration.server.debugging = {
   'filesystem': {
     'change': {
       'loaded': true,
-      'other': true
+      'other': false
     }
   }
 };
