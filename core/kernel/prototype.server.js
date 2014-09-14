@@ -23,7 +23,7 @@ Object._property_store = Object._property_store || {};
 
 Object.definePropertyEx = function(obj_name, prop, descriptor, target){
   var target_name;
-  var full_name;
+  var strong_name;
   var property_name;
   var extended_descriptor;
 
@@ -42,13 +42,13 @@ Object.definePropertyEx = function(obj_name, prop, descriptor, target){
       target_name = obj_name.slice(0,leaf_position-1);
       target = target || platform.kernel.get(target_name);
     }
-    full_name = obj_name;
+    strong_name = obj_name;
   } else {
     extended_descriptor = descriptor;
     property_name = prop;
     target_name = obj_name;
     target = target || platform.kernel.get(obj_name);
-    full_name = target_name + '.' + property_name;
+    strong_name = target_name + '.' + property_name;
   }
 
   if (target == null || typeof target !== 'object' || target_name == null || typeof target_name !== 'string' || property_name == null || typeof property_name !== 'string' || extended_descriptor == null || typeof extended_descriptor !== 'object'){
@@ -56,11 +56,11 @@ Object.definePropertyEx = function(obj_name, prop, descriptor, target){
   }
 
   legacy_descriptor = {};
-  property_store = Object._property_store[full_name] || {};
-  property_store.name = property_store.name || full_name;
+  property_store = Object._property_store[strong_name] || {};
+  property_store.name = property_store.name || strong_name;
 
   if (property_store.configurable === false){
-    throw new Exception('property %s is not configurable', full_name);
+    throw new Exception('property %s is not configurable', strong_name);
   }
 
   if (extended_descriptor.hasOwnProperty('configurable') === true) {
@@ -79,16 +79,16 @@ Object.definePropertyEx = function(obj_name, prop, descriptor, target){
        */
     } else {
       try {
-        property_store.value = platform.kernel.get(full_name);
+        property_store.value = platform.kernel.get(strong_name);
       } catch (err) {
         property_store.value = undefined;
       }
     }
     if (platform.configuration.server.debugging.object.property.set === true) {
-      console.debug('setting property %s internal value to %s', full_name, property_store.value);
+      console.debug('setting property %s internal value to %s', strong_name, property_store.value);
     }
   } else {
-    throw new Exception('property %s is not writable', full_name);
+    throw new Exception('property %s is not writable', strong_name);
   }
 
   if (extended_descriptor.hasOwnProperty('writable') === true) {
@@ -159,15 +159,15 @@ Object.definePropertyEx = function(obj_name, prop, descriptor, target){
       if (global.hasOwnProperty(property_store.prelink) === true) {
         delete global[property_store.prelink];
         if (platform.configuration.server.debugging.object.property.set === true) {
-          console.warn('property %s resetting prelink %s', full_name, property_store.prelink);
+          console.warn('property %s resetting prelink %s', strong_name, property_store.prelink);
         }
       }
       Object.defineProperty(global,property_store.prelink,{
-        get: Object.definePropertyEx._get_function.bind(null,full_name),
-        set: Object.definePropertyEx._set_function.bind(null,full_name)
+        get: Object.definePropertyEx._get_function.bind(null,strong_name),
+        set: Object.definePropertyEx._set_function.bind(null,strong_name)
       });
       if (platform.configuration.server.debugging.object.property.set === true) {
-        console.warn('property %s prelinked with %s', full_name, property_store.prelink);
+        console.warn('property %s prelinked with %s', strong_name, property_store.prelink);
       }
     } else {
       throw new Exception('invalid prelink identifier');
@@ -189,44 +189,44 @@ Object.definePropertyEx = function(obj_name, prop, descriptor, target){
     }
     //T: read value if stored
     if (platform.configuration.server.debugging.object.property.persist === true){
-      console.debug('property %s value imported from persist store',full_name);
+      console.debug('property %s value imported from persist store',strong_name);
     }
     if (property_store.persist === 2 && extended_descriptor.hasOwnProperty('value') === true) {
       //T: store value to persistent store
       if (platform.configuration.server.debugging.object.property.persist === true) {
-        console.debug('property %s value exported to persist store', full_name);
+        console.debug('property %s value exported to persist store', strong_name);
       }
     }
   }
 
   //T: support remote
 
-  Object._property_store[full_name] = property_store;
+  Object._property_store[strong_name] = property_store;
 
   if (platform.configuration.server.debugging.object.property.define === true) {
-    console.debug('property %s store updated', full_name);
+    console.debug('property %s store updated', strong_name);
   }
 
-  legacy_descriptor.get = Object.definePropertyEx._get_function.bind(null,full_name);
-  legacy_descriptor.set = Object.definePropertyEx._set_function.bind(null,full_name);
+  legacy_descriptor.get = Object.definePropertyEx._get_function.bind(null,strong_name);
+  legacy_descriptor.set = Object.definePropertyEx._set_function.bind(null,strong_name);
 
   Object.defineProperty(target,property_name,legacy_descriptor);
 
   if (platform.configuration.server.debugging.object.property.define === true) {
-    console.debug('property %s configured', full_name);
+    console.debug('property %s configured', strong_name);
   }
 
 };
 
 //F: Implements default operations for building a member get function.
 /*#preprocessor.disable*/
-Object.definePropertyEx._get_function = function(full_name) {
-  var property_store = Object._property_store[full_name];
+Object.definePropertyEx._get_function = function(strong_name) {
+  var property_store = Object._property_store[strong_name];
   var stored_value = property_store.value;
   var result = stored_value;
 
   if (platform.configuration.server.debugging.object.property.get === true) {
-    console.debug('getting property %s internal value %s', full_name, result);
+    console.debug('getting property %s internal value %s', strong_name, result);
   }
 
   if (property_store.get != null) {
@@ -234,19 +234,19 @@ Object.definePropertyEx._get_function = function(full_name) {
       property_store.get.forEach(function(child_get){
         result = child_get(result,stored_value);
         if (platform.configuration.server.debugging.object.property.get === true) {
-          console.debug('changing property %s return value to %s', full_name, result);
+          console.debug('changing property %s return value to %s', strong_name, result);
         }
       });
     } else if(typeof property_store.get === 'function') {
       result = property_store.get(result,stored_value);
       if (platform.configuration.server.debugging.object.property.get === true) {
-        console.debug('changing property %s return value to %s', full_name, result);
+        console.debug('changing property %s return value to %s', strong_name, result);
       }
     }
   }
 
   if (platform.configuration.server.debugging.object.property.get === true) {
-    console.debug('returning property %s value %s', full_name, result);
+    console.debug('returning property %s value %s', strong_name, result);
   }
   return result;
 };
@@ -254,39 +254,39 @@ Object.definePropertyEx._get_function = function(full_name) {
 //F: Implements default operations for building a member set function.
 //A: value: Specifies the value to be used in the template function construction.
 /*#preprocessor.disable*/
-Object.definePropertyEx._set_function = function(full_name,new_value) {
-  var property_store = Object._property_store[full_name];
+Object.definePropertyEx._set_function = function(strong_name,new_value) {
+  var property_store = Object._property_store[strong_name];
   var stored_value = property_store.value;
   var result = new_value;
 
   if (property_store.writable === false){
-    throw new Exception('property %s is not writable', full_name);
+    throw new Exception('property %s is not writable', strong_name);
   }
 
   if (platform.configuration.server.debugging.object.property.set === true) {
-    console.debug('changing property %s new value to %s', full_name, result);
+    console.debug('changing property %s new value to %s', strong_name, result);
   }
 
-  //T: remote_readonly
+  //T: security
 
   if (property_store.set != null) {
     if (PropertyStore.set.constructor === Array) {
       property_store.set.forEach(function(child_set){
         result = child_set(result,new_value,stored_value);
         if (platform.configuration.server.debugging.object.property.set === true) {
-          console.debug('changing property %s new value to %s', full_name, result);
+          console.debug('changing property %s new value to %s', strong_name, result);
         }
       });
     } else if(typeof property_store.set === 'function') {
       result = property_store.set(result,new_value,stored_value);
       if (platform.configuration.server.debugging.object.property.set === true) {
-        console.debug('changing property %s new value to %s', full_name, result);
+        console.debug('changing property %s new value to %s', strong_name, result);
       }
     }
   }
 
   if (platform.configuration.server.debugging.object.property.set === true) {
-    console.debug('setting property %s internal value to %s', full_name, result);
+    console.debug('setting property %s internal value to %s', strong_name, result);
   }
   property_store.value = result;
 
@@ -295,7 +295,7 @@ Object.definePropertyEx._set_function = function(full_name,new_value) {
   if (property_store.persist === 2){
     //T: store value to persistent store
     if (platform.configuration.server.debugging.object.property.persist === true) {
-      console.debug('property %s value exported to persist store', full_name);
+      console.debug('property %s value exported to persist store', strong_name);
     }
   }
 
@@ -313,12 +313,12 @@ Object.definePropertiesEx = function(obj_name,props) {
 };
 
 Object.getOwnPropertyDescriptorEx = function(obj_name,prop){
-  var full_name;
+  var strong_name;
   if (prop == null && typeof obj_name === 'string') {
-    full_name = obj_name;
+    strong_name = obj_name;
   } else {
-    full_name = obj_name + '.' + prop;
+    strong_name = obj_name + '.' + prop;
   }
 
-  return Object._property_store[full_name];
+  return Object._property_store[strong_name];
 };
