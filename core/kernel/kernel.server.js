@@ -200,3 +200,31 @@ platform.kernel.new = function (name,args,root,divisor) {
   target.apply(new_instance,args);
   return new_instance;
 };
+
+platform.kernel.exist = function(name,root,divisor) {
+  var target = root;
+  var subname;
+  var tree;
+  var count;
+  if (target == null){
+    target = global;
+  }
+
+  subname = null;
+  tree = name.split (divisor||'.');
+  for (count = 0; count < tree.length-1; count++) {
+    subname = tree [count];
+    if (subname === '')
+      continue;
+    if (target [subname] == null) {
+      return false;
+    }
+    target = target [subname];
+  }
+  subname = tree [tree.length-1];
+  return target.hasOwnProperty(subname);
+};
+
+platform.kernel.sudo = function(name,args,scope,root,divisor){
+  //T: implement platform.kernel.sudo
+};
