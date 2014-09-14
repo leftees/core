@@ -71,12 +71,12 @@ platform.messaging.mail.send.message = function(message, callback){
   return count;
 };
 
-platform.messaging.mail.send.template = function(message_templated, callback){
+platform.messaging.mail.send.template = function(message_template, callback){
   var template = null;
-  if (platform.messaging.mail.template.exist(message_templated.template) === true) {
-    template = platform.messaging.mail.template._store[message_templated.template];
+  if (platform.messaging.mail.template.exist(message_template.template) === true) {
+    template = platform.messaging.mail.template._store[message_template.template];
   } else {
-    var err = new Exception('mail template %s does not exist',message_templated.template);
+    var err = new Exception('mail template %s does not exist',message_template.template);
     if (typeof callback !== 'function') {
       throw err;
     } else {
@@ -98,12 +98,12 @@ platform.messaging.mail.send.template = function(message_templated, callback){
     }
   });
 
-  message_templated.text = compiled_text;
-  message_templated.html = compiled_html;
-  delete message_templated['template'];
-  delete message_templated['fields'];
+  message_template.text = compiled_text;
+  message_template.html = compiled_html;
+  delete message_template['template'];
+  delete message_template['fields'];
 
-  return platform.messaging.mail.send.message(message_templated,callback);
+  return platform.messaging.mail.send.message(message_template,callback);
 };
 
 platform.classes.register('core.messaging.mail.message',function(){
@@ -124,7 +124,7 @@ platform.classes.register('core.messaging.mail.message',function(){
   this.messageId = undefined;
   this.date = undefined;
   this.encoding = undefined;
-});
+},true);
 
 platform.classes.register('core.messaging.mail.attachment',function(){
   this.filename = undefined;
@@ -134,9 +134,9 @@ platform.classes.register('core.messaging.mail.attachment',function(){
   this.path = undefined;
   this.contentType = undefined;
   this.contentDisposition = undefined;
-});
+},true);
 
-platform.classes.register('core.messaging.mail.message.templated',function(){
+platform.classes.register('core.messaging.mail.message.template',function(){
   this.from = undefined;
   this.to = undefined;
   this.cc = undefined;
@@ -157,7 +157,7 @@ platform.classes.register('core.messaging.mail.message.templated',function(){
 
   this.template = undefined;
   this.fields = undefined;
-});
+},true);
 
 platform.messaging.mail._init = function() {
   if (platform.configuration.engine.messaging.mail.enable === true) {

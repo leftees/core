@@ -23,14 +23,15 @@
 platform.classes = platform.classes || {};
 
 //O: Stores the registered classes constructors.
-platform.classes._store = {};
+platform.classes._store = platform.classes._store || {};
 
 //F: Registers a class into current environment.
 //A: name: Specifies name of new class to register.
 //A: constructor: Specifies constructor with prototype object for new class instances.
+//A: [replace]: Specifies whether existing constructor should be replaced instead of throwing exception. Default is false.
 //R: Returns true if class is successfully registered.
-platform.classes.register = function(name,constructor){
-  if (platform.classes.exist(name) === false) {
+platform.classes.register = function(name,constructor,replace){
+  if (platform.classes.exist(name) === false || replace === true) {
     platform.classes._store[name] = constructor;
     return true;
   } else {

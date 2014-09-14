@@ -358,4 +358,4 @@ var filesystem_backend = function(root) {
 };
 
 //C: registering 'core.io.store.file' to global classes
-platform.classes.register('core.io.store.file',filesystem_backend);
+platform.classes.register('core.io.store.file',filesystem_backend,true);

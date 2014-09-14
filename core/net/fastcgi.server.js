@@ -608,4 +608,4 @@ var fastcgi_client = function(port_or_socket, host){
 
 
 //C: registering 'core.io.store.file' to global classes
-platform.classes.register('core.net.fastcgi.client',fastcgi_client);
+platform.classes.register('core.net.fastcgi.client',fastcgi_client,true);
