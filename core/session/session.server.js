@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -44,7 +43,7 @@ platform.sessions.register = function() {
     'id': session_id,
     'identity':{
       'token': session_token,
-      'store': null,
+      '_store': null,
       'user': null,
       'service': false,
       'browser': (context.session != null) ? context.session.browser : native.useragent.parse(context.request.headers['user-agent']),
@@ -118,13 +117,18 @@ platform.sessions.unregister = function(session_id) {
       var session = platform.sessions._store[session_id];
 
       if (session.state === 4) {
-        return;
+        return false;
       }
 
       platform.statistics.counter('sessions.active').dec();
       platform.statistics.counter('sessions.gen' + session.state).dec();
 
-      //T: update account/login perfcounter/stats
+      if (session.identity.user == null) {
+        platform.statistics.counter('users.anonymous').dec();
+      } else {
+        platform.statistics.counter('users.logged').dec();
+        //T: Platform.Events.Raise('user.logout');
+      }
 
       //T: platform.events.raise('session.unregister');
 
@@ -134,7 +138,7 @@ platform.sessions.unregister = function(session_id) {
 
       platform.sessions.pools.remove(session_id);
 
-      delete platform.sessions._store[session_id];
+       return (delete platform.sessions._store[session_id]);
 
       //T: clean socket auths for session
 
@@ -145,6 +149,7 @@ platform.sessions.unregister = function(session_id) {
   } else {
     throw new Exception('session id %s is not valid',session_id);
   }
+  return false;
 };
 
 //F: Sets a session to be persistent or time-based.
