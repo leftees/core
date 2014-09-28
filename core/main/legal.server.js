@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -23,8 +22,8 @@
 global.main.commands.legal = function(){
   //T: read license from LICENSE file
   console.log('ljve.io - Live Javascript Virtualized Environment\n\
-Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>\n\
-Copyright (C) 2011-2013  Novetica\n\
+Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>\n\
+Copyright (C) 2011-2013 Novetica\n\
 \n\
 This program is free software: you can redistribute it and/or modify\n\
 it under the terms of the GNU Affero General Public License as published by\n\

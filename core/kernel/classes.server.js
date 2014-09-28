@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +39,7 @@ platform.classes.register = function(name,constructor,replace){
 };
 
 //F: Unregisters a class from current environment.
-//A: name: Specifies name of new class to unregister.
+//A: name: Specifies name of class to unregister.
 //R: Returns true if class is successfully unregistered.
 platform.classes.unregister = function(name){
   if (platform.classes.exist(name) === true) {
@@ -51,7 +50,7 @@ platform.classes.unregister = function(name){
 };
 
 //F: Gets a class constructor from current environment.
-//A: name: Specifies name of new class to get.
+//A: name: Specifies name of class to get.
 //R: Returns class constructor.
 platform.classes.get = function(name){
   if (platform.classes.exist(name) === true) {
@@ -66,7 +65,7 @@ platform.classes.list = function(){
 };
 
 //F: Checks whether a class is registered in current environment.
-//A: name: Specifies name of new class to check.
+//A: name: Specifies name of class to check.
 //R: Returns true if class is registered.
 platform.classes.exist = function(name){
   return (platform.classes._store.hasOwnProperty(name) && typeof platform.classes._store[name] === 'function');
