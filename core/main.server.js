@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -91,6 +90,7 @@ native.metrics = require('measured');
 native.mail = require('nodemailer');
 native.async = require('async');
 native.watch = require('node-watch');
+native.database = require('caminte').Schema;
 
 //C: injecting core HTML5 classes implementation (we like a mirrored environment)
 //T: test W3C compliance for Worker
@@ -102,29 +102,40 @@ global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 //T: add localStorage/indexDB emulation?
 
 //C: creating global platform-wide exception object for managed error handling/remoting
-global.Exception = function(message){
-  //C: getting message argument
-  var formatted_message = message;
-  //C: sanitizing message to 'unknown' if missing
-  if (formatted_message == null) {
-    formatted_message = 'unknown';
+global.Exception = function(messageOrObject){
+  var error;
+  if (typeof messageOrObject === 'string') {
+    //C: getting message argument
+    var formatted_message = messageOrObject;
+    //C: sanitizing message to 'unknown' if missing
+    if (formatted_message == null) {
+      formatted_message = 'unknown';
+    }
+    //C: getting formatted message from arguments (emulating behavior of console.log)
+    var arguments_array = Array.prototype.slice.call(arguments);
+    if (arguments_array.length > 0) {
+      formatted_message = native.util.format.apply(native.util, arguments_array);
+    }
+    //C: removing original message from arguments
+    if (arguments_array.length > 0) {
+      arguments_array.shift();
+    }
+    error = new Error(formatted_message);
+    //C: storing arguments as exception data
+    error.data = arguments_array;
+  } else if (messageOrObject != null && typeof messageOrObject === 'object' && messageOrObject.constructor === Error) {
+    error = messageOrObject;
+    //C: storing arguments as exception data
+    error.data = Array.prototype.slice.call(arguments);
+  } else {
+    error = new Error('custom error object');
+    //C: storing arguments as exception data
+    error.data = Array.prototype.slice.call(arguments);
   }
-  //C: getting formatted message from arguments (emulating behavior of console.log)
-  var arguments_array = Array.prototype.slice.call(arguments);
-  if (arguments_array.length > 0){
-    formatted_message = native.util.format.apply(native.util,arguments_array);
-  }
-  //C: removing original message from arguments
-  if (arguments_array.length > 0) {
-    arguments_array.shift();
-  }
-  var error = new Error(formatted_message);
-  //C: storing arguments as exception data
-  error.data = arguments_array;
   //C: initializing dump as null (will be populated by embedded runtime debugger)
   error.dump = null;
   //C: patching stack
-  error.stack = error.stack.replace(/\n\s*?at new global\.Exception.*?\n/,'\n');
+  error.stack = error.stack.replace(/\n\s*?at new global\.Exception.*?\n/, '\n');
   return error;
 };
 //C: overriding toString() function to provide Error emulation
@@ -177,6 +188,11 @@ console.error = function () {
 //C: replacing or defining console.debug with coloured implementation
 console.debug = function () {
   console.print('debug',8, Array.prototype.slice.call(arguments));
+};
+
+//C: creating console.check with coloured implementation
+console.check = function () {
+  console.print('log',12, Array.prototype.slice.call(arguments));
 };
 
 //C: creating supported CLI commands hashtable (will be populated afterwards)
