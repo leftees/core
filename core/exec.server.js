@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -27,22 +26,24 @@ global.main.path = {};
 global.main.path.app = process.cwd();
 global.main.path.core = require('path').dirname(require.main.filename);
 
-//C: detecting whether Node is running as debugging environment
-global.debugging = false;
-if (process.env.NODE_ENV === 'debugging') {
-  global.debugging = true;
-}
-
 //C: detecting whether Node is running as development environment
 global.development = false;
 if (process.env.NODE_ENV === 'development') {
   global.development = true;
 }
 
+//C: detecting whether Node is running as debugging environment
+global.debugging = false;
+if (process.env.NODE_ENV === 'debugging') {
+  global.debugging = true;
+  global.development = true;
+}
+
 //C: detecting whether Node is running as testing environment
 global.testing = false;
-if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === 'testing') {
   global.testing = true;
+  global.debugging = true;
   global.development = true;
 }
 
@@ -67,7 +68,7 @@ if (execArgv.indexOf('--harmony') === -1){
   execArgv.push('--harmony');
 
   //C: enabling debugger if needed
-  if (global.debugging === true || global.development === true) {
+  if (global.debugging === true) {
     execArgv.unshift('--debug');
   }
 
@@ -133,9 +134,8 @@ if (execArgv.indexOf('--harmony') === -1){
   try {
     global.require.main._compile('\n'+require('fs').readFileSync(global.main.path.core + '/core/main.server.js', { encoding: 'utf-8' }),'app:///core/main.server.js');
   } catch (err) {
-    console.error(err.message);
+    throw err;
   }
-
 }
 
 //C: attaching on main process fail events
