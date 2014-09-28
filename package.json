@@ -1,6 +1,6 @@
 {
   "name": "ljve",
-  "version": "0.3.9999-6",
+  "version": "0.3.9999-7",
   "description": "Live Javascript Virtualized Environment",
   "author": "Marco Minetti <marco.minetti@novetica.org>",
   "contributors": [],
@@ -48,7 +48,7 @@
     "multiparty": "*",
     "node-brackets": "https://github.com/marcominetti/node-brackets/tarball/master",
     "node-console": "*",
-    "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/master",
+    "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/0.10.x",
     "node-uuid": "*",
     "nodemailer": "*",
     "nodemailer-smtp-pool": "*",
@@ -65,7 +65,8 @@
     "ws": "*",
     "xmlhttprequest": "*",
     "yamlparser": "*",
-    "yargs": "*"
+    "yargs": "*",
+    "node-zlib-backport": "*"
   },
   "scripts": {
     "oss": {
@@ -82,5 +83,9 @@
   "preferGlobal": true,
   "private": false,
   "analyze": true,
-  "license": "AGPLv3"
+  "license": "AGPLv3",
+  "private": false,
+  "publishConfig": {
+    "registry": "https://npm.novetica.org/"
+  }
 }
