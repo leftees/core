@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -165,22 +164,28 @@ platform.development.tools.ide.stop = platform.development.tools._stop.bind(null
 });
 
 //C: attaching exit events to kill node-inspector
-['exit','SIGINT','SIGTERM','uncaughtException'].forEach(function (e) {
+['exit','SIGINT','SIGTERM'].forEach(function (e) {
   process.on(e, function () {
-    //C: stopping inspector before exit
-    if (platform.development.tools.inspector.running === true) {
-      platform.development.tools.inspector.stop();
-    }
+    try {
+      //C: stopping inspector before exit
+      if (platform.development.tools.inspector.running === true) {
+        platform.development.tools.inspector.stop();
+      }
+    } catch(err){}
 
-    //C: stopping console before exit
-    if (platform.development.tools.console.running === true) {
-      platform.development.tools.console.stop();
-    }
+    try{
+      //C: stopping console before exit
+      if (platform.development.tools.console.running === true) {
+        platform.development.tools.console.stop();
+      }
+    } catch(err){}
 
-    //C: stopping ide before exit
-    if (platform.development.tools.ide.running === true) {
-      platform.development.tools.ide.stop();
-    }
+    try{
+      //C: stopping ide before exit
+      if (platform.development.tools.ide.running === true) {
+        platform.development.tools.ide.stop();
+      }
+    } catch(err){}
   });
 });
 
