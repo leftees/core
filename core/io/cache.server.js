@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -27,11 +26,14 @@ platform.io.cache = platform.io.cache || {};
 
 //F: Clean the whole cache.
 platform.io.cache.clean = function(){
-  //C: get cache backend
-  var backend = platform.io.cache._backend;
   //C: deleting and recreating root in cache IO backend
-  backend.delete('/');
-  backend.create('/');
+  platform.io.cache._backend.delete('/');
+  platform.io.cache._backend.create('/');
+
+  if (global.development === true) {
+    platform.io.cache._backend_raw.delete('/');
+    platform.io.cache._backend_raw.create('/');
+  }
 };
 
 //F: Checks whether the latest version of a file is cached.
@@ -576,6 +578,10 @@ platform.io.cache.set.string = function(path, tag, data, callback){
     }
   }
 
+  if (global.testing === true || global.development === true) {
+    platform.io.cache._backend_raw.set.string(path, data);
+  }
+
   //C: detecting if operate asynchronously or synchronously
   if (typeof callback !== 'function') {
     //C: compressing data and writing to cache
@@ -627,6 +633,10 @@ platform.io.cache.set.bytes = function(path, tag, data, callback){
     if(platform.configuration.server.debugging.cache === true) {
       console.debug('recaching %s', path);
     }
+  }
+
+  if (global.development === true) {
+    platform.io.cache._backend_raw.set.bytes(path, data);
   }
 
   //C: detecting if operate asynchronously or synchronously
@@ -746,6 +756,15 @@ platform.io.store.register('cache',platform.kernel.new('core.io.store.file',[ na
 
 //V: Stores the 'cache' store backend.
 platform.io.cache._backend = platform.io.store.getByName('cache');
+
+if (global.development === true) {
+  //C: registering 'cache.raw' store as new filesystem backend with app root path + /cache.raw/
+  //T: allow build store override by configuration
+  platform.io.store.register('cache.raw', platform.kernel.new('core.io.store.file', [ native.path.join(platform.runtime.path.app, 'cache.raw') ]), -1);
+
+  //V: Stores the 'cache.raw' store backend.
+  platform.io.cache._backend_raw = platform.io.store.getByName('cache.raw');
+}
 
 if (platform.configuration.server.cache.startup.clean === true){
   platform.io.cache.clean();
