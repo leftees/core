@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  result program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -94,9 +93,19 @@ platform.server.http.context.create = function(request, response, server){
   //C: defining content object representation (assigned later)
   call.data.object = null;
 
+  //C: defining flag for content data ready (fetched and parsed)
   call.data.ready = false;
 
+  //C: defining function to fetch and parse content data
   call.data.get = function(callback){
+    //C: skipping if data already fetched
+    if (call.data.ready === true){
+      if (server.debug === true && platform.configuration.server.debugging.http === true) {
+        console.warn('data already parsed for client request http' + ((server.secure) ? 's' : '') + ':%s#%s', server.port, request.id);
+      }
+      callback(null);
+      return;
+    }
     //C: generating request body if type is supported
     if (call.data.length === 0) {
       callback(null);
@@ -138,19 +147,23 @@ platform.server.http.context.create = function(request, response, server){
       });
     } else {
       call.arguments = JSON.normalize(call.arguments,true);
+      //C: getting data as buffer
       var buffer = [];
       var buffer_length = 0;
       //T: apply body size limit
       //T: handle errors
+      //C: handling data stream event
       request.on('data', function (chunk) {
         buffer_length += chunk.length;
         buffer.push(chunk);
+        //C: checking if data read from socket stream is larger than expected
         if (buffer_length > call.data.length && call.data.ready === false) {
           call.data.object = Buffer.concat(buffer).slice(0, call.data.length);
           call.data.ready = true;
           callback(null);
         }
       });
+      //C: handling end stream event
       request.on('end', function () {
         if (call.data.ready === false) {
           call.data.object = Buffer.concat(buffer);
