@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -127,7 +126,8 @@ platform.system.memory.log = function(always,rebase){
 //T: add platform event for memory leak/stats
 //C: attaching to memwatch leak event
 platform.system.memory._memwatch.on('leak', #name('memwatch.on.info'):function (info) {
-  console.warn('possible memory leak detected: %s', info.reason);
+  //T: investigate negative memory leaks?
+  //console.warn('possible memory leak detected: %s', info.reason);
 });
 //C: attaching to memwatch stats event
 platform.system.memory._memwatch.on('stats', #name('memwatch.on.stats'):function (stats) {
