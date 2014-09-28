@@ -1,0 +1,67 @@
+var test = function(a,b,callback){
+}
+
+var main = function(b,next){
+	var a = 9;
+	var t = #await: test(0,a);
+	console.log(t+b);
+	for(var c = 0; c < 10; c++){
+	}
+	for (var i = 0, l = 0; i < 20; t++){
+	}
+	next(t);
+}
+
+----------------------------------------------------------------------------------
+
+var main = function(b,next){
+	var __args_1_, __vars_1_;
+	var a, t, c, i, l;
+
+	__args_1_ = { 'b': b, 'next' : next };
+	__vars_1_ = {
+		'db': db,
+		'query': query,
+		'result': result,
+		'a': a,
+		'b': b,
+		'l': l
+	};
+	main[0].bind(this,args,vars)();
+}
+
+main[0] = function(__args_1_,__vars_1_,result){
+	var b = __args_1_.b, next = __args_1_.next;
+	var db = __vars_1_.db, query = __vars_1_.query, result = __vars_1_.result;
+
+	a = 9;
+	test(0,a,platform.kernel.async.forward.bind(this,main[1].bind(this,__args_1_,__vars_1_)));
+}
+
+main[1] = function(__args_1_,__vars_1_,result){
+	var b = __args_1_.b, next = __args_1_.next;
+	var db = __vars_1_.db, query = __vars_1_.query, result = __vars_1_.result;
+
+	t = result;
+	console.log(t+b);
+	for(var c = 0; c < 10; c++){
+	}
+	for (var i = 0, l = 0; i < 20; t++){
+	}
+	next(t);
+}
+
+----------------------------------------------------------------------------------
+
+platform.kernel.async.forward = function(next,err,result){
+	if (err) {
+		if (Object.isError(err) === true) {
+	  		next(err);
+		} else {
+			next(new Exception(err));
+		}
+	} else {
+	  next(result);
+	}
+}
+

@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -54,14 +53,14 @@ platform.parser.js._block_check = function(node,parent,previous){
         && parent.type !== 'WhileStatement'
         && parent.type !== 'WithStatement'
         && parent.type !== 'CatchClause'){
-        node._is_exec_block = true;
+        return true;
       }
       break;
     case 'VariableDeclaration':
       if (parent != null
         && parent.type !== 'ForInStatement'
         && parent.type !== 'ForStatement'){
-        node._is_exec_block = true;
+        return true;
       }
       break;
     case 'BreakStatement':
@@ -80,9 +79,10 @@ platform.parser.js._block_check = function(node,parent,previous){
     case 'TryStatement':
     case 'WhileStatement':
     case 'WithStatement':
-      node._is_exec_block = true;
+      return true;
       break;
   }
+  return false;
 };
 
 platform.parser.js._name_get = function(node,parent,previous) {
@@ -134,14 +134,19 @@ platform.parser.js._name_get = function(node,parent,previous) {
   }
 };
 
-platform.parser.js.parse = function(code){
+platform.parser.js.parse = function(code) {
   var ast = native.parser.js.parse(code,{ 'attachComment': true, 'range': true, 'comment': true, 'loc': true, 'tag': true });
+  return platform.parser.js.normalizeAST(ast);
+}
+
+platform.parser.js.normalizeAST = function(ast){
   delete ast.comments;
   delete ast.range;
 
   var breadcrumb = [];
   var count_id = 0;
   var previous = null;
+  var block = null;
 
   native.parser.js.traverse(ast, {
     'enter': function (node, parent) {
@@ -182,10 +187,14 @@ platform.parser.js.parse = function(code){
 
   //C: keeps last function/program object
   var scopes = [];
+  var variables = [];
+
   //C: keeps current function index (level)
   var level = 0;
 
   scopes[level] = ast;
+  variables[level] = [];
+  ast._vars = variables[level];
 
   native.parser.js.traverse(ast,{
     'enter': function(node,parent){
@@ -201,6 +210,7 @@ platform.parser.js.parse = function(code){
       node.tree = node.tree || {};
       node.tree.parent = parent;
 
+      node.tree.scope = scopes[level];
       switch(node.type){
         case 'FunctionDeclaration':
         case 'FunctionExpression':
@@ -208,11 +218,29 @@ platform.parser.js.parse = function(code){
         case 'ArrowExpression':
           ++level;
           scopes[level] = node;
+          variables[level] = [];
+          node._vars = variables[level];
+          node._args = [];
+          node._level = level;
+          if (node.params != null) {
+            node.params.forEach(function (param) {
+              node._args.push(param.name);
+            });
+          }
+          break;
+        case 'VariableDeclarator':
+          if (node.id != null && node.id.name != null) {
+            variables[level].push(node.id.name);
+          }
           break;
       }
-      node.tree.scope = scopes[level];
 
-      platform.parser.js._block_check(node,parent,previous);
+      if (platform.parser.js._block_check(node,parent,previous) === true){
+        node._is_exec_block = true;
+        block = node;
+      }
+      node.tree.block = block;
+
       platform.parser.js._name_get(node,parent,previous);
 
       node.prepend = [];
@@ -249,6 +277,7 @@ platform.parser.js.parse = function(code){
       platform.parser.js._tree_ast_ref_leave(node,parent,previous);
 
       if (scopes[level] != null && node === scopes[level]) {
+        delete scopes[level];
         --level;
       }
 
@@ -281,10 +310,10 @@ platform.parser.js.stringify = function(ast,compact,tag){
   if (compact == null){
     compact = true;
   }
-  return native.parser.js.codegen(ast,{
+  return native.parser.js.codegen(ast, {
     format: {
       indent: {
-        style: (compact) ? '  ' : '',
+        style: (compact === false) ? '  ' : '',
         base: 0,
         adjustMultilineComment: false
       },

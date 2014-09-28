@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -225,6 +224,4 @@ platform.kernel.exist = function(name,root,divisor) {
   return target.hasOwnProperty(subname);
 };
 
-platform.kernel.sudo = function(name,args,scope,root,divisor){
-  //T: implement platform.kernel.sudo
-};
+platform.kernel.sudo = platform.kernel.invoke;

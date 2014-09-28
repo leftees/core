@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -19,7 +18,7 @@
 
  */
 
-platform.kernel._preprocessors.server.code_leveling = function(ast,code,file,module,preprocessor){
+platform.kernel._preprocessors.server[2].code_leveling = function(ast,code,file,module,preprocessor){
   var prepend_code = Function.info.code(_code_level_check, true).replace('$1','') + '{';
   var append_code = '}else{' + Function.info.code(_code_level_debug, true) + '}';
 

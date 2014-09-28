@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -19,7 +18,7 @@
 
  */
 
-platform.kernel._preprocessors.server.exception_dump = function(ast,code,file,module,preprocessor){
+platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file,module,preprocessor){
   var prepend_code = 'try {';
   var append_code = '} catch(__exception_) {' + Function.info.code(_exception_dump_code, true) + '}';
 
@@ -95,6 +94,12 @@ var _exception_dump_code = function() {
   (function(){
     __exception_.date = new Date();
     __exception_.dump = $0;
+    try {
+      var __function_code_ = arguments.callee.caller.toString();
+      if (__function_code_.endsWith('[native code] }') === false) {
+        __exception_.block = __function_code_.match(new RegExp('__c_\\s*=\\s*' + __c_ + ';[\\n\\s]*.*?[\\n\\s]*(__c_\\s*=\\s*' + (__c_ + 1) + ';|;[\\n\\s]*\})'))[0].replace(/^__c_\s*=\s*\d+;[\n\s]*|[\n\s]*__c_\s*=\s*\d+;$|[\n\s]*\}$/g, '');
+      }
+    } catch(err){}
     __exception_.called = arguments.called;
     throw __exception_;
   })();

@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -23,8 +22,15 @@
 platform.kernel = platform.kernel || {};
 
 platform.kernel._preprocessors = platform.kernel._preprocessors || {};
-platform.kernel._preprocessors.client = platform.kernel._preprocessors.client || {};
-platform.kernel._preprocessors.server = platform.kernel._preprocessors.server || {};
+platform.kernel._preprocessors.client = platform.kernel._preprocessors.client || [];
+platform.kernel._preprocessors.client[0] = platform.kernel._preprocessors.client[0] || {};
+platform.kernel._preprocessors.client[1] = platform.kernel._preprocessors.client[1] || {};
+platform.kernel._preprocessors.client[2] = platform.kernel._preprocessors.client[2] || {};
+
+platform.kernel._preprocessors.server = platform.kernel._preprocessors.server || [];
+platform.kernel._preprocessors.server[0] = platform.kernel._preprocessors.server[0] || {};
+platform.kernel._preprocessors.server[1] = platform.kernel._preprocessors.server[1] || {};
+platform.kernel._preprocessors.server[2] = platform.kernel._preprocessors.server[2] || {};
 
 //F: Augments Javascript code for injection to current environment.
 //A: code: Specifies Javascript code to be augmented.
@@ -33,7 +39,7 @@ platform.kernel._preprocessors.server = platform.kernel._preprocessors.server ||
 //R: Returns the augmented code.
 platform.kernel.preprocess = function(code, file, module){
   //C: logging
-  if(platform.configuration.server.debugging.load === true) {
+  if(platform.configuration.server.debugging.preprocess === true) {
     if (file == null) {
       console.debug('preprocessing runtime code');
     } else {
@@ -54,11 +60,22 @@ platform.kernel.preprocess = function(code, file, module){
     side = 'server';
   }
   var preprocessors = platform.kernel._preprocessors[side];
-  Object.keys(preprocessors).forEach(function(preprocessor){
-    var process = preprocessors[preprocessor];
-    if (typeof process === 'function'){
-      process(ast,code,file,module,preprocessor);
-    }
+  Object.keys(preprocessors).forEach(function(phase){
+    Object.keys(preprocessors[phase]).forEach(function(preprocessor){
+      var process = preprocessors[phase][preprocessor];
+      if (typeof process === 'function'){
+        if(platform.configuration.server.debugging.preprocess === true) {
+          if (file == null) {
+            console.debug('preprocessing runtime code phase %s (%s)', phase, preprocessor);
+          } else {
+            console.debug('preprocessing %s phase %s (%s)', file, phase, preprocessor);
+          }
+        }
+        process(ast,code,file,module,preprocessor);
+      }
+    });
+    //T: rewrite preprocessors avoiding prepend/append
+    ast = platform.parser.js.parse(platform.parser.js.stringify(ast,false,true));
   });
 
   var augmented_code = platform.parser.js.stringify(ast,!platform.runtime.development,platform.runtime.development);
@@ -112,10 +129,6 @@ platform.kernel.load = function(path,module,preprocess) {
     } else {
       preprocessed_code = code;
     }
-    //C: saving augmented file to be loaded through require (only for testing environment)
-    if (global.testing === true || global.development === true) {
-      platform.kernel._backend.set.string(path, preprocessed_code);
-    }
     //C: caching augmented file
     //T: replace with sync  set call
     platform.io.cache.set.string(path, 'built', preprocessed_code);
@@ -128,7 +141,7 @@ platform.kernel.load = function(path,module,preprocess) {
     if(platform.configuration.server.debugging.load === true){
       console.debug('loading %s', path);
     }
-    return global.require(native.path.join(platform.kernel._backend.base,path));
+    return global.require(native.path.join(platform.io.cache._backend_raw.base,path));
   } else {
     if(platform.configuration.server.debugging.load === true) {
       console.debug('loading %s' + ((is_cached === false) ? '' : ' from cache'), path);
@@ -136,10 +149,3 @@ platform.kernel.load = function(path,module,preprocess) {
     return global.require.main._compile(preprocessed_code,'app://'+path);
   }
 };
-
-//C: registering 'build' store as new filesystem backend with app root path + /build/
-//T: allow build store override by configuration
-platform.io.store.register('build',platform.kernel.new('core.io.store.file',[ native.path.join(platform.runtime.path.app,'build') ]),-1);
-
-//V: Stores the 'build' store backend.
-platform.kernel._backend = platform.io.store.getByName('build');

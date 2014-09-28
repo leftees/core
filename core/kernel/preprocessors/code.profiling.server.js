@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -19,7 +18,7 @@
 
  */
 
-platform.kernel._preprocessors.server.code_profile = function(ast,code,file,module,preprocessor){
+platform.kernel._preprocessors.server[2].code_profile = function(ast,code,file,module,preprocessor){
   var prepend_code = Function.info.code(_code_profile_start_monitor, true);
   var append_code = Function.info.code(_code_profile_stop_monitor, true);
 
@@ -45,7 +44,7 @@ platform.kernel._preprocessors.server.code_profile = function(ast,code,file,modu
   }
 };
 
-platform.kernel._preprocessors.server.code_profile._data = [];
+platform.kernel._preprocessors.server[2].code_profile._data = [];
 
 platform.metrics = platform.metrics || {};
 
@@ -57,7 +56,7 @@ var _code_profile_start_monitor = function() {
   if (platform.configuration.server.kernel.profile === true) {
     (function () {
       var time_start = Date.now();
-      platform.kernel._preprocessors.server.code_profile._data.push(time_start);
+      platform.kernel._preprocessors.server[2].code_profile._data.push(time_start);
     })();
   }
 };
@@ -68,7 +67,7 @@ var _code_profile_stop_monitor = function() {
     (function(){
       var key = '$+0';
       var time_stop = Date.now();
-      var time_start = platform.kernel._preprocessors.server.code_profile._data.pop();
+      var time_start = platform.kernel._preprocessors.server[2].code_profile._data.pop();
       var time_elapsed =  time_stop - time_start;
       //C: updating metrics statistics
       if (platform.metrics.code.hasOwnProperty(key) === false) {

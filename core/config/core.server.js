@@ -1,8 +1,7 @@
-'use strict';
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014  Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -42,6 +41,7 @@ platform.configuration.server.bootloader.preload = [
   'stat.server.js',
   'utility.server.js',
   'kernel/kernel.server.js',
+  'kernel/async.server.js',
   'kernel/prototype.server.js',
   'kernel/classes.server.js',
   'io/backend/file.server.js',
@@ -59,6 +59,7 @@ platform.configuration.server.bootloader.preload = [
   'kernel/preprocessors/code.profiling.server.js',
   'kernel/preprocessors/code.documentation.server.js',
   'kernel/preprocessors/exception.dump.server.js',
+  'kernel/preprocessors/javascript.async.server.js',
   'environment/load.server.js'
 ];
 
@@ -72,6 +73,7 @@ platform.configuration.server.bootloader.modules = [
   'development/jsdoc.server.js',
   'development/change.server.js',
   'kernel/kernel.server.js',
+  'kernel/async.server.js',
   'kernel/prototype.server.js',
   'kernel/classes.server.js',
   'io/backend/file.server.js',
@@ -95,12 +97,13 @@ platform.configuration.server.bootloader.modules = [
   'messaging/mail/mail.server.js',
   'http/context.server.js',
   'http/http.server.js',
-  'environment/module.server.js'
+  'environment/module.server.js',
+  'database/database.server.js'
 ];
 
 platform.configuration.server.cache = {
   'startup': {
-    'clean': true
+    'clean': false
   }
 };
 
@@ -125,86 +128,86 @@ platform.configuration.server.http = {};
 //O: Contains HTTP and TLS port configurations.
 //H: Multiple ports are supported through piped name, e.g. '8080\8081' activate both ports with same configuration.
 platform.configuration.server.http.ports = {
-    //V: Define port to be configured.
-    '8080': {
-      //V: Define standard unsecure HTTP server on specified ports.
-      'secure': false,
-      //V: Enable or disable verbose HTTP debug log on specified ports (overrides defaults).
-      'debug': true,
-      //V: Define content body max byte size for requests on specified ports (overrides defaults).
-      'limit': 5000000,
-      'timeout': 15000,
-      'compression': {
-        'enable': true,
-        'limit': 1024
-      },
-      //V: Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
-      'auth': false,
-      //V: Define realm for HTTP authorization on specified ports.
-      'realm': null,
-      //V: Define port-specific regexp to reject request by URI (overrides defaults).
-      //H: Filter is applied against request relative URI cleaned by querystring.
-      'reject': {
-        'url': /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|\/^\/project\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//
-      },
-      //V: Contains port-specific HTTP redirect configuration.
-      //H: Filters are applied against request relative URI cleaned by querystring.
-      'redirect':{
-        //V: Define new redirector name.
-        'myredirectbystring': {
-          //V: Define string to be searched into URL as string.
-          'filter': '/example',
-          //V: Define new URI to redirect to, as string.
-          'to': 'http://example.com/ljve/8080/'
-        }
+  //V: Define port to be configured.
+  '8080': {
+    //V: Define standard unsecure HTTP server on specified ports.
+    'secure': false,
+    //V: Enable or disable verbose HTTP debug log on specified ports (overrides defaults).
+    'debug': true,
+    //V: Define content body max byte size for requests on specified ports (overrides defaults).
+    'limit': 5000000,
+    'timeout': 15000,
+    'compression': {
+      'enable': true,
+      'limit': 1024
+    },
+    //V: Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
+    'auth': false,
+    //V: Define realm for HTTP authorization on specified ports.
+    'realm': null,
+    //V: Define port-specific regexp to reject request by URI (overrides defaults).
+    //H: Filter is applied against request relative URI cleaned by querystring.
+    'reject': {
+      'url': /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|\/^\/project\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//
+    },
+    //V: Contains port-specific HTTP redirect configuration.
+    //H: Filters are applied against request relative URI cleaned by querystring.
+    'redirect':{
+      //V: Define new redirector name.
+      'myredirectbystring': {
+        //V: Define string to be searched into URL as string.
+        'filter': '/example',
+        //V: Define new URI to redirect to, as string.
+        'to': 'http://example.com/ljve/8080/'
+      }
+    }
+  },
+  //V: Define port to be configured.
+  '8443': {
+    //V: Enable or disable secure TLS on specified ports.
+    'secure': true,
+    //V: Enable or disable verbose HTTP debug log on specified ports (overrides defaults).
+    'debug': true,
+    //V: Define content body max byte size for requests on specified ports (overrides defaults).
+    'limit': 5000000,
+    'timeout': 15000,
+    'compression': {
+      'enable': true,
+      'limit': 1024
+    },
+    //V: Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
+    'auth': false,
+    //V: Define realm for HTTP authorization on specified ports.
+    'realm': null,
+    //V: Contains port-specific HTTP redirect configuration.
+    //H: Filters are applied against request relative URI cleaned by querystring.
+    'redirect':{
+      //V: Define new redirector name.
+      'override_redirect_by_string': {
+        //V: Define string to be searched into URL as string.
+        'filter': '/example',
+        //V: Define new URI to redirect to, as string.
+        'to': 'http://example.com/ljve/8443/'
       }
     },
-    //V: Define port to be configured.
-    '8443': {
-      //V: Enable or disable secure TLS on specified ports.
-      'secure': true,
-      //V: Enable or disable verbose HTTP debug log on specified ports (overrides defaults).
-      'debug': true,
-      //V: Define content body max byte size for requests on specified ports (overrides defaults).
-      'limit': 5000000,
-      'timeout': 15000,
-      'compression': {
-        'enable': true,
-        'limit': 1024
-      },
-      //V: Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
-      'auth': false,
-      //V: Define realm for HTTP authorization on specified ports.
-      'realm': null,
-      //V: Contains port-specific HTTP redirect configuration.
-      //H: Filters are applied against request relative URI cleaned by querystring.
-      'redirect':{
-        //V: Define new redirector name.
-        'override_redirect_by_string': {
-          //V: Define string to be searched into URL as string.
-          'filter': '/example',
-          //V: Define new URI to redirect to, as string.
-          'to': 'http://example.com/ljve/8443/'
-        }
-      },
-      //V: Defines ciphers suite for TLS stack.
-      'ciphers': 'HIGH !aNULL !eNULL !MEDIUM !LOW !3DES !MD5 !EXP !PSK !SRP !DSS',
-      //V: Enable or disable specific secure protocol versions (SSLv2 is deprecated by default).
-      'protocols': {
-        'SSLv3': false,
-        'TLSv10': true,
-        'TLSv11': true,
-        'TLSv12': true
-      },
-      //V: Specifies the absolute path to pfx file containing PEM certificate and private key.
-      'pfx': null,
-      //V: Specifies the passphrase to unwrap the private key in pfx file.
-      'passphrase': null,
-      //V: Specifies the absolute path to PEM certificate file.
-      'cert': '/core/ssl/self.crt',
-      //V: Specifies the absolute path to certificate private key file.
-      'key': '/core/ssl/self.key'
-    }
+    //V: Defines ciphers suite for TLS stack.
+    'ciphers': 'HIGH !aNULL !eNULL !MEDIUM !LOW !3DES !MD5 !EXP !PSK !SRP !DSS',
+    //V: Enable or disable specific secure protocol versions (SSLv2 is deprecated by default).
+    'protocols': {
+      'SSLv3': false,
+      'TLSv10': true,
+      'TLSv11': true,
+      'TLSv12': true
+    },
+    //V: Specifies the absolute path to pfx file containing PEM certificate and private key.
+    'pfx': null,
+    //V: Specifies the passphrase to unwrap the private key in pfx file.
+    'passphrase': null,
+    //V: Specifies the absolute path to PEM certificate file.
+    'cert': '/core/ssl/self.crt',
+    //V: Specifies the absolute path to certificate private key file.
+    'key': '/core/ssl/self.key'
+  }
 };
 
 //O: Contains common defaults for web server configuration.
@@ -407,7 +410,9 @@ platform.configuration.server.debugging = {
       'loaded': true,
       'other': false
     }
-  }
+  },
+  'database': true,
+  'preprocess': true
 };
 
 //O: Contains memory management configuration.
@@ -569,4 +574,14 @@ platform.configuration.addons.google.analytics = {
   'enable': false,
   'id': '',
   'domain': ''
+};
+
+platform.configuration.server.databases = {};
+
+platform.configuration.server.databases = {
+  //C: Define settings object that should be passed to ORM schema initialization.
+  'accounts': {
+    'driver': 'sqlite3',
+    'database': '/data/db/accounts.db'
+  }
 };
