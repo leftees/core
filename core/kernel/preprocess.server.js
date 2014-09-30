@@ -136,16 +136,25 @@ platform.kernel.load = function(path,module,preprocess) {
     //C: getting file from cache
     preprocessed_code = platform.io.cache.get.string(path, 'built', true);
   }
+  //C: storing code to /runtime/ for debuggers (only for backend files...)
+  platform.kernel._backend.set.string(path,preprocessed_code);
   //C: loading file through require
   if (global.testing === true) {
     if(platform.configuration.server.debugging.load === true){
       console.debug('loading %s', path);
     }
-    return global.require(native.path.join(platform.io.cache._backend_raw.base,path));
+    return global.require(native.path.join(platform.kernel._backend.base,path));
   } else {
     if(platform.configuration.server.debugging.load === true) {
       console.debug('loading %s' + ((is_cached === false) ? '' : ' from cache'), path);
     }
-    return global.require.main._compile(preprocessed_code,'app://'+path);
+    return global.require.main._compile(preprocessed_code,native.path.join(platform.kernel._backend.base,path));
   }
 };
+
+//C: registering 'runtime' store as new filesystem backend with app root path + /runtime/
+//T: allow build store override by configuration
+platform.io.store.register('runtime', platform.kernel.new('core.io.store.file', [ native.path.join(platform.runtime.path.app, 'runtime') ]), -1);
+
+//V: Stores the 'runtime' store backend.
+platform.kernel._backend = platform.io.store.getByName('runtime');

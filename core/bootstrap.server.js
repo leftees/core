@@ -54,7 +54,7 @@ bootstrap.post = function(){
 
   //C: creating default folders
   //T: default folders should be created after platform.io stores loading for first store
-  [ '/build', '/cache', '/core', '/data', '/lib', '/log', '/module', '/tmp' ].forEach(function(folder) {
+  [ '/build', '/cache', '/core', '/data', '/lib', '/log', '/module', '/runtime', '/tmp' ].forEach(function(folder) {
     if (native.fs.existsSync(native.path.join(global.main.path.app, folder)) === false) {
       native.fs.ensureDirSync(native.path.join(global.main.path.app, folder));
     }
@@ -163,7 +163,7 @@ bootstrap.load = function(path,root){
     /*if (global.testing === true) {
       global.require(resource.uri);
     } else {*/
-      global.require.main._compile('\n'+resource.data,'app://'+path);
+      global.require.main._compile('\n'+resource.data /*,resource.uri*/);
     //}
   } catch (ex) {
     throw new Exception("error loading %s: %s", resource.uri, ex.message, ex);

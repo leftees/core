@@ -215,7 +215,7 @@ if (native.fs.existsSync(native.path.join(global.main.path.core,'/core/main')) =
   //C: loading every .js files available in /core/main folder
   exec_files.forEach(function (file) {
     if (file.endsWith('.js') === true) {
-      global.require.main._compile('\n' + native.fs.readFileSync(global.main.path.core + '/core/main/' + file, { encoding: 'utf-8' }), 'app:///core/main/' + file);
+      global.require.main._compile('\n' + native.fs.readFileSync(global.main.path.core + '/core/main/' + file, { encoding: 'utf-8' })/*, global.main.path.core + '/core/main/' + file*/);
     }
   });
 }
