@@ -66,6 +66,7 @@
     "xmlhttprequest": "*",
     "yamlparser": "*",
     "yargs": "*",
+    "freeport": "*",
     "node-zlib-backport": "*"
   },
   "scripts": {

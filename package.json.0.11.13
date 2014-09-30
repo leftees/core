@@ -65,12 +65,13 @@
     "ws": "*",
     "xmlhttprequest": "*",
     "yamlparser": "*",
-    "yargs": "*"
+    "yargs": "*",
+    "freeport": "*"
   },
   "scripts": {
   },
   "engines": {
-    "node": ">=0.11"
+    "node": "=0.11.13"
   },
   "preferGlobal": true,
   "private": false,
