@@ -163,7 +163,7 @@ bootstrap.load = function(path,root){
     /*if (global.testing === true) {
       global.require(resource.uri);
     } else {*/
-      global.require.main._compile('\n'+resource.data /*,resource.uri*/);
+      global.require.main._compile('\n'+resource.data ,resource.uri);
     //}
   } catch (ex) {
     throw new Exception("error loading %s: %s", resource.uri, ex.message, ex);

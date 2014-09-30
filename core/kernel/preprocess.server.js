@@ -34,24 +34,51 @@ platform.kernel._preprocessors.server[2] = platform.kernel._preprocessors.server
 
 //F: Augments Javascript code for injection to current environment.
 //A: code: Specifies Javascript code to be augmented.
-//A: [file]: Specifies the file name containing code to be augmented.
+//A: [path]: Specifies the file name containing code to be augmented.
 //A: [module]: Specifies name of the module that is augmenting code
 //R: Returns the augmented code.
-platform.kernel.preprocess = function(code, file, module){
+platform.kernel.preprocess = function(code, path, module){
   //C: logging
   if(platform.configuration.server.debugging.preprocess === true) {
-    if (file == null) {
+    if (path == null) {
       console.debug('preprocessing runtime code');
     } else {
-      console.debug('preprocessing %s', file);
+      console.debug('preprocessing %s', path);
     }
   }
 
-  var ast = platform.parser.js.parse(code);
+  var marked_code = '';
+  var index = 0;
+  var length = code.length;
+  var line_counter = 1;
+  var skip = false;
+  while(index < length){
+    var ch = code.charCodeAt(index);
+    if (skip === false) {
+      if (ch === 0x2F && (index+1) < length && code.charCodeAt(index + 1) === 0x2A) {
+        skip = true;
+      }
+    } else {
+      if (ch === 0x2A && (index+1) < length && code.charCodeAt(index + 1) === 0x2F) {
+        skip = false;
+      }
+    }
+    marked_code += String.fromCharCode(ch);
+    if (ch === 10) {
+      ++line_counter;
+      if (skip === false) {
+        marked_code += '/*#mapline(' + line_counter + ')*/';
+      }
+    }
+    ++index;
+  }
+
+  //C: compacting code and adding line marker as preprocessor
+  var ast = platform.parser.js.parse(marked_code);
 
   var side = null;
-  if (file != null) {
-    if (file.endsWith('.server.js') === true) {
+  if (path != null) {
+    if (path.endsWith('.server.js') === true) {
       side = 'server';
     } else {
       side = 'client';
@@ -65,23 +92,61 @@ platform.kernel.preprocess = function(code, file, module){
       var process = preprocessors[phase][preprocessor];
       if (typeof process === 'function'){
         if(platform.configuration.server.debugging.preprocess === true) {
-          if (file == null) {
+          if (path == null) {
             console.debug('preprocessing runtime code phase %s (%s)', phase, preprocessor);
           } else {
-            console.debug('preprocessing %s phase %s (%s)', file, phase, preprocessor);
+            console.debug('preprocessing %s phase %s (%s)', path, phase, preprocessor);
           }
         }
-        process(ast,code,file,module,preprocessor);
+        process(ast,marked_code,path,module,preprocessor);
       }
     });
     //T: rewrite preprocessors avoiding prepend/append
-    ast = platform.parser.js.parse(platform.parser.js.stringify(ast,false,true));
+    ast = platform.parser.js.parse(platform.parser.js.stringify(ast,true,true));
   });
 
-  var augmented_code = platform.parser.js.stringify(ast,!platform.runtime.development,platform.runtime.development);
+  var augmented_code = platform.parser.js.stringify(ast,true,true);
 
   if (augmented_code.charCodeAt(0) === 0x10){
     augmented_code = augmented_code.slice(1);
+  }
+  if (augmented_code.charCodeAt(0) === 0x13){
+    augmented_code = augmented_code.slice(1);
+  }
+
+  if (path != null) {
+    //C: generating sourcemap
+    var sourcemap = new native.parser.js.sourcemap.SourceMapGenerator({
+      file: native.path.basename(path)
+    });
+
+    var augmented_line_counter = 0;
+    augmented_code = augmented_code.replace(/\/\*\#mapline\((\d+)\)\*\/(.*?)(?=$|\/\*\#mapline\((\d+)\)\*\/)/g,function(generated,line,origin){
+      ++augmented_line_counter;
+      sourcemap.addMapping({
+        generated: {
+          line: augmented_line_counter,
+          column: 1
+        },
+        source: native.path.basename(path),
+        original: {
+          line: parseInt(line),
+          column: 1
+        }
+      });
+      return '\n'+origin;
+    });
+
+    sourcemap.setSourceContent(native.path.basename(path),code);
+
+    augmented_code += '\n//# sourceMappingURL='+native.path.basename(path)+'.map';
+
+    //C: storing code to /runtime/ for debuggers (only for backend files...)
+    platform.kernel._backend.set.string(path, augmented_code);
+    //C: storing sourcemap to /runtime/ for debuggers (only for backend files...)
+    platform.kernel._backend.set.string(path+'.map', sourcemap.toString());
+  } else {
+    //T: support source mapping for evals?
   }
 
   //T: migrate preprocessor stack from 0.3.x branch
@@ -136,8 +201,6 @@ platform.kernel.load = function(path,module,preprocess) {
     //C: getting file from cache
     preprocessed_code = platform.io.cache.get.string(path, 'built', true);
   }
-  //C: storing code to /runtime/ for debuggers (only for backend files...)
-  platform.kernel._backend.set.string(path,preprocessed_code);
   //C: loading file through require
   if (global.testing === true) {
     if(platform.configuration.server.debugging.load === true){

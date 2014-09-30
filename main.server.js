@@ -27,3 +27,5 @@ global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/
 
 //C: starting executable stub
 global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/exec.server.js', { encoding: 'utf-8' })/*,__dirname + '/core/exec.server.js'*/);
+
+global.require.main.filename = null;
