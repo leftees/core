@@ -117,10 +117,10 @@ platform.kernel.preprocess = function(code, path, module){
   if (path != null) {
     //C: generating sourcemap
     var sourcemap = new native.parser.js.sourcemap.SourceMapGenerator({
-      file: native.path.basename(path)
+      file: 'file://'+platform.io.resolve(path)
     });
 
-    var augmented_line_counter = 0;
+    var augmented_line_counter = 1;
     augmented_code = augmented_code.replace(/\/\*\#mapline\((\d+)\)\*\/(.*?)(?=$|\/\*\#mapline\((\d+)\)\*\/)/g,function(generated,line,origin){
       ++augmented_line_counter;
       sourcemap.addMapping({
@@ -128,7 +128,7 @@ platform.kernel.preprocess = function(code, path, module){
           line: augmented_line_counter,
           column: 1
         },
-        source: native.path.basename(path),
+        source: 'file://'+platform.io.resolve(path),
         original: {
           line: parseInt(line),
           column: 1
@@ -137,7 +137,7 @@ platform.kernel.preprocess = function(code, path, module){
       return '\n'+origin;
     });
 
-    sourcemap.setSourceContent(native.path.basename(path),code);
+    sourcemap.setSourceContent('file://'+platform.io.resolve(path),'//AUGMENTED: actually running code exported to ' + platform.kernel._backend.base + path + '\n' +code);
 
     augmented_code += '\n//# sourceMappingURL='+native.path.basename(path)+'.map';
 
