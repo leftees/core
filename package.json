@@ -40,7 +40,7 @@
     "libxmljs": "*",
     "measured": "*",
     "nan": "*",
-    "memwatch": "*",
+    "memwatch": "https://github.com/marcominetti/node-memwatch/tarball/master",
     "minimatch": "*",
     "mocha": "*",
     "mocha-lcov-reporter": "*",
@@ -48,7 +48,7 @@
     "multiparty": "*",
     "node-brackets": "https://github.com/marcominetti/node-brackets/tarball/master",
     "node-console": "*",
-    "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/0.10.x",
+    "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/0.11.x",
     "node-uuid": "*",
     "nodemailer": "*",
     "nodemailer-smtp-pool": "*",
@@ -66,13 +66,12 @@
     "xmlhttprequest": "*",
     "yamlparser": "*",
     "yargs": "*",
-    "freeport": "*",
-    "node-zlib-backport": "*"
+    "freeport": "*"
   },
   "scripts": {
   },
   "engines": {
-    "node": ">=0.10"
+    "node": "=0.11.13"
   },
   "preferGlobal": true,
   "private": false,
