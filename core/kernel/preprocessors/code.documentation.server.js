@@ -18,7 +18,7 @@
 
  */
 
-platform.kernel._preprocessors.server[2].code_documentation = function(ast,code,file,module,preprocessor){
+platform.kernel._preprocessors.server[0].code_documentation = function(ast,code,file,module,preprocessor){
   if(platform.configuration.server.kernel.documentation.generate === false){
     return;
   }
