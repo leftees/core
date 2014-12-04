@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ljve.io.cook.iml" filepath="$PROJECT_DIR$/.idea/ljve.io.cook.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ljve.io.iml" filepath="$PROJECT_DIR$/.idea/ljve.io.iml" />
     </modules>
   </component>
 </project>
