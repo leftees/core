@@ -29,11 +29,6 @@ platform.io.cache.clean = function(){
   //C: deleting and recreating root in cache IO backend
   platform.io.cache._backend.delete('/');
   platform.io.cache._backend.create('/');
-
-  if (global.development === true) {
-    platform.io.cache._backend_raw.delete('/');
-    platform.io.cache._backend_raw.create('/');
-  }
 };
 
 //F: Checks whether the latest version of a file is cached.
@@ -579,7 +574,7 @@ platform.io.cache.set.string = function(path, tag, data, callback){
   }
 
   if (global.testing === true || global.development === true) {
-    platform.io.cache._backend_raw.set.string(path, data);
+    backend.set.string(path + cachetag + '.raw', data);
   }
 
   //C: detecting if operate asynchronously or synchronously
@@ -635,8 +630,8 @@ platform.io.cache.set.bytes = function(path, tag, data, callback){
     }
   }
 
-  if (global.development === true) {
-    platform.io.cache._backend_raw.set.bytes(path, data);
+  if (global.testing === true || global.development === true) {
+    backend.set.bytes(path + cachetag + '.raw', data);
   }
 
   //C: detecting if operate asynchronously or synchronously
@@ -690,6 +685,8 @@ platform.io.cache.set.stream = function(path, tag, callback){
       console.debug('recaching %s', path);
     }
   }
+
+  //T: support raw stream output (mirrored stream)
 
   //C: creating gzipped stream for cache
   var stream = native.zlib.createGzip();
@@ -756,15 +753,6 @@ platform.io.store.register('cache',platform.kernel.new('core.io.store.file',[ na
 
 //V: Stores the 'cache' store backend.
 platform.io.cache._backend = platform.io.store.getByName('cache');
-
-if (global.development === true) {
-  //C: registering 'cache.raw' store as new filesystem backend with app root path + /cache.raw/
-  //T: allow build store override by configuration
-  platform.io.store.register('cache.raw', platform.kernel.new('core.io.store.file', [ native.path.join(platform.runtime.path.app, 'cache.raw') ]), -1);
-
-  //V: Stores the 'cache.raw' store backend.
-  platform.io.cache._backend_raw = platform.io.store.getByName('cache.raw');
-}
 
 if (platform.configuration.server.cache.startup.clean === true){
   platform.io.cache.clean();

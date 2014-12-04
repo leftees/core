@@ -195,7 +195,7 @@ platform.kernel.load = function(path,module,preprocess) {
       preprocessed_code = code;
     }
     //C: caching augmented file
-    //T: replace with sync  set call
+    //T: replace with sync set call
     platform.io.cache.set.string(path, 'built', preprocessed_code);
   } else {
     //C: getting file from cache

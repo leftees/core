@@ -104,7 +104,7 @@ describe('io', function() {
       result[1].name.should.equal('core');
       result[2].name.should.equal('system');
       result[3].name.should.equal('cache');
-      result[4].name.should.equal('build');
+      result[4].name.should.equal('runtime');
       result[5].name.should.equal('session');
       result[6].name.should.equal('pool');
       result[7].name.should.equal('doexist');
@@ -209,7 +209,7 @@ describe('io', function() {
         result[1].name.should.equal('core');
         result[2].name.should.equal('system');
         result[3].name.should.equal('cache');
-        result[4].name.should.equal('build');
+        result[4].name.should.equal('runtime');
         result[5].name.should.equal('session');
         result[6].name.should.equal('pool');
       }).should.not.throw();
