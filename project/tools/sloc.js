@@ -23,12 +23,17 @@ var stdin = process.stdin;
 var stdout = process.stdout;
 var data = [];
 
+//T: MISSING CODE DOCUMENTATION
+//C: [allows stdin to be used in "old" mode, compatible with scripts written for node prior v0.10]
 stdin.resume();
 stdin.setEncoding('utf8');
+
+//T: MISSING CODE DOCUMENTATION
 stdin.on('data', function (chunk) {
   data.push(chunk);
 });
 
+//T: MISSING CODE DOCUMENTATION
 stdin.on('end', function () {
   var json = data.join();
   var result = JSON.parse(json);
