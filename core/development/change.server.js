@@ -18,8 +18,10 @@
 
  */
 
+//T: MISSING CODE DOCUMENTATION
 platform.development.change = platform.development.change || {};
 
+//T: MISSING CODE DOCUMENTATION
 platform.development.change.process = function(file){
   var type;
   if (platform.io.system.exist(file) === true) {
@@ -28,6 +30,7 @@ platform.development.change.process = function(file){
     type = 'delete';
   }
 
+  //T: MISSING CODE DOCUMENTATION
   var path = file.replace(platform.runtime.path.core,'');
   var file_is_loaded = platform.environment._files.indexOf(path);
   if((file_is_loaded > -1 && platform.configuration.server.debugging.filesystem.change.loaded === true)
@@ -40,6 +43,7 @@ platform.development.change.process = function(file){
   }
 };
 
+//T: MISSING CODE DOCUMENTATION
 platform.development.change.process.change = function(path){
   return;
   if(platform.io.cache.was(path,'built') === true){
@@ -49,10 +53,12 @@ platform.development.change.process.change = function(path){
   }
 };
 
+//T: MISSING CODE DOCUMENTATION
 platform.development.change.process.delete = function(path){
 
 };
 
+//T: MISSING CODE DOCUMENTATION
 var _compute_change = function(old_data, new_data){
   var old_split_data = old_data.split('\n');
   var new_split_data = new_data.split('\n');
@@ -82,6 +88,7 @@ var _compute_change = function(old_data, new_data){
   };
 };
 
+//T: MISSING CODE DOCUMENTATION
 if (platform.runtime.development === true) {
   //T: activate on platform ready event
   native.watch(platform.runtime.path.core, platform.development.change.process);

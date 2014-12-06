@@ -151,6 +151,7 @@ JSON._parseNormalize = function(json_string,safe,outer) {
   return json_string;
 };
 
+//T: MISSING CODE DOCUMENTATION
 JSON.normalize = function(target,safe){
   platform.utility.recursiveCallH(function(json_object){
     var pending = [];
@@ -170,6 +171,7 @@ JSON.normalize = function(target,safe){
   return target;
 };
 
+//T: MISSING CODE DOCUMENTATION.
 JSON.parseAndNormalize = function(json_string,safe,evaluate) {
   //evaluate = true;
   var json_normalized = JSON._parseNormalize(json_string,safe,true);

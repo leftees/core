@@ -1,3 +1,8 @@
+//T: MISSING CODE DOCUMENTATION
+//C: [backporting functionalities that may not exist in some Javascript versions]
+
+//T: MISSING CODE DOCUMENTATION
+//C: [extending String class with repeat]
 if (!String.prototype.repeat) {
   String.prototype.repeat = function (count) {
     "use strict";
@@ -32,12 +37,16 @@ if (!String.prototype.repeat) {
   }
 }
 
+//T: MISSING CODE DOCUMENTATION
+//C: [extending String class with trim]
 if (!String.prototype.trim) {
   String.prototype.trim = function () {
     return this.replace(/^\s+|\s+$/g, '');
   };
 }
 
+//T: MISSING CODE DOCUMENTATION
+//C: [extending String class with startsWidth]
 if (!String.prototype.startsWith) {
   Object.defineProperty(String.prototype, 'startsWith', {
     enumerable: false,
@@ -50,6 +59,8 @@ if (!String.prototype.startsWith) {
   });
 }
 
+//T: MISSING CODE DOCUMENTATION
+//C: [extending String class with endsWith]
 if (!String.prototype.endsWith) {
   Object.defineProperty(String.prototype, 'endsWith', {
     value: function (searchString, position) {
@@ -64,12 +75,16 @@ if (!String.prototype.endsWith) {
   });
 }
 
+//T: MISSING CODE DOCUMENTATION
+//C: [extending String class with contains
 if (!String.prototype.contains) {
   String.prototype.contains = function() {
     return String.prototype.indexOf.apply( this, arguments ) !== -1;
   };
 }
 
+//T: MISSING CODE DOCUMENTATION
+//C: [defining binding]
 if (Function.prototype.bind == null) {
   Function.prototype.bind = function(scope) {
     if (arguments.length == 0 || (arguments.length == 1 && arguments[0] == null))
@@ -88,6 +103,8 @@ if (Function.prototype.bind == null) {
   };
 }
 
+//T: MISSING CODE DOCUMENTATION
+//C: [defining indexOf]
 if (Array.prototype.indexOf == null) {
   Array.prototype.indexOf = function(obj,start) {
     for (var Index = (start || 0); Index < this.length; Index++) {

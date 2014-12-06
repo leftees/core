@@ -17,5 +17,6 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-
+//T: MISSING CODE DOCUMENTATION
+//C: [declaring statistics namespace as itself or as the result of the creation of the collection of an external module]
 platform.statistics = platform.statistics || native.metrics.createCollection();

@@ -46,6 +46,9 @@ native.websocket.server = require('ws').Server;
 native.args = require('yargs').argv;
 native.cli = {};
 native.cli.color = require('cli-color');
+
+//T: MISSING CODE DOCUMENTATION
+//C: [if running node 0.10.0 - 0.11.11 use node-zlib-backport, else use zlib]
 if (native.semver.satisfies(native.semver.clean(process.version),'0.10.0 - 0.11.11') === true) {
   native.zlib = require('node-zlib-backport');
 } else {

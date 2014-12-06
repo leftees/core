@@ -38,6 +38,7 @@ Object.defineProperty(platform,"side",{
   value: 'server'
 });
 
+//T: MISSING CODE DOCUMENTATION
 bootstrap._files = [];
 
 //C: defining post power-on-self-test bootstrap function
@@ -93,6 +94,8 @@ bootstrap.post = function(){
 
   console.log('core initialized in %s', Number.toHumanTime(time_stop-time_start));
 
+  //T: MISSING CODE DOCUMENTATION
+  //C: [forcing garbage collector to clean the ram]
   platform.system.memory.collect();
 
   //T: switch to PXE (pre execution environment)
