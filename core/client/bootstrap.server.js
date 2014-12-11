@@ -166,8 +166,6 @@ platform.client.bootstrap.seed = function() {
     content += platform.io.get.string('/lib/jquery.knob.js');
     content += platform.io.get.string('/lib/jquery.sparkline.js');
     content += platform.io.get.string('/lib/crypto.js');
-    content += platform.io.get.string('/lib/lz4.js');
-    content += platform.io.get.string('/lib/lzma.js');
 
     content += '</script>';
 
