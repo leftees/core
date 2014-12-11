@@ -103,7 +103,7 @@ platform.configuration.server.bootloader.modules = [
 
 platform.configuration.server.cache = {
   'startup': {
-    'clean': false
+    'clean': true
   }
 };
 
@@ -412,7 +412,7 @@ platform.configuration.server.debugging = {
     }
   },
   'database': true,
-  'preprocess': true
+  'preprocess': false
 };
 
 //O: Contains memory management configuration.
