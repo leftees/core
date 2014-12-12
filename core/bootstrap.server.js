@@ -80,7 +80,7 @@ bootstrap.post = function(){
 
   //C: loading preprocessors for code augmentation
   console.log('loading core kernel preprocessors');
-  bootstrap.loadModules(platform.configuration.server.kernel.preprocessors,'/core/kernel/preprocessors/server/');
+  bootstrap.loadModules(platform.configuration.server.kernel.preprocessors,'/core/kernel/preprocessors/');
 
   //C: switching to code-augmentation enabled bootstrap.load (assuming platform.environment is loaded)
   bootstrap.load = platform.environment.load;
