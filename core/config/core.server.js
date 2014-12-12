@@ -24,7 +24,7 @@ platform.configuration = {};
 //O: Contains general application info.
 platform.configuration.application = {
   'name': 'Novetica Ljve',
-  'version': '0.4.0-porting',
+  'version': '0.4.0',
   'available': true
 };
 
@@ -106,7 +106,7 @@ platform.configuration.server.kernel.preprocessors = [
   'node.naming.server.js',
   //'function.reflection.server.js',
   //'function.logging.server.js',
-  //'code.blocking.server.js',
+  'code.blocking.server.js',
   //'code.leveling.server.js',
   //'code.breakpoint.server.js',
   //'code.profiling.server.js',

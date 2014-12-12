@@ -46,13 +46,46 @@ platform.kernel._preprocessors.server[2].code_blocking = function(ast,code,file,
     }
     if (skip === false) {
       if (node._is_exec_block === true){
-          ++counters[level];
-          var prepend_code = '';
-          if (counters[level] === 1) {
-            prepend_code = 'var ';
+        ++counters[level];
+        var prepend_node = null;
+        if (counters[level] === 1) {
+          prepend_node = {
+            "type": "VariableDeclaration",
+              "declarations": [
+              {
+                "type": "VariableDeclarator",
+                "id": {
+                  "type": "Identifier",
+                  "name": "__c_"
+                },
+                "init": {
+                  "type": "Literal",
+                  "value": counters[level],
+                  "raw": counters[level].toString()
+                }
+              }
+            ],
+            "kind": "var"
           }
-          prepend_code += native.util.format('__c_=%s;', counters[level]);
-          node.prepend.push(prepend_code);
+        } else {
+          prepend_node = {
+            "type": "ExpressionStatement",
+            "expression": {
+            "type": "AssignmentExpression",
+              "operator": "=",
+              "left": {
+              "type": "Identifier",
+                "name": "__c_"
+            },
+            "right": {
+              "type": "Literal",
+                "value": counters[level],
+                "raw": counters[level].toString()
+              }
+            }
+          };
+        }
+        node.tree.container.splice(node.tree.container.indexOf(node),0,prepend_node);
       }
     }
     node = node.tree.next;
