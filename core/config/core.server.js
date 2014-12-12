@@ -50,16 +50,6 @@ platform.configuration.server.bootloader.preload = [
   'io/cache.server.js',
   'parser/js.server.js',
   'kernel/preprocess.server.js',
-  'kernel/preprocessors/node.naming.server.js',
-  'kernel/preprocessors/function.reflection.server.js',
-  'kernel/preprocessors/function.logging.server.js',
-  'kernel/preprocessors/code.blocking.server.js',
-  'kernel/preprocessors/code.leveling.server.js',
-  'kernel/preprocessors/code.breakpoint.server.js',
-  'kernel/preprocessors/code.profiling.server.js',
-  'kernel/preprocessors/code.documentation.server.js',
-  'kernel/preprocessors/exception.dump.server.js',
-  'kernel/preprocessors/javascript.async.server.js',
   'environment/load.server.js'
 ];
 
@@ -113,6 +103,16 @@ platform.configuration.server.kernel = {};
 //O: Contains Javascript preprocessor modules, as array, to be loaded to augment code.
 //H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. 'http://cdn.example.com/...').
 platform.configuration.server.kernel.preprocessors = [
+  'node.naming.server.js',
+  //'function.reflection.server.js',
+  //'function.logging.server.js',
+  //'code.blocking.server.js',
+  //'code.leveling.server.js',
+  //'code.breakpoint.server.js',
+  //'code.profiling.server.js',
+  'code.documentation.server.js',
+  //'exception.dump.server.js',
+  //'javascript.async.server.js'
 ];
 
 platform.configuration.server.kernel.runlevel = true;
