@@ -225,6 +225,7 @@ Number.toHumanSize = function (bytes) {
   return Math.round(bytes / Math.pow(1024, i), 2) + labels[i];
 };
 
+//C: extending String object (not prototype) with hashing implementations
 String.hash = {};
 
 //F: Returns hash with Jenkins algorithm.

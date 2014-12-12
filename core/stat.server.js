@@ -17,6 +17,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-//T: MISSING CODE DOCUMENTATION
-//C: [declaring statistics namespace as itself or as the result of the creation of the collection of an external module]
+
+//N: Provides statistics methods to create and collect performance counters (currently using 'measured' external module)
+//H: Please visit https://github.com/felixge/node-measured for how-tos and usage information.
 platform.statistics = platform.statistics || native.metrics.createCollection();

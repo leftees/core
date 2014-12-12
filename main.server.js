@@ -23,13 +23,11 @@
 //C: exporting global require against server root (needed later)
 global.require = require;
 
-//T: MISSING CODE DOCUMENTATION
-//C: [Injecting /core/polyfill.server.js to backport Ecma Script 6 features]
-global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/polyfill.server.js', { encoding: 'utf-8' })/*,__dirname + '/core/polyfill.server.js'*/);
+//C: backporting partial ECMAScript 6 features (through injection of hidden javascript file)
+global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/polyfill.server.js', { encoding: 'utf-8' }),__dirname + '/core/polyfill.server.js');
 
-//C: starting executable stub
-global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/exec.server.js', { encoding: 'utf-8' })/*,__dirname + '/core/exec.server.js'*/);
+//C: starting executable stub (through injection of hidden javascript file)
+global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/exec.server.js', { encoding: 'utf-8' }));
 
-//T: MISSING CODE DOCUMENTATION
-//C: [partially hide ljve code inside node.js]
+//C: hiding ljve.io main javascript file from node.js runtime
 global.require.main.filename = null;

@@ -1,8 +1,4 @@
-//T: MISSING CODE DOCUMENTATION
-//C: [backporting functionalities that may not exist in some Javascript versions]
-
-//T: MISSING CODE DOCUMENTATION
-//C: [extending String class with repeat]
+//C: extending String class with .repeat implementation from ECMAScript 6 (MDN)
 if (!String.prototype.repeat) {
   String.prototype.repeat = function (count) {
     "use strict";
@@ -37,16 +33,14 @@ if (!String.prototype.repeat) {
   }
 }
 
-//T: MISSING CODE DOCUMENTATION
-//C: [extending String class with trim]
+//C: extending String class with .trim implementation from ECMAScript 6 (MDN)
 if (!String.prototype.trim) {
   String.prototype.trim = function () {
     return this.replace(/^\s+|\s+$/g, '');
   };
 }
 
-//T: MISSING CODE DOCUMENTATION
-//C: [extending String class with startsWidth]
+//C: extending String class with .startsWith implementation from ECMAScript 6 (MDN)
 if (!String.prototype.startsWith) {
   Object.defineProperty(String.prototype, 'startsWith', {
     enumerable: false,
@@ -59,8 +53,7 @@ if (!String.prototype.startsWith) {
   });
 }
 
-//T: MISSING CODE DOCUMENTATION
-//C: [extending String class with endsWith]
+//C: extending String class with .endsWith implementation from ECMAScript 6 (MDN)
 if (!String.prototype.endsWith) {
   Object.defineProperty(String.prototype, 'endsWith', {
     value: function (searchString, position) {
@@ -75,16 +68,14 @@ if (!String.prototype.endsWith) {
   });
 }
 
-//T: MISSING CODE DOCUMENTATION
-//C: [extending String class with contains
+//C: extending String class with .contains implementation from ECMAScript 6 (MDN)
 if (!String.prototype.contains) {
   String.prototype.contains = function() {
     return String.prototype.indexOf.apply( this, arguments ) !== -1;
   };
 }
 
-//T: MISSING CODE DOCUMENTATION
-//C: [defining binding]
+//C: extending Function class with .bind implementation (for very old browsers)
 if (Function.prototype.bind == null) {
   Function.prototype.bind = function(scope) {
     if (arguments.length == 0 || (arguments.length == 1 && arguments[0] == null))
@@ -103,8 +94,7 @@ if (Function.prototype.bind == null) {
   };
 }
 
-//T: MISSING CODE DOCUMENTATION
-//C: [defining indexOf]
+//C: extending Array class with .indexOf implementation (for very old browsers)
 if (Array.prototype.indexOf == null) {
   Array.prototype.indexOf = function(obj,start) {
     for (var Index = (start || 0); Index < this.length; Index++) {
