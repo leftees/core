@@ -77,7 +77,7 @@ platform.kernel.preprocess = function(code, path, module){
     });
   });
 
-  var generated_object = platform.parser.js.stringify(ast,true,true);
+  var generated_object = platform.parser.js.stringify(ast,!platform.runtime.debugging,true);
   ast = null;
 
   var generated_code = generated_object.code;
