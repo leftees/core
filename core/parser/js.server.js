@@ -43,12 +43,15 @@ platform.parser.js._block_check = function(node,parent,previous){
     case 'BlockStatement':
       if (parent != null
         && parent.type !== 'FunctionExpression'
+        && parent.type !== 'ArrowFunctionExpression'
+        && parent.type !== 'ArrowExpression'
         && parent.type !== 'FunctionDeclaration'
         && parent.type !== 'DoWhileStatement'
         && parent.type !== 'ForInStatement'
         && parent.type !== 'ForStatement'
         && parent.type !== 'IfStatement'
         && parent.type !== 'SwitchStatement'
+        && parent.type !== 'SwitchCase'
         && parent.type !== 'TryStatement'
         && parent.type !== 'WhileStatement'
         && parent.type !== 'WithStatement'
@@ -80,9 +83,19 @@ platform.parser.js._block_check = function(node,parent,previous){
     case 'WhileStatement':
     case 'WithStatement':
       return true;
-      break;
   }
   return false;
+};
+
+platform.parser.js._container_get = function(node,parent){
+  if (parent != null){
+    if (parent.type === 'Program' || parent.type === 'BlockStatement'){
+      return parent.body;
+    } else {
+      throw new Error('parser has detected unsupported container for exec block');
+    }
+  }
+  return null;
 };
 
 platform.parser.js._name_get = function(node,parent,previous) {
@@ -165,6 +178,14 @@ platform.parser.js.normalizeAST = function(ast){
             };
           }
           break;
+        case "SwitchCase":
+          if (node.consequent != null && (node.consequent.constructor === Array && (node.consequent.length > 1 || (node.consequent.length === 1 && node.consequent[0].type !== 'BlockStatement')))) {
+            node.consequent = [{
+              type: 'BlockStatement',
+              body: node.consequent
+            }];
+          }
+          break;
         case 'FunctionExpression':
         case 'ArrowFunctionExpression':
         case 'ArrowExpression':
@@ -237,6 +258,7 @@ platform.parser.js.normalizeAST = function(ast){
 
       if (platform.parser.js._block_check(node,parent,previous) === true){
         node._is_exec_block = true;
+        node.tree.container = platform.parser.js._container_get(node,parent);
         block = node;
       }
       node.tree.block = block;
