@@ -135,7 +135,7 @@ platform.parser.js._name_get = function(node,parent,previous) {
 };
 
 platform.parser.js.parse = function(code) {
-  var ast = native.parser.js.parse(code,{ 'attachComment': true, 'range': true, 'comment': true, 'loc': true, 'tag': true });
+  var ast = native.parser.js.parse(code,{ 'attachComment': true, 'range': true, 'comment': true, 'loc': true, 'tag': true, 'source': 'source.js' });
   return platform.parser.js.normalizeAST(ast);
 }
 
@@ -332,10 +332,8 @@ platform.parser.js.stringify = function(ast,compact,tag){
     parse: null,
     comment: !compact,
     tag: tag || false,
-    //sourceMap: undefined,
-    //sourceMapRoot: null,
-    //sourceMapWithCode: false,
-    //sourceContent: undefined,
+    sourceMap: true,
+    sourceMapWithCode: true,
     directive: false,
     verbatim: undefined
   });
