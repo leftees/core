@@ -47,13 +47,13 @@ native.args = require('yargs').argv;
 native.cli = {};
 native.cli.color = require('cli-color');
 
-//T: MISSING CODE DOCUMENTATION
-//C: [if running node 0.10.0 - 0.11.11 use node-zlib-backport, else use zlib]
+//C: properly load zlib native module with sync implementations (on node version 0.10.0 - 0.11.11 we'll use our node-zlib-backport)
 if (native.semver.satisfies(native.semver.clean(process.version),'0.10.0 - 0.11.11') === true) {
   native.zlib = require('node-zlib-backport');
 } else {
   native.zlib = require('zlib');
 }
+
 native.body = {};
 native.body.text = require('body');
 native.body.json = require('body/json');

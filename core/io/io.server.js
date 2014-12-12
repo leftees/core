@@ -41,7 +41,7 @@ platform.io.map = function(path,root) {
   //C: normalizing through natives
   normalized_path = native.path.normalize(normalized_path);
   //C: returning path joined to custom or app root
-  return  native.path.join(root||platform.runtime.path.app, normalized_path);
+  return native.path.join(root||platform.runtime.path.app, normalized_path);
 };
 
 //F: Resolves the path throughout the overlay abstract filesystem.

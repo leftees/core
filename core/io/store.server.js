@@ -62,7 +62,7 @@ platform.io.store.register = function(name,backend,priority){
 
     return true;
   } else {
-    throw new Exception('class %s already exists',name);
+    throw new Exception('store %s already exists',name);
   }
 };
 

@@ -21,7 +21,7 @@
 //C: defining local bootstrap namespace
 global.bootstrap = {};
 
-//C: creating and enforcing global platform namespace
+//C: creating and enforcing readonly global platform namespace
 global.platform = {};
 Object.defineProperty(global,"platform",{
   configurable: false,
@@ -30,6 +30,7 @@ Object.defineProperty(global,"platform",{
   value: {}
 });
 
+//C: creating and enforcing readonly platform.side to enable node-type code awareness
 global.platform.side = 'server';
 Object.defineProperty(platform,"side",{
   configurable: false,
@@ -38,14 +39,17 @@ Object.defineProperty(platform,"side",{
   value: 'server'
 });
 
-//T: MISSING CODE DOCUMENTATION
+//C: defining an array to store the file names loaded during bootstrap
 bootstrap._files = [];
 
 //C: defining post power-on-self-test bootstrap function
 bootstrap.post = function(){
+  //C: starting stopwatch to profile bootstrap elapsed time
   var time_start = Date.now();
 
+  //C: logging
   console.log('initializing core');
+
   //T: implement power-on-self-test
 
   //C: deleting temporary folder if any
@@ -65,6 +69,7 @@ bootstrap.post = function(){
   console.log('loading core configuration');
   bootstrap.loadFolder(global.main.path.core,'/core/config/');
 
+  //C checking whether is necessary to override /core/config from app root
   if(global.main.path.core !== global.main.path.app) {
     //C: loading core configuration overrides from app root
     bootstrap.loadFolder(global.main.path.app, '/core/config/');
@@ -84,26 +89,31 @@ bootstrap.post = function(){
 
   //C: switching to code-augmentation enabled bootstrap.load (assuming platform.environment is loaded)
   bootstrap.load = platform.environment.load;
+
+  //C: copying bootstrap loaded files list to environment for further awareness of what is loaded
   platform.environment._files = bootstrap._files;
 
   //C: loading preload module
   console.log('loading core modules');
   bootstrap.loadModules(platform.configuration.server.bootloader.modules,'/core/');
 
+  //C: getting stopwatch end to profile bootstrap elapsed time
   var time_stop = Date.now();
 
+  //C: logging with bootstrap elapsed time
   console.log('core initialized in %s', Number.toHumanTime(time_stop-time_start));
 
-  //T: MISSING CODE DOCUMENTATION
-  //C: [forcing garbage collector to clean the ram]
+  //C: forcing garbage collector to clean memory after preprocessing and multiple code loading
   platform.system.memory.collect();
 
   //T: switch to PXE (pre execution environment)
   //T: PXE test http ports to prevent EADDRINUSE exception later
+
+  //C: destroying global bootstrap namespace
   delete global.bootstrap;
 };
 
-//C: defining function to resolve relative paths against app or custom root
+//C: defining function to resolve relative paths against app (default) or custom root
 bootstrap.mapPath = function(path,root) {
   var normalized_path = path;
   //C: sanitizing empty path
@@ -123,10 +133,9 @@ bootstrap.mapPath = function(path,root) {
 
 //C: defining function to get data from uri with path resolution
 bootstrap.get = function(path,load) {
-  //T: define a resource class for delayed io/data loading
-  var result = {};
   //T: implement support for remote resources (requires io/caching)
-  //C: trying to resolve file against app, core and system root paths
+  var result = {};
+  //C: trying to resolve file against app, core and system root paths (in that order)
   var uri;
   if (native.fs.existsSync(bootstrap.mapPath(path, global.main.path.app)) === true) {
     uri = bootstrap.mapPath(path, global.main.path.app);
@@ -135,11 +144,13 @@ bootstrap.get = function(path,load) {
   } else if (native.fs.existsSync(path) === true) {
     uri = path;
   }
+  //C: checking if something has been found
   if (uri != null) {
-    //C: creating result with .uri and delayed .data properties
+    //C: defining .path (input) and .uri (resolved path) properties in result object
     result.uri = uri;
     result.path = path;
     result._data = undefined;
+    //C: defining .data property to get data when needed with dummy internal cache (sync implementation)
     Object.defineProperty(result, 'data', { get: function () {
       //C: loading data if empty
       if (this._data === undefined) {
@@ -159,24 +170,27 @@ bootstrap.get = function(path,load) {
   }
 };
 
-//C: defining early bootstrap .js load function
+//C: defining load function to resolve and load a .server.js file (supporting also custom roots)
 bootstrap.load = function(path,root){
+  //C: trying to resolve request path
   var resource = bootstrap.get(native.path.join(root||'',path));
   try {
-    /*if (global.testing === true) {
-      global.require(resource.uri);
-    } else {*/
-      global.require.main._compile('\n'+resource.data ,resource.uri);
-    //}
+    //C: injecting code as hidden module
+    global.require.main._compile('\n'+resource.data ,resource.uri);
   } catch (ex) {
     throw new Exception("error loading %s: %s", resource.uri, ex.message, ex);
   }
+  //C: adding path to the loaded files list
   bootstrap._files.push(path);
 };
 
+//C: defining loadFolder function to load all .server.js file within a folder (no recursive)
 bootstrap.loadFolder = function(root,path){
+  //C: checking whether the folder exists
   if (native.fs.existsSync(bootstrap.mapPath(path,root)) === true) {
+    //C: getting file lists (no recursive)
     var config_files = native.fs.readdirSync(bootstrap.mapPath(path,root));
+    //C: loading every detected file if matches .server.js extension
     config_files.forEach(function (file) {
       if (file.endsWith('.server.js') === true) {
         bootstrap.load(native.path.join(path,file),root);
@@ -185,7 +199,9 @@ bootstrap.loadFolder = function(root,path){
   }
 };
 
+//C: defining loadModules function to load .server.js files within an array of string (usually read from configuration)
 bootstrap.loadModules = function(modules,path){
+  //C: loading every listed file if matches .server.js extension
   modules.forEach(function(file){
     if (file.endsWith('.server.js') === true) {
       bootstrap.load(path + file);
