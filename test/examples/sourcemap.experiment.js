@@ -8,7 +8,7 @@ var code = "var t = 0;\nt++;";
 var ast = native.parser.js.parse(code,{ 'attachComment': true, 'range': true, 'comment': true, 'loc': true, 'tag': true, 'source': 'test.js' });
 
 //C: Manipulating the code: changing the var name, adding an expression statement between original lines, switching position of the two original lines
-ast.body[0].declarations[0].id.name
+ast.body[0].declarations[0].id.name = 'da'
 ast.body.push(ast.body[1]);
 ast.body[1] = {};
 ast.body[1].type = "ExpressionStatement";
