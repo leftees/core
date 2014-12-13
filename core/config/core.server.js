@@ -109,7 +109,7 @@ platform.configuration.server.kernel.preprocessors = [
   'code.blocking.server.js',
   'code.leveling.server.js',
   'code.breakpoint.server.js',
-  //'code.profiling.server.js',
+  'code.profiling.server.js',
   'code.documentation.server.js',
   //'exception.dump.server.js',
   //'javascript.async.server.js'
