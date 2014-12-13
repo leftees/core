@@ -104,8 +104,8 @@ platform.configuration.server.kernel = {};
 //H: This should include paths relative to core, app or system roots. Remote HTTP/HTTPS resources are supported (e.g. 'http://cdn.example.com/...').
 platform.configuration.server.kernel.preprocessors = [
   'node.naming.server.js',
-  //'function.reflection.server.js',
-  //'function.logging.server.js',
+  'function.logging.server.js',
+  'function.reflection.server.js',
   'code.blocking.server.js',
   //'code.leveling.server.js',
   'code.breakpoint.server.js',
