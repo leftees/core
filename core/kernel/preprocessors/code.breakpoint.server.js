@@ -29,8 +29,49 @@ platform.kernel._preprocessors.server[2].code_breakpoint = function(ast,code,fil
       if (node._tags != null && node._tags['b'] != null) {
         if (node._is_exec_block === true){
           //T: append code to the closest safe node (backward)
-          var prepend_code = 'if (platform.runtime.debugging === true) { debugger; }';
-          node.prepend.push(prepend_code);
+          // injecting: if (platform.runtime.debugging === true) { debugger; }
+          var prepend_node = {
+            "type": "IfStatement",
+            "test": {
+              "type": "BinaryExpression",
+              "operator": "===",
+              "left": {
+                "type": "MemberExpression",
+                "computed": false,
+                "object": {
+                  "type": "MemberExpression",
+                  "computed": false,
+                  "object": {
+                    "type": "Identifier",
+                    "name": "platform"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "runtime"
+                  }
+                },
+                "property": {
+                  "type": "Identifier",
+                  "name": "debugging"
+                }
+              },
+              "right": {
+                "type": "Literal",
+                "value": true,
+                "raw": "true"
+              }
+            },
+            "consequent": {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "DebuggerStatement"
+                }
+              ]
+            },
+            "alternate": null
+          };
+          node.tree.container.splice(node.tree.container.indexOf(node),0,prepend_node);
         } else {
           console.warn('breakpoint tag ignored for node at line %s in %s',node.loc.start.line,(file == null) ? 'eval code' : ('file ' + file));
         }
