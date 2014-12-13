@@ -49,6 +49,7 @@ platform.kernel._preprocessors.server[2].code_blocking = function(ast,code,file,
         ++counters[level];
         var prepend_node = null;
         if (counters[level] === 1) {
+          // injecting: var __c_ = 0;
           prepend_node = {
             "type": "VariableDeclaration",
               "declarations": [
@@ -68,6 +69,7 @@ platform.kernel._preprocessors.server[2].code_blocking = function(ast,code,file,
             "kind": "var"
           }
         } else {
+          // injecting: __c_ = 1;
           prepend_node = {
             "type": "ExpressionStatement",
             "expression": {
