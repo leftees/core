@@ -20,8 +20,6 @@
 
 platform.kernel._preprocessors.server[2].function_reflection = function(ast,code,file,module,preprocessor){
 
-  var prepend_code = Function.info.code(_code_reflection_create_object, true);
-
   var node = ast;
   while (node != null) {
     var skip = false;
@@ -38,44 +36,126 @@ platform.kernel._preprocessors.server[2].function_reflection = function(ast,code
             var function_name = node._name || 'unknown';
             var function_params = [];
             node.params.forEach(function(param){
-              function_params.push(param.name);
+              function_params.push({
+                'type': 'Literal',
+                'value': param.name,
+                'raw': '\''+param.name+'\''
+              });
             });
-            if (function_params.length > 0){
-              function_params = '\'' + function_params.join('\', \'') + '\'';
-            } else {
-              function_params = '';
-            }
             var function_vars = [];
             native.parser.js.traverse(node,{
               'enter': function(child_node,parent) {
-                if (child_node.tree.scope === node) {
+                if (child_node.tree != null && child_node.tree.scope === node) {
                   switch (child_node.type) {
                     case 'VariableDeclarator':
-                      function_vars.push(child_node.id.name);
+                      function_vars.push({
+                        'type': 'Literal',
+                        'value': child_node.id.name,
+                        'raw': '\''+child_node.id.name+'\''
+                      });
                       break;
                   }
                 }
               }
             });
-            if (function_vars.length > 0){
-              function_vars = '\'' + function_vars.join('\', \'') + '\'';
-            } else {
-              function_vars = '';
-            }
-            node.body.body[0].prepend.push(prepend_code.replace('$+0',function_name).replace('$+1',function_params).replace('$+2',function_vars));
+            /* injecting:
+              arguments.called = {
+               'name': '$function_name',
+               'function': arguments.callee,
+               'params': '[]function_params',
+               'vars': '[]function_vars'
+              };
+            */
+            var prepend_node = {
+              'type': 'ExpressionStatement',
+              'expression': {
+                'type': 'AssignmentExpression',
+                'operator': '=',
+                'left': {
+                  'type': 'MemberExpression',
+                  'computed': false,
+                  'object': {
+                    'type': 'Identifier',
+                    'name': 'arguments'
+                  },
+                  'property': {
+                    'type': 'Identifier',
+                    'name': 'called'
+                  }
+                },
+                'right': {
+                  'type': 'ObjectExpression',
+                  'properties': [
+                    {
+                      'type': 'Property',
+                      'key': {
+                        'type': 'Literal',
+                        'value': 'name',
+                        'raw': '\'name\''
+                      },
+                      'value': {
+                        'type': 'Literal',
+                        'value': function_name,
+                        'raw': '\''+function_name+'\''
+                      },
+                      'kind': 'init'
+                    },
+                    {
+                      'type': 'Property',
+                      'key': {
+                        'type': 'Literal',
+                        'value': 'function',
+                        'raw': '\'function\''
+                      },
+                      'value': {
+                        'type': 'MemberExpression',
+                        'computed': false,
+                        'object': {
+                          'type': 'Identifier',
+                          'name': 'arguments'
+                        },
+                        'property': {
+                          'type': 'Identifier',
+                          'name': 'callee'
+                        }
+                      },
+                      'kind': 'init'
+                    },
+                    {
+                      'type': 'Property',
+                      'key': {
+                        'type': 'Literal',
+                        'value': 'params',
+                        'raw': '\'params\''
+                      },
+                      'value': {
+                        'type': 'ArrayExpression',
+                        'elements': function_vars
+                      },
+                      'kind': 'init'
+                    },
+                    {
+                      'type': 'Property',
+                      'key': {
+                        'type': 'Literal',
+                        'value': 'vars',
+                        'raw': '\'vars\''
+                      },
+                      'value': {
+                        'type': 'ArrayExpression',
+                        'elements': function_vars
+                      },
+                      'kind': 'init'
+                    }
+                  ]
+                }
+              }
+            };
+            node.body.body.unshift(prepend_node);
           }
           break;
       }
     }
     node = node.tree.next;
   }
-};
-
-var _code_reflection_create_object = function() {
-  arguments.called = {
-    'name': '$+0',
-    'function': arguments.callee,
-    'params': [ $+1 ],
-    'vars': [ $+2 ]
-  };
 };
