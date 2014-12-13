@@ -438,6 +438,7 @@ platform.kernel._preprocessors.server[2].code_leveling = function(ast,code,file,
             }
           };
           node.tree.container.splice(node.tree.container.indexOf(node),1,prepend_node);
+          node.tree.container = prepend_node.consequent.body;
         } else {
           console.warn('runlevel tag ignored for node at line %s in %s',node.loc.start.line,(file == null) ? 'eval code' : ('file ' + file));
         }
