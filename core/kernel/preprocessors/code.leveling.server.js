@@ -19,8 +19,6 @@
  */
 
 platform.kernel._preprocessors.server[2].code_leveling = function(ast,code,file,module,preprocessor){
-  var prepend_code = Function.info.code(_code_level_check, true).replace('$1','') + '{';
-  var append_code = '}else{' + Function.info.code(_code_level_debug, true) + '}';
 
   var node = ast;
   while (node != null) {
@@ -34,31 +32,418 @@ platform.kernel._preprocessors.server[2].code_leveling = function(ast,code,file,
           platform.kernel.runlevels[runlevel] = platform.kernel.runlevels[runlevel] || false;
         });
         if (node._is_exec_block === true){
-          node.prepend.push(prepend_code.replace('$0',node._tags['runlevel'].join('\'] === true && platform.kernel.runlevels[\'')));
-          node.append.push(append_code.replace('$0',node._tags['runlevel'].join('\', \'')).replace('$1',node.loc.start.line).replace('$2',(file == null) ? 'eval code' : ('file ' + file)));
+          var node_runlevels = [];
+          node._tags['runlevel'].forEach(function(runlevel){
+            node_runlevels.push({
+              'type': 'Literal',
+              'value': runlevel,
+              'raw': '\''+runlevel+'\''
+            });
+          });
+          var node_runlevels_condition = 'platform.kernel.runlevels[\'' + node._tags['runlevel'].join('\'] === true && platform.kernel.runlevels[\'') + '\'] === true';
+          /* injecting:
+           if(((platform.kernel.runlevels['$0'] === true) && platform.configuration.server.kernel.runlevel === true) || platform.configuration.server.kernel.runlevel === false){
+           } else if (platform.configuration.server.debugging.kernel.runlevel === true) {
+             (function () {
+               var disabled_runlevels = ['$0'];
+               disabled_runlevels = disabled_runlevels.filter(function(runlevel){
+                return (platform.kernel.runlevels[runlevel] === false);
+               });
+               console.warn('code block at line %s in %s skipped because of runlevel%s %s', '$1', '$2', (disabled_runlevels.length > 1) ? 's' : '', disabled_runlevels.join(', '));
+             })();
+           }
+          */
+          var prepend_node = {
+            "type": "IfStatement",
+            "test": {
+              "type": "LogicalExpression",
+              "operator": "||",
+              "left": {
+                "type": "LogicalExpression",
+                "operator": "&&",
+                "left": native.parser.js.parse(node_runlevels_condition).body[0].expression,
+                "right": {
+                  "type": "BinaryExpression",
+                  "operator": "===",
+                  "left": {
+                    "type": "MemberExpression",
+                    "computed": false,
+                    "object": {
+                      "type": "MemberExpression",
+                      "computed": false,
+                      "object": {
+                        "type": "MemberExpression",
+                        "computed": false,
+                        "object": {
+                          "type": "MemberExpression",
+                          "computed": false,
+                          "object": {
+                            "type": "Identifier",
+                            "name": "platform"
+                          },
+                          "property": {
+                            "type": "Identifier",
+                            "name": "configuration"
+                          }
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "server"
+                        }
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "name": "kernel"
+                      }
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "name": "runlevel"
+                    }
+                  },
+                  "right": {
+                    "type": "Literal",
+                    "value": true,
+                    "raw": "true"
+                  }
+                }
+              },
+              "right": {
+                "type": "BinaryExpression",
+                "operator": "===",
+                "left": {
+                  "type": "MemberExpression",
+                  "computed": false,
+                  "object": {
+                    "type": "MemberExpression",
+                    "computed": false,
+                    "object": {
+                      "type": "MemberExpression",
+                      "computed": false,
+                      "object": {
+                        "type": "MemberExpression",
+                        "computed": false,
+                        "object": {
+                          "type": "Identifier",
+                          "name": "platform"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "configuration"
+                        }
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "name": "server"
+                      }
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "name": "kernel"
+                    }
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "runlevel"
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": false,
+                  "raw": "false"
+                }
+              }
+            },
+            "consequent": {
+              "type": "BlockStatement",
+              "body": [ node ]
+            },
+            "alternate": {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "operator": "===",
+                "left": {
+                  "type": "MemberExpression",
+                  "computed": false,
+                  "object": {
+                    "type": "MemberExpression",
+                    "computed": false,
+                    "object": {
+                      "type": "MemberExpression",
+                      "computed": false,
+                      "object": {
+                        "type": "MemberExpression",
+                        "computed": false,
+                        "object": {
+                          "type": "MemberExpression",
+                          "computed": false,
+                          "object": {
+                            "type": "Identifier",
+                            "name": "platform"
+                          },
+                          "property": {
+                            "type": "Identifier",
+                            "name": "configuration"
+                          }
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "server"
+                        }
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "name": "debugging"
+                      }
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "name": "kernel"
+                    }
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "runlevel"
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": true,
+                  "raw": "true"
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "FunctionExpression",
+                        "id": null,
+                        "params": [],
+                        "defaults": [],
+                        "body": {
+                          "type": "BlockStatement",
+                          "body": [
+                            {
+                              "type": "VariableDeclaration",
+                              "declarations": [
+                                {
+                                  "type": "VariableDeclarator",
+                                  "id": {
+                                    "type": "Identifier",
+                                    "name": "disabled_runlevels"
+                                  },
+                                  "init": {
+                                    "type": "ArrayExpression",
+                                    "elements": node_runlevels
+                                  }
+                                }
+                              ],
+                              "kind": "var"
+                            },
+                            {
+                              "type": "ExpressionStatement",
+                              "expression": {
+                                "type": "AssignmentExpression",
+                                "operator": "=",
+                                "left": {
+                                  "type": "Identifier",
+                                  "name": "disabled_runlevels"
+                                },
+                                "right": {
+                                  "type": "CallExpression",
+                                  "callee": {
+                                    "type": "MemberExpression",
+                                    "computed": false,
+                                    "object": {
+                                      "type": "Identifier",
+                                      "name": "disabled_runlevels"
+                                    },
+                                    "property": {
+                                      "type": "Identifier",
+                                      "name": "filter"
+                                    }
+                                  },
+                                  "arguments": [
+                                    {
+                                      "type": "FunctionExpression",
+                                      "id": null,
+                                      "params": [
+                                        {
+                                          "type": "Identifier",
+                                          "name": "runlevel"
+                                        }
+                                      ],
+                                      "defaults": [],
+                                      "body": {
+                                        "type": "BlockStatement",
+                                        "body": [
+                                          {
+                                            "type": "ReturnStatement",
+                                            "argument": {
+                                              "type": "BinaryExpression",
+                                              "operator": "===",
+                                              "left": {
+                                                "type": "MemberExpression",
+                                                "computed": true,
+                                                "object": {
+                                                  "type": "MemberExpression",
+                                                  "computed": false,
+                                                  "object": {
+                                                    "type": "MemberExpression",
+                                                    "computed": false,
+                                                    "object": {
+                                                      "type": "Identifier",
+                                                      "name": "platform"
+                                                    },
+                                                    "property": {
+                                                      "type": "Identifier",
+                                                      "name": "kernel"
+                                                    }
+                                                  },
+                                                  "property": {
+                                                    "type": "Identifier",
+                                                    "name": "runlevels"
+                                                  }
+                                                },
+                                                "property": {
+                                                  "type": "Identifier",
+                                                  "name": "runlevel"
+                                                }
+                                              },
+                                              "right": {
+                                                "type": "Literal",
+                                                "value": false,
+                                                "raw": "false"
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      },
+                                      "rest": null,
+                                      "generator": false,
+                                      "expression": false
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "type": "ExpressionStatement",
+                              "expression": {
+                                "type": "CallExpression",
+                                "callee": {
+                                  "type": "MemberExpression",
+                                  "computed": false,
+                                  "object": {
+                                    "type": "Identifier",
+                                    "name": "console"
+                                  },
+                                  "property": {
+                                    "type": "Identifier",
+                                    "name": "warn"
+                                  }
+                                },
+                                "arguments": [
+                                  {
+                                    "type": "Literal",
+                                    "value": "code block at line %s in %s skipped because of runlevel%s %s",
+                                    "raw": "'code block at line %s in %s skipped because of runlevel%s %s'"
+                                  },
+                                  {
+                                    "type": "Literal",
+                                    "value": node.loc.start.line,
+                                    "raw": "\'"+node.loc.start.line+"\'"
+                                  },
+                                  {
+                                    "type": "Literal",
+                                    "value": (file == null) ? 'eval code' : ('file ' + file),
+                                    "raw": '\''+(file == null) ? 'eval code' : ('file ' + file)+'\''
+                                  },
+                                  {
+                                    "type": "ConditionalExpression",
+                                    "test": {
+                                      "type": "BinaryExpression",
+                                      "operator": ">",
+                                      "left": {
+                                        "type": "MemberExpression",
+                                        "computed": false,
+                                        "object": {
+                                          "type": "Identifier",
+                                          "name": "disabled_runlevels"
+                                        },
+                                        "property": {
+                                          "type": "Identifier",
+                                          "name": "length"
+                                        }
+                                      },
+                                      "right": {
+                                        "type": "Literal",
+                                        "value": 1,
+                                        "raw": "1"
+                                      }
+                                    },
+                                    "consequent": {
+                                      "type": "Literal",
+                                      "value": "s",
+                                      "raw": "'s'"
+                                    },
+                                    "alternate": {
+                                      "type": "Literal",
+                                      "value": "",
+                                      "raw": "''"
+                                    }
+                                  },
+                                  {
+                                    "type": "CallExpression",
+                                    "callee": {
+                                      "type": "MemberExpression",
+                                      "computed": false,
+                                      "object": {
+                                        "type": "Identifier",
+                                        "name": "disabled_runlevels"
+                                      },
+                                      "property": {
+                                        "type": "Identifier",
+                                        "name": "join"
+                                      }
+                                    },
+                                    "arguments": [
+                                      {
+                                        "type": "Literal",
+                                        "value": ", ",
+                                        "raw": "', '"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "rest": null,
+                        "generator": false,
+                        "expression": false
+                      },
+                      "arguments": []
+                    }
+                  }
+                ]
+              },
+              "alternate": null
+            }
+          };
+          node.tree.container.splice(node.tree.container.indexOf(node),1,prepend_node);
         } else {
           console.warn('runlevel tag ignored for node at line %s in %s',node.loc.start.line,(file == null) ? 'eval code' : ('file ' + file));
         }
       }
     }
     node = node.tree.next;
-  }
-};
-
-var _code_level_check = function() {
-  if(((platform.kernel.runlevels['$0'] === true) && platform.configuration.server.kernel.runlevel === true) || platform.configuration.server.kernel.runlevel === false)
-    $1
-};
-
-var _code_level_debug = function() {
-  if (platform.configuration.server.debugging.kernel.runlevel === true) {
-    (function () {
-      var disabled_runlevels = ['$0'];
-      disabled_runlevels = disabled_runlevels.filter(function(runlevel){
-        return (platform.kernel.runlevels[runlevel] === false);
-      });
-      console.warn('code block at line %s in %s skipped because of runlevel%s %s', '$1', '$2', (disabled_runlevels.length > 1) ? 's' : '', disabled_runlevels.join(', '));
-    })();
   }
 };
 

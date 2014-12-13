@@ -107,7 +107,7 @@ platform.configuration.server.kernel.preprocessors = [
   'function.logging.server.js',
   'function.reflection.server.js',
   'code.blocking.server.js',
-  //'code.leveling.server.js',
+  'code.leveling.server.js',
   'code.breakpoint.server.js',
   //'code.profiling.server.js',
   'code.documentation.server.js',
