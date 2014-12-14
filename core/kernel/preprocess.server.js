@@ -47,34 +47,8 @@ platform.kernel.preprocess = function(code, path, module){
     }
   }
 
-  var marked_code = '';
-  var index = 0;
-  var length = code.length;
-  var line_counter = 1;
-  var skip = false;
-  while(index < length){
-    var ch = code.charCodeAt(index);
-    if (skip === false) {
-      if (ch === 0x2F && (index+1) < length && code.charCodeAt(index + 1) === 0x2A) {
-        skip = true;
-      }
-    } else {
-      if (ch === 0x2A && (index+1) < length && code.charCodeAt(index + 1) === 0x2F) {
-        skip = false;
-      }
-    }
-    marked_code += String.fromCharCode(ch);
-    if (ch === 10) {
-      ++line_counter;
-      if (skip === false) {
-        marked_code += '/*#mapline(' + line_counter + ')*/';
-      }
-    }
-    ++index;
-  }
-
   //C: compacting code and adding line marker as preprocessor
-  var ast = platform.parser.js.parse(marked_code);
+  var ast = platform.parser.js.parse(code);
 
   var side = null;
   if (path != null) {
@@ -98,59 +72,33 @@ platform.kernel.preprocess = function(code, path, module){
             console.debug('preprocessing %s phase %s (%s)', path, phase, preprocessor);
           }
         }
-        process(ast,marked_code,path,module,preprocessor);
+        process(ast,code,path,module,preprocessor);
       }
     });
-    //T: rewrite preprocessors avoiding prepend/append
-    ast = platform.parser.js.parse(platform.parser.js.stringify(ast,true,true));
   });
 
-  var augmented_code = platform.parser.js.stringify(ast,true,true);
+  var generated_object = platform.parser.js.stringify(ast,!platform.runtime.debugging,false);
+  ast = null;
 
-  if (augmented_code.charCodeAt(0) === 0x10){
-    augmented_code = augmented_code.slice(1);
-  }
-  if (augmented_code.charCodeAt(0) === 0x13){
-    augmented_code = augmented_code.slice(1);
-  }
+  var generated_code = generated_object.code;
+  var generated_map = generated_object.map.toJSON();
 
   if (path != null) {
-    //C: generating sourcemap
-    var sourcemap = new native.parser.js.sourcemap.SourceMapGenerator({
-      file: 'file://'+platform.io.resolve(path)
-    });
 
-    var augmented_line_counter = 1;
-    augmented_code = augmented_code.replace(/\/\*\#mapline\((\d+)\)\*\/(.*?)(?=$|\/\*\#mapline\((\d+)\)\*\/)/g,function(generated,line,origin){
-      ++augmented_line_counter;
-      sourcemap.addMapping({
-        generated: {
-          line: augmented_line_counter,
-          column: 1
-        },
-        source: 'file://'+platform.io.resolve(path),
-        original: {
-          line: parseInt(line),
-          column: 1
-        }
-      });
-      return '\n'+origin;
-    });
+    generated_map.sources = [ 'file://'+platform.io.resolve(path) ];
+    generated_map.sourcesContent = [ code ];
 
-    sourcemap.setSourceContent('file://'+platform.io.resolve(path),'//AUGMENTED: actually running code exported to ' + platform.kernel._backend.base + path + '\n' +code);
-
-    augmented_code += '\n//# sourceMappingURL='+native.path.basename(path)+'.map';
+    generated_code += '\n//# sourceMappingURL='+native.path.basename(path)+'.map';
 
     //C: storing code to /runtime/ for debuggers (only for backend files...)
-    platform.kernel._backend.set.string(path, augmented_code);
+    platform.kernel._backend.set.string(path, generated_code);
     //C: storing sourcemap to /runtime/ for debuggers (only for backend files...)
-    platform.kernel._backend.set.string(path+'.map', sourcemap.toString());
+    platform.kernel._backend.set.string(path+'.map', JSON.stringify(generated_map));
   } else {
     //T: support source mapping for evals?
   }
 
-  //T: migrate preprocessor stack from 0.3.x branch
-  return augmented_code;
+  return generated_code;
 };
 
 //F: Injects Javascript code to current environment.
