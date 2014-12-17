@@ -1,6 +1,6 @@
 {
   "name": "ljve",
-  "version": "0.3.9999-7",
+  "version": "0.3.9999-8",
   "description": "Live Javascript Virtualized Environment",
   "author": "Marco Minetti <marco.minetti@novetica.org>",
   "contributors": [],
@@ -46,7 +46,7 @@
     "mocha-lcov-reporter": "*",
     "moment": "*",
     "multiparty": "*",
-    "node-brackets": "https://github.com/marcominetti/node-brackets/tarball/master",
+    "node-ide": "*",
     "node-console": "*",
     "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/0.10.x",
     "node-uuid": "*",

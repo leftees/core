@@ -143,20 +143,48 @@ platform.development.tools.ide.running = false;
 platform.development.tools.ide._process = undefined;
 
 //V: Define separated process path for brackets.io IDE.
-platform.development.tools.ide._process_path = [
-  '/node_modules/node-brackets/agent.js',
-  '/node_modules/node-brackets/server.js'
-];
+platform.development.tools.ide._process_path = '/node_modules/node-ide/lib/run.js';
 
-//F: Starts the specified tool.
+//F: Starts the IDE tool.
+//A: [port]: Specifies the port argument to be passed to the tool (varies by tool).
 //R: None.
 //H: Throws exception if tool is already running.
-platform.development.tools.ide.start = platform.development.tools._start.bind(null,'ide',9092,9998);
+platform.development.tools.ide.start = function(port){
+  var name = 'ide';
+  if (platform.development.tools._is_running(name) === false) {
+    //C: checking and creating brackets data folder (temporary, it should be replace with in-browser-filesystem)
+    var data_fs = platform.io.store.getByName('app');
+    if (data_fs.exist('/data/ide/') === false){
+      data_fs.create('/data/ide/');
+    }
+    //C: executing tool separate process(es)
+    platform.development.tools[name]._process = require('child_process').spawn('node', [
+      platform.runtime.path.core + platform.development.tools[name]._process_path,
+      '--port',
+      port,
+      '--proj-dir',
+      platform.runtime.path.app,
+      '--supp-dir',
+      native.path.join(data_fs.base,'/data/ide')
+    ]);
+  } else {
+    throw new Exception('%s tool is already running',name);
+  }
+};
 
-//F: Stops the specified tool.
+//F: Stops the IDE tool.
 //R: None.
 //H: Throws exception if tool is not running.
-platform.development.tools.ide.stop = platform.development.tools._stop.bind(null,'ide');
+platform.development.tools.ide.stop = function(){
+  var name = 'ide';
+  if (platform.development.tools._is_running(name) === true) {
+    //C: killing separate process(es)
+    platform.development.tools[name]._process.kill();
+    platform.development.tools[name]._process = undefined;
+  } else {
+    throw new Exception('%s tool is not running', name);
+  }
+};
 
 //C: defining running property for each supported tool.
 ['inspector' ,'console', 'ide'].forEach(function(name){
@@ -200,5 +228,5 @@ if (platform.runtime.debugging === true) {
 if (platform.runtime.development === true) {
   //T: add autostart support in configuration
   platform.development.tools.console.start();
-  platform.development.tools.ide.start();
+  platform.development.tools.ide.start(9092);
 }
