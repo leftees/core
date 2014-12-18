@@ -82,7 +82,7 @@ platform.server.http.context.create = function(request, response, server){
   }
 
   //C: extending call with arguments (querystring params)
-  call.arguments = call.url.query;
+  call.arguments = call.url.query || {};
 
   //C: creating object container for request body helper
   call.data = {};
