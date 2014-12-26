@@ -95,16 +95,39 @@ platform.development.tools.inspector._process = undefined;
 //V: Define separated process path for inspector.
 platform.development.tools.inspector._process_path = '/node_modules/node-inspector/bin/inspector.js';
 
-//F: Starts the specified tool.
+//F: Starts the Inspector tool.
+//A: [port]: Specifies the port argument to be passed to the tool (varies by tool).
 //R: None.
 //H: Throws exception if tool is already running.
-platform.development.tools.inspector.start = platform.development.tools._start.bind(null,'inspector',9091,process.debugPort);
+platform.development.tools.inspector.start = function(port){
+  var name = 'inspector';
+  if (platform.development.tools._is_running(name) === false) {
+    //C: executing tool separate process(es)
+    platform.development.tools[name]._process = require('child_process').spawn('node', [
+      platform.runtime.path.core + platform.development.tools[name]._process_path,
+      '--web-port',
+      port,
+      '--debug-port',
+      process.debugPort
+    ]);
+  } else {
+    throw new Exception('%s tool is already running',name);
+  }
+};
 
-//F: Stops the specified tool.
+//F: Stops the Inspector tool.
 //R: None.
 //H: Throws exception if tool is not running.
-platform.development.tools.inspector.stop = platform.development.tools._stop.bind(null,'inspector');
-
+platform.development.tools.inspector.stop = function(){
+  var name = 'inspector';
+  if (platform.development.tools._is_running(name) === true) {
+    //C: killing separate process(es)
+    platform.development.tools[name]._process.kill();
+    platform.development.tools[name]._process = undefined;
+  } else {
+    throw new Exception('%s tool is not running', name);
+  }
+};
 
 //O: Provides support for node-webkit-agent console frontend.
 platform.development.tools.console = {};
@@ -220,7 +243,7 @@ platform.development.tools.ide.stop = function(){
 //C: starting node-inspector (only if debug is enabled)
 if (platform.runtime.debugging === true) {
   //T: add autostart support in configuration
-  platform.development.tools.inspector.start();
+  platform.development.tools.inspector.start(9091);
 }
 
 

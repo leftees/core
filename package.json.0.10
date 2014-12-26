@@ -48,7 +48,7 @@
     "multiparty": "*",
     "node-ide": "*",
     "node-console": "*",
-    "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/0.10.x",
+    "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/master",
     "node-uuid": "*",
     "nodemailer": "*",
     "nodemailer-smtp-pool": "*",

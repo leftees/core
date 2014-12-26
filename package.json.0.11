@@ -48,7 +48,7 @@
     "multiparty": "*",
     "node-ide": "*",
     "node-console": "*",
-    "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/0.11.x",
+    "node-inspector": "https://github.com/marcominetti/node-inspector/tarball/master",
     "node-uuid": "*",
     "nodemailer": "*",
     "nodemailer-smtp-pool": "*",
@@ -73,7 +73,7 @@
       "test": "NODE_ENV=testing node main.server.js test"
   },
   "engines": {
-    "node": "=0.11.13"
+    "node": "=0.11.14"
   },
   "preferGlobal": true,
   "private": false,
