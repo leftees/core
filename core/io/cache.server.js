@@ -540,7 +540,7 @@ platform.io.cache.set = {};
 //A: path: Specifies the target path.
 //A: [tag]: Specifies a custom tag for different cache variants.
 //A: data: Specifies the data to be cached.
-//A: callback(err): Callback for async support.
+//A: [callback(err)]: Callback for async support.
 platform.io.cache.set.string = function(path, tag, data, callback){
   //C: get cache backend
   var backend = platform.io.cache._backend;
@@ -597,7 +597,7 @@ platform.io.cache.set.string = function(path, tag, data, callback){
 //A: path: Specifies the target path.
 //A: [tag]: Specifies a custom tag for different cache variants.
 //A: data: Specifies the data to be cached.
-//A: callback(err): Callback for async support.
+//A: [callback(err)]: Callback for async support.
 platform.io.cache.set.bytes = function(path, tag, data, callback){
   //C: get cache backend
   var backend = platform.io.cache._backend;
@@ -653,7 +653,7 @@ platform.io.cache.set.bytes = function(path, tag, data, callback){
 //F: Gets write stream to latest cached data for a file.
 //A: path: Specifies the target path.
 //A: [tag]: Specifies a custom tag for different cache variants.
-//A: callback(err,stream): Callback for async support.
+//A: [callback(err,stream)]: Callback for async support.
 platform.io.cache.set.stream = function(path, tag, callback){
   //C: get cache backend
   var backend = platform.io.cache._backend;
