@@ -105,10 +105,14 @@ platform.development.tools.inspector.start = function(port){
     //C: executing tool separate process(es)
     platform.development.tools[name]._process = require('child_process').spawn('node', [
       platform.runtime.path.core + platform.development.tools[name]._process_path,
+      '--web-host',
+      '0.0.0.0',
       '--web-port',
       port,
       '--debug-port',
-      process.debugPort
+      process.debugPort,
+      '--no-save-live-edit',
+      '--no-preload'
     ]);
   } else {
     throw new Exception('%s tool is already running',name);
