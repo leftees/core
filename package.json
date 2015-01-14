@@ -43,7 +43,8 @@
     "memwatch": "https://github.com/marcominetti/node-memwatch/tarball/master",
     "minimatch": "*",
     "mocha": "*",
-    "mocha-lcov-reporter": "*",
+    "mocha-lcov-sourcemap-reporter": "*",
+    "mocha-htmlcov-sourcemap-reporter": "*",
     "moment": "*",
     "multiparty": "*",
     "node-ide": "*",
@@ -69,7 +70,7 @@
     "freeport": "*"
   },
   "scripts": {
-    "coverage": "if [ -d \".git\" ]; then CWD=$(pwd)/tmp/test-root; NODE_ENV=testing node main.server.js coverage --reporter=html-cov | sed \"s|$CWD/build/|$CWD/|g\" | sed \"s|$CWD/|/|g\" > project/stats/coverage.html; rm -rf tmp/test-root; wget `node_modules/sloc/bin/sloc --format json core | node project/tools/sloc.js` -O project/stats/comments.badge.png; wget http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat -O project/stats/coverage.badge.png; fi;",
+    "coverage": "if [ -d \".git\" ]; then CWD=$(pwd)/tmp/test-root; NODE_ENV=testing node main.server.js coverage --reporter=mocha-htmlcov-sourcemap-reporter | sed \"s|$CWD/runtime/|$CWD/|g\" | sed \"s|$CWD/|/|g\" > project/stats/coverage.html; rm -rf tmp/test-root; wget `node_modules/sloc/bin/sloc --format json core | node project/tools/sloc.js` -O project/stats/comments.badge.png; wget http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat -O project/stats/coverage.badge.png; fi;",
     "test": "NODE_ENV=testing node main.server.js test"
   },
   "engines": {

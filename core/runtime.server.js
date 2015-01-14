@@ -27,8 +27,6 @@ platform.runtime.app = platform.runtime.app || {};
 //N: Contains runtime automatic/volatile data (core related).
 platform.runtime.core = platform.runtime.core || {};
 
-platform.runtime.core = platform.runtime.core || {};
-
 //N: Contains runtime automatic/volatile data (environment related).
 platform.runtime.env = platform.runtime.env || {};
 

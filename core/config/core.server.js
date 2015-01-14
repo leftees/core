@@ -93,7 +93,7 @@ platform.configuration.server.bootloader.modules = [
 
 platform.configuration.server.cache = {
   'startup': {
-    'clean': true
+    'clean': false
   }
 };
 
@@ -493,7 +493,7 @@ platform.configuration.engine.messaging.mail = {
 };
 
 platform.configuration.engine.handlers = {
-  'php': {
+  /*'php': {
     'filter': /^\/php/gi,
     'type': 'fastcgi',
     //'to': '$1',
@@ -513,7 +513,7 @@ platform.configuration.engine.handlers = {
       'root': null
     },
     'debug': true
-  },
+  },*/
   'http': {
     'filter': /\/git\/(.*?)$/gi,
     'type': 'http',

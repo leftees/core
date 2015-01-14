@@ -19,11 +19,11 @@
 
  */
 
-//C: loading blanket coverage tool with shortname disable if running in testing environment (assuming CI)
+//C: loading blanket coverage tool with shortname disabled
 require('blanket')({
-  "pattern": [ "core", "app" ],
-  "data-cover-never": [ "external", "node_modules" ],
-  "data-cover-reporter-options": {
-    "shortnames": ((global.testing === false) ? true : false)
+  'pattern': [ 'core', 'app' ],
+  'data-cover-never': [ 'external', 'node_modules' ],
+  'data-cover-reporter-options': {
+    'shortnames': false
   }
 });

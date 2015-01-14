@@ -31,7 +31,7 @@ global.main.commands.test = function(coverage) {
   var mocha = require('mocha');
   global.mocha = new mocha({
     'ui': 'bdd',
-    'reporter': native.args.reporter || ((coverage === true) ? 'html-cov' : 'spec')
+    'reporter': native.args.reporter || ((coverage === true) ? 'mocha-htmlcov-sourcemap-reporter' : 'spec')
   });
 
   //C: initializing coverage stuff if required
@@ -47,7 +47,7 @@ global.main.commands.test = function(coverage) {
   global.mocha.addFile(global.main.path.core + '/test/bootstrap.js');
 
   //C: queueing test files as specified in /test/series file
-  var js_line_comment = /^\/\/.*/;
+  var js_line_comment = /^\/\/.*|^#.*/;
   var series = native.fs.readFileSync(global.main.path.core + '/test/series', 'utf8').split('\n');
   series.forEach(function(script){
     if (js_line_comment.test(script) === false) {

@@ -77,7 +77,7 @@ platform.kernel.preprocess = function(code, path, module){
     });
   });
 
-  var generated_object = platform.parser.js.stringify(ast,!platform.runtime.debugging,false);
+  var generated_object = platform.parser.js.stringify(ast,false,false);
   ast = null;
 
   var generated_code = generated_object.code;
@@ -150,17 +150,10 @@ platform.kernel.load = function(path,module,preprocess) {
     preprocessed_code = platform.io.cache.get.string(path, 'built', true);
   }
   //C: loading file through require
-  if (global.testing === true) {
-    if(platform.configuration.server.debugging.load === true){
-      console.debug('loading %s', path);
-    }
-    return global.require(native.path.join(platform.kernel._backend.base,path));
-  } else {
-    if(platform.configuration.server.debugging.load === true) {
-      console.debug('loading %s' + ((is_cached === false) ? '' : ' from cache'), path);
-    }
-    return global.require.main._compile(preprocessed_code,native.path.join(platform.kernel._backend.base,path));
+  if(platform.configuration.server.debugging.load === true){
+    console.debug('loading %s', path);
   }
+  return global.require(native.path.join(platform.kernel._backend.base,path));
 };
 
 //C: registering 'runtime' store as new filesystem backend with app root path + /runtime/
