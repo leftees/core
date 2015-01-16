@@ -48,6 +48,13 @@ platform.engine.handlers.register = function(name,options){
       handler._process.on('close', function (code,signal) {
         handler._process = undefined;
       });
+
+      //C: attaching on main process kill events to kill handler before exit
+      ['exit','SIGINT','SIGTERM'].forEach(function(e) {
+        process.on(e, function() {
+          platform.engine.handlers.unregister(name);
+        });
+      });
     }
 
     switch(handler.type){
