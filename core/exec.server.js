@@ -34,10 +34,6 @@ if (process.env.NODE_ENV === 'development') {
 
 //C: detecting whether Node is running as debugging environment
 global.debugging = false;
-if (process.env.NODE_ENV === 'debugging') {
-  global.debugging = true;
-  global.development = true;
-}
 //C: detecting whether debugger is running through node args
 process.execArgv.forEach(function(arg) {
   if (arg.indexOf('--debug') === 0 || arg.indexOf('debug') === 0){
@@ -45,6 +41,15 @@ process.execArgv.forEach(function(arg) {
     global.development = true;
   }
 });
+//C: detecting whether debugger should run because of environment
+if (process.env.NODE_ENV === 'debugging') {
+  if (global.debugging === false) {
+    //C: starting debugger agent if not automatically done by node
+    process.kill(process.pid, 'SIGUSR1');
+  }
+  global.debugging = true;
+  global.development = true;
+}
 
 //C: detecting whether Node is running as testing environment
 global.testing = false;
