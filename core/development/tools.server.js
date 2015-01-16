@@ -219,7 +219,7 @@ platform.development.tools.ide.stop = function(){
 });
 
 //C: attaching exit events to kill node-inspector
-['exit','SIGINT','SIGTERM'].forEach(function (e) {
+['exit'].forEach(function (e) {
   process.on(e, function () {
     try {
       //C: stopping inspector before exit
