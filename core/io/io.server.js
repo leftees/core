@@ -211,13 +211,14 @@ platform.io.rename = function(oldpath,newpath){
 
 //F: Finds all files in a path through the first backend.
 //A: path: Specifies the target path.
+//A: [type]: Specifies what type of entries should be listed as string ('directories','files','both','all'). Default is 'files'.
 //A: [deep]: Specifies if search should be recursive. Default is false.
 //A: [filter]: Specifies filter, as string or strings array, to match results (based on minimatch). Default is null.
 //R: Returns results as array of strings.
-platform.io.list = function(path,deep,filter){
+platform.io.list = function(path,type,deep,filter){
   //C: getting first backend
   var backend = platform.io.store.getByPriority(0);
-  return backend.list(path,deep,filter);
+  return backend.list(path,type,deep,filter);
 };
 
 //F: Resolves the path throughout the overlay abstract filesystem.
@@ -240,10 +241,11 @@ platform.io.resolveAll = function(path){
 
 //F: Finds all files in a path throughout the overlay abstract filesystem.
 //A: path: Specifies the target path.
+//A: [type]: Specifies what type of entries should be listed as string ('directories','files','both','all'). Default is 'files'.
 //A: [deep]: Specifies if search should be recursive. Default is false.
 //A: [filter]: Specifies filter, as string or strings array, to match results (based on minimatch). Default is null.
 //R: Returns results as object with backend name as properties and array of strings as values.
-platform.io.listAll = function(path,deep,filter){
+platform.io.listAll = function(path,type,deep,filter){
   //C: getting backends by priority
   var backends = platform.io.store.list();
   var result = {};
@@ -252,7 +254,7 @@ platform.io.listAll = function(path,deep,filter){
     var backend = backends[index];
     //C: detecting if path exists in current backend
     if (backend.exist(path) === true){
-      result[backend.name] = backend.list(path,deep,filter);
+      result[backend.name] = backend.list(path,type,deep,filter);
     }
   }
   return result;

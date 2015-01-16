@@ -25,6 +25,7 @@ global.native = {};
 native.semver = require('semver');
 native.domain = require('domain');
 native.fs = require('fs-extra');
+native.fs.readdirp = require('readdirp');
 native.stream = require('stream');
 native.net = require('net');
 native.path = require('path');

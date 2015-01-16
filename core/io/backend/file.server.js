@@ -264,27 +264,42 @@ var filesystem_backend = function(root) {
     }
   };
 
-  //T: add flag to support result type (file, directory, any)
-  //T: add full async implementation
   //F: Finds all files in a path.
   //A: path: Specifies the target path.
+  //A: [type]: Specifies what type of entries should be listed as string ('directories','files','both','all'). Default is 'files'.
   //A: [deep]: Specifies if search should be recursive. Default is false.
   //A: [filter]: Specifies filter, as string or strings array, to match results (based on minimatch). Default is null.
   //A: [callback(err,result)]: Callback for async support (currently fake implementation). If missing, the function operates synchronously.
   //H: Implementation is based on synchronous native.fs.readdirSync, callback is invoked if specified.
   //R: Returns results as array of strings.
-  this.list = function(path,deep,filter,callback){
+  this.list = function(path,type,deep,filter,callback) {
+    //C: detecting if operate asynchronously or synchronously
+    if (typeof callback !== 'function') {
+      return _listSync(path,type,deep,filter);
+    } else {
+      _listAsync(path,type,deep,filter,callback);
+    }
+  };
+
+  //F: Finds all files in a path (sync implementation).
+  //A: path: Specifies the target path.
+  //A: [type]: Specifies what type of entries should be listed as string ('directories','files','both','all'). Default is 'files'.
+  //A: [deep]: Specifies if search should be recursive. Default is false.
+  //A: [filter]: Specifies filter, as string or strings array, to match results (based on minimatch). Default is null.
+  //H: Implementation is based on synchronous native.fs.readdirSync, callback is invoked if specified.
+  //R: Returns results as array of strings.
+  var _listSync = function(path,type,deep,filter){
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: checking whether search path exists
     if (native.fs.existsSync(fullpath) === false) {
-      //T: throw real ENOENT error
-      if (typeof callback === 'function') {
-        callback(new Exception());
-      } else {
-        throw Error();
-      }
-      return;
+      //C: simulating ENOENT error
+      var error = new Error('no such file or directory \''+path+'\'');
+      error.errno = -2;
+      error.code = 'ENOENT';
+      error.path = fullpath;
+      error.syscall = 'stat';
+      throw error;
     }
     //C: initializing minimatch class for filter
     var minimatch;
@@ -303,53 +318,117 @@ var filesystem_backend = function(root) {
       files.forEach(function(file){
         //C: getting absolute path
         var filename = curpath+native.path.sep+file;
-        //C: getting relative path to search path
-        var fileresult = filename.replace(fullpath+native.path.sep,'');
+        //C: getting file stats
+        var filestat = native.fs.statSync(filename);
         //C: detecting directory for nested levels
-        if (native.fs.statSync(filename).isDirectory() === true) {
+        if (deep === true && filestat.isDirectory() === true) {
           //C: queueing directory to nested levels if recursive search requested (filter not applied)
           if(deep === true) {
             pending.push(filename);
           }
-        } else {
-          //C: applies filters if any
-          if (filter != null) {
-            //C: detecting array of filters
-            if (filter.constructor === Array){
-              //C: applying filters
-              var matches = false;
-              filter.forEach(function(filter_child){
-                if (minimatch(fileresult,filter_child) === true) {
-                  matches = true;
-                }
-              });
-              if (matches === false) {
-                return;
+        }
+        switch(type) {
+          case 'directories':
+            if(filestat.isDirectory() === false) {
+              return;
+            }
+          case 'both':
+            if(filestat.isDirectory() === false && filestat.isFile() === false) {
+              return;
+            }
+          case 'all':
+            break;
+          case 'files':
+          default:
+            if(filestat.isFile() === false) {
+              return;
+            }
+        }
+        //C: getting relative path to search path
+        var fileresult = filename.replace(fullpath+native.path.sep,'');
+        //C: applies filters if any
+        if (filter != null) {
+          //C: detecting array of filters
+          if (filter.constructor === Array){
+            //C: applying filters
+            var matches = false;
+            filter.forEach(function(filter_child){
+              if (minimatch(fileresult,filter_child) === true) {
+                matches = true;
               }
-            } else {
-              //C: applying single filter
-              if (minimatch(fileresult,filter) === false) {
-                return;
-              }
+            });
+            if (matches === false) {
+              return;
+            }
+          } else {
+            //C: applying single filter
+            if (minimatch(fileresult,filter) === false) {
+              return;
             }
           }
-          //C: pushing file to result array (relative to search path)
-          result.push(fileresult);
         }
+        //C: pushing file to result array (relative to search path)
+        result.push(fileresult);
       });
       //C: returning nested children to be search into
       return pending;
-    },function(result){
-      //C: fake support for async callback
-      if (typeof callback === 'function') {
-        callback(null,result);
-      }
-    },fullpath,result);
-    //C: fake support for async callback
-    if (typeof callback === 'function') {
-      return;
-    }
+    },null,fullpath,result);
     return result;
+  };
+
+  //F: Finds all files in a path (async implementation).
+  //A: path: Specifies the target path.
+  //A: [type]: Specifies what type of entries should be listed as string ('directories','files','both','all'). Default is 'files'.
+  //A: [deep]: Specifies if search should be recursive. Default is false.
+  //A: [filter]: Specifies filter, as string or strings array, to match results (based on minimatch). Default is null.
+  //A: [callback(err,result)]: Callback for async support (currently fake implementation). If missing, the function operates synchronously.
+  //H: Implementation is based on synchronous native.fs.readdirSync, callback is invoked if specified.
+  //R: Returns results as array of strings.
+  var _listAsync = function(path,type,deep,filter,callback) {
+    //C: mapping path to base root of current instance
+    var fullpath = native.path.join(base,path||'');
+    //C: checking whether search path exists
+    native.fs.exists(fullpath,function(exists){
+      if (exists === false) {
+        //C: simulating ENOENT error
+        var error = new Error('no such file or directory \''+path+'\'');
+        error.errno = -2;
+        error.code = 'ENOENT';
+        error.path = fullpath;
+        error.syscall = 'stat';
+        callback(error);
+      } else {
+        var result = [];
+        var error_occurred = false;
+        //C: creating a readdirp streamed walker
+        var walker = native.fs.readdirp({
+          root: fullpath,
+          fileFilter: filter,
+          directoryFilter: filter,
+          depth: (deep === true) ? undefined : 0,
+          entryType: type,
+          lstat: false
+        });
+        //C: attaching to new entry found event
+        walker.on('data',function(entry){
+          //C: adding entry to results (only the path relative to the search root)
+          result.push(entry.path);
+        });
+        //C: attaching to error event
+        walker.on('error',function(error){
+          //C: storing error prevent duplicated callback call with partial results
+          error_occurred = true;
+          callback(error);
+        });
+        //C: attaching to search end event
+        walker.on('end',function(){
+          //C: invoking callback with results if no error occurred
+          if (error_occurred === false){
+            callback(null,result);
+          }
+        });
+      }
+    });
   };
 
   this.create('/');

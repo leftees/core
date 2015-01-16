@@ -87,7 +87,7 @@ platform.io.cache.was = function(path, tag){
   }
 
   //C: searching cached versions of the file
-  return (backend.list(filepath, false, filename + cachetag + '.*').length > 0);
+  return (backend.list(filepath, null, false, filename + cachetag + '.*').length > 0);
 };
 
 //O: Provides get implementations.
@@ -339,7 +339,7 @@ platform.io.cache.got.string = function(path, tag, decompress, callback){
   }
 
   //C: searching for any cached version of the file
-  var candidates = backend.list(filepath, false, filename + cachetag + '.*');
+  var candidates = backend.list(filepath, null, false, filename + cachetag + '.*');
   //C: checking whether there is no cached version of the file
   if (candidates.length === 0) {
     error = new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag);
@@ -416,7 +416,7 @@ platform.io.cache.got.bytes = function(path, tag, decompress, callback){
   }
 
   //C: searching for any cached version of the file
-  var candidates = backend.list(filepath, false, filename + cachetag + '.*');
+  var candidates = backend.list(filepath, null, false, filename + cachetag + '.*');
   //C: checking whether there is no cached version of the file
   if (candidates.length === 0) {
     error = new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag);
@@ -493,7 +493,7 @@ platform.io.cache.got.stream = function(path, tag, decompress, callback){
   }
 
   //C: searching for any cached version of the file
-  var candidates = backend.list(filepath, false, filename + cachetag + '.*');
+  var candidates = backend.list(filepath, null, false, filename + cachetag + '.*');
   //C: checking whether there is no cached version of the file
   if (candidates.length === 0) {
     error = new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag);
@@ -736,7 +736,7 @@ platform.io.cache.unset = function(path, tag) {
   }
 
   //C: deleting all cached versions of a file
-  var result = backend.list(filepath, false, filename + cachetag + '.*');
+  var result = backend.list(filepath, null, false, filename + cachetag + '.*');
   if (result.length === 0) {
     return false;
   } else {

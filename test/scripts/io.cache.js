@@ -599,7 +599,7 @@ describe('io', function() {
 
       it('clean should succeed', function () {
         platform.io.cache.clean();
-        var result = platform.io.cache._backend.list('/',true);
+        var result = platform.io.cache._backend.list('/',null,true);
         result.should.deep.equal([]);
       });
 
@@ -1251,7 +1251,7 @@ describe('io', function() {
 
       it('clean should succeed', function () {
         platform.io.cache.clean();
-        var result = platform.io.cache._backend.list('/',true);
+        var result = platform.io.cache._backend.list('/',null,true);
         result.should.deep.equal([]);
       });
 

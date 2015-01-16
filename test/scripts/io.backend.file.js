@@ -220,6 +220,7 @@ describe('io', function() {
         });
 
         it('get data write stream for file should succeed and content should be successfully written', function (done) {
+
           var wstream = backend.set.stream('/dir/file.stream.txt');
           wstream.on('open', function () {
             wstream.write('test€');
@@ -253,7 +254,7 @@ describe('io', function() {
         });
 
         it('list recursively directory should succeed with correct results', function () {
-          var result = backend.list('/', true);
+          var result = backend.list('/', null, true);
           result.should.deep.equal(["dir/file.bytes.txt", "dir/file.stream.txt", "dir/file.string.txt"]);
         });
 
@@ -263,12 +264,12 @@ describe('io', function() {
         });
 
         it('list directory with single filter should succeed with correct results', function () {
-          var result = backend.list('/dir', true, 'file.s*.txt');
+          var result = backend.list('/dir', null, true, 'file.s*.txt');
           result.should.deep.equal(["file.stream.txt", "file.string.txt"]);
         });
 
         it('list directory with multiple filters should succeed with correct results', function () {
-          var result = backend.list('/dir', true, ['file.stream.*', 'file.string.*']);
+          var result = backend.list('/dir', null, true, ['file.stream.*', 'file.string.*']);
           result.should.deep.equal(["file.stream.txt", "file.string.txt"]);
         });
 
@@ -340,7 +341,7 @@ describe('io', function() {
         });
 
         it('list missing directory should fail', function (done) {
-          backend.list('/dir',null,null,function(err,result){
+          backend.list('/dir',null,null,null,function(err,result){
             if (err) {
               done();
             }
@@ -524,35 +525,35 @@ describe('io', function() {
         });
 
         it('list empty directory should succeed with no results', function (done) {
-          backend.list('/',null,null,function(err,result){
+          backend.list('/',null,null,null,function(err,result){
             result.should.deep.equal([]);
             done();
           });
         });
 
         it('list recursively directory should succeed with correct results', function (done) {
-          backend.list('/', true, null, function(err,result){
+          backend.list('/', null, true, null, function(err,result){
             result.should.deep.equal(["dir/file.bytes.txt", "dir/file.stream.txt", "dir/file.string.txt"]);
             done();
           });
         });
 
         it('list directory should succeed with correct results', function (done) {
-          backend.list('/dir',null,null, function(err,result){
+          backend.list('/dir', null,null,null, function(err,result){
             result.should.deep.equal(["file.bytes.txt", "file.stream.txt", "file.string.txt"]);
             done();
           });
         });
 
         it('list directory with single filter should succeed with correct results', function (done) {
-          backend.list('/dir', true, 'file.s*.txt', function(err,result){
+          backend.list('/dir', null, true, 'file.s*.txt', function(err,result){
             result.should.deep.equal(["file.stream.txt", "file.string.txt"]);
             done();
           });
         });
 
         it('list directory with multiple filter should succeed with correct results', function (done) {
-          backend.list('/dir', true, ['file.stream.*', 'file.string.*'], function(err,result){
+          backend.list('/dir', null, true, ['file.stream.*', 'file.string.*'], function(err,result){
             result.should.deep.equal(["file.stream.txt", "file.string.txt"]);
             done();
           });

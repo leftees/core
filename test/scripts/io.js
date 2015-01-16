@@ -241,7 +241,7 @@ describe('io', function() {
     });
 
     it('list recursively directory should succeed with correct results', function () {
-      var result = platform.io.list('/', true);
+      var result = platform.io.list('/', null, true);
       result.should.deep.equal(["dir/file.bytes.txt", "dir/file.stream.txt", "dir/file.string.txt"]);
     });
 
@@ -251,12 +251,12 @@ describe('io', function() {
     });
 
     it('list directory with single filter should succeed with correct results', function () {
-      var result = platform.io.list('/dir', true, 'file.s*.txt');
+      var result = platform.io.list('/dir', null, true, 'file.s*.txt');
       result.should.deep.equal(["file.stream.txt", "file.string.txt"]);
     });
 
     it('list directory with multiple filters should succeed with correct results', function () {
-      var result = platform.io.list('/dir', true, ['file.stream.*', 'file.string.*']);
+      var result = platform.io.list('/dir', null, true, ['file.stream.*', 'file.string.*']);
       result.should.deep.equal(["file.stream.txt", "file.string.txt"]);
     });
 
@@ -323,7 +323,7 @@ describe('io', function() {
       });
 
       it('listAll should succeed', function () {
-        var result = platform.io.listAll('/dir',true);
+        var result = platform.io.listAll('/dir', null,true);
         result.should.deep.equal({
           'testA': [ 'file.bytes.txt', 'file.stream.txt', 'file.string.txt' ],
           'testB': [ 'file.bytes.txt', 'file.string.txt' ]
