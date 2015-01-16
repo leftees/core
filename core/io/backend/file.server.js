@@ -35,7 +35,7 @@ var filesystem_backend = function(root) {
 
   //F: Checks whether path exist (file or directory).
   //A: path: Specifies the target path.
-  //A: [callback(err,exists)]: Callback for async support. If missing, the function operates syncronously.
+  //A: [callback(exists)]: Callback for async support. If missing, the function operates syncronously.
   //R: Returns true or false.
   //H: Implementation is based on native.fs.exists.
   this.exist = function(path, callback) {
@@ -270,7 +270,6 @@ var filesystem_backend = function(root) {
   //A: [deep]: Specifies if search should be recursive. Default is false.
   //A: [filter]: Specifies filter, as string or strings array, to match results (based on minimatch). Default is null.
   //A: [callback(err,result)]: Callback for async support (currently fake implementation). If missing, the function operates synchronously.
-  //H: Implementation is based on synchronous native.fs.readdirSync, callback is invoked if specified.
   //R: Returns results as array of strings.
   this.list = function(path,type,deep,filter,callback) {
     //C: detecting if operate asynchronously or synchronously
@@ -286,7 +285,6 @@ var filesystem_backend = function(root) {
   //A: [type]: Specifies what type of entries should be listed as string ('directories','files','both','all'). Default is 'files'.
   //A: [deep]: Specifies if search should be recursive. Default is false.
   //A: [filter]: Specifies filter, as string or strings array, to match results (based on minimatch). Default is null.
-  //H: Implementation is based on synchronous native.fs.readdirSync, callback is invoked if specified.
   //R: Returns results as array of strings.
   var _listSync = function(path,type,deep,filter){
     //C: mapping path to base root of current instance
@@ -382,7 +380,6 @@ var filesystem_backend = function(root) {
   //A: [deep]: Specifies if search should be recursive. Default is false.
   //A: [filter]: Specifies filter, as string or strings array, to match results (based on minimatch). Default is null.
   //A: [callback(err,result)]: Callback for async support (currently fake implementation). If missing, the function operates synchronously.
-  //H: Implementation is based on synchronous native.fs.readdirSync, callback is invoked if specified.
   //R: Returns results as array of strings.
   var _listAsync = function(path,type,deep,filter,callback) {
     //C: mapping path to base root of current instance
