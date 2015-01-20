@@ -85,7 +85,7 @@ platform.kernel.preprocess = function(code, path, module){
 
   if (path != null) {
 
-    generated_map.sources = [ 'file://'+platform.io.resolve(path) ];
+    generated_map.sources = [ platform.io.resolve(path) ];
     generated_map.sourcesContent = [ code ];
 
     generated_code += '\n//# sourceMappingURL='+native.path.basename(path)+'.map';
