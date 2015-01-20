@@ -112,7 +112,8 @@ platform.configuration.server.kernel.preprocessors = [
   'code.profiling.server.js',
   'code.documentation.server.js',
   'exception.dump.server.js',
-  //'javascript.async.server.js'
+  //'javascript.async.server.js',
+  'sourcemap.stack.server.js'
 ];
 
 platform.configuration.server.kernel.runlevel = true;
@@ -142,17 +143,17 @@ platform.configuration.server.http.ports = {
       'limit': 1024
     },
     //V: Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
-    'auth': false,
+    'auth': 'basic',
     //V: Define realm for HTTP authorization on specified ports.
-    'realm': null,
+    'realm': '',
     //V: Define port-specific regexp to reject request by URI (overrides defaults).
     //H: Filter is applied against request relative URI cleaned by querystring.
-    'reject': {
-      'url': /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|\/^\/project\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//
-    },
+    //'reject': {
+      //'url': /^\/LICENSE|^\/README|\/\.|\.exe$|\.dll$|\.class$|\.jar$|\.server\.js$|\.json$|^\/bin\/|^\/build\/|^\/cache\/|^\/core\/|^\/data\/|^\/external\/|^\/log\/|^\/node_modules\/|\/^\/project\/|^\/stats\/|^\/test\/|^\/tmp\/|^\/tools\//
+    //},
     //V: Contains port-specific HTTP redirect configuration.
     //H: Filters are applied against request relative URI cleaned by querystring.
-    'redirect':{
+    /*'redirect':{/*
       //V: Define new redirector name.
       'myredirectbystring': {
         //V: Define string to be searched into URL as string.
@@ -160,7 +161,7 @@ platform.configuration.server.http.ports = {
         //V: Define new URI to redirect to, as string.
         'to': 'http://example.com/ljve/8080/'
       }
-    }
+    }*/
   },
   //V: Define port to be configured.
   '8443': {
@@ -181,7 +182,7 @@ platform.configuration.server.http.ports = {
     'realm': null,
     //V: Contains port-specific HTTP redirect configuration.
     //H: Filters are applied against request relative URI cleaned by querystring.
-    'redirect':{
+    /*'redirect':{
       //V: Define new redirector name.
       'override_redirect_by_string': {
         //V: Define string to be searched into URL as string.
@@ -189,7 +190,7 @@ platform.configuration.server.http.ports = {
         //V: Define new URI to redirect to, as string.
         'to': 'http://example.com/ljve/8443/'
       }
-    },
+    },*/
     //V: Defines ciphers suite for TLS stack.
     'ciphers': 'HIGH !aNULL !eNULL !MEDIUM !LOW !3DES !MD5 !EXP !PSK !SRP !DSS',
     //V: Enable or disable specific secure protocol versions (SSLv2 is deprecated by default).
@@ -232,7 +233,7 @@ platform.configuration.server.http.default.reject.url = /^\/LICENSE|^\/README|\/
 
 //O: Contains default HTTP redirect configuration.
 //H: Filters are applied against request relative URI cleaned by querystring.
-platform.configuration.server.http.default.redirect = {
+platform.configuration.server.http.default.redirect = {/*
   //V: Define new redirector name.
   'redirect_by_string': {
     //V: Define string to be searched into URL as string.
@@ -255,7 +256,7 @@ platform.configuration.server.http.default.redirect = {
     },
     //V: Define new URI to redirect to, as string but with regexp grouping support.
     'to': 'http://example.com/$1/'
-  }
+  }*/
 };
 
 //T: allow port specific configuration
@@ -366,7 +367,9 @@ platform.configuration.server.http.default.mimetypes = {
 //O: Contains global debugging configuration.
 platform.configuration.server.debugging = {
   //V: Enable or disable global verbose HTTP debug log.
-  'http': true,
+  'http': false,
+  //V: Enable or disable global verbose HTTP debug log.
+  'error': true,
   //V: Enable or disable global verbose WebSocket debug log.
   'websocket': true,
   //V: Enable or disable global verbose memory watcher debug log.
@@ -412,7 +415,7 @@ platform.configuration.server.debugging = {
     }
   },
   'database': true,
-  'preprocess': false
+  'preprocess': true
 };
 
 //O: Contains memory management configuration.
@@ -421,9 +424,9 @@ platform.configuration.server.memory = {};
 //O: Contains memory garbage collector configuration.
 platform.configuration.server.memory.gc = {
   //V: Enable or disable forced garbage collector.
-  'force': true,
+  'force': false,
   //V: Define forced garbage collection interval (ms).
-  'interval': 1000*60*1
+  'interval': 1000*60*15
 };
 
 //T: support multiple backends by configuration
@@ -493,7 +496,7 @@ platform.configuration.engine.messaging.mail = {
 };
 
 platform.configuration.engine.handlers = {
-  'php': {
+  /*'php': {
     'filter': /^\/php/gi,
     'type': 'fastcgi',
     //'to': '$1',
@@ -557,16 +560,10 @@ platform.configuration.engine.handlers = {
       platform.engine.process.file();
     },
     'debug': true
-  }
+  }*/
 };
 
 platform.configuration.addons = {};
-
-platform.configuration.addons.css = {};
-
-platform.configuration.addons.css.reset = {
-  'enable': true
-};
 
 platform.configuration.addons.google = {};
 
