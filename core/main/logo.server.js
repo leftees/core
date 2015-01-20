@@ -1,7 +1,7 @@
 /*
 
  ljve.io - Live Javascript Virtualized Environment
- Copyright (C) 2010-2014 Marco Minetti <marco.minetti@novetica.org>
+ Copyright (C) 2010-2015 Marco Minetti <marco.minetti@novetica.org>
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,10 @@
 
 //C: defining logo CLI command
 global.main.commands.logo = function(){
-  console.log('ljve.io - © 2010-2014 Marco Minetti and contributors. All rights reserved.');
-  if (global.main.commands.logo.showLegal) {
+  console.log('ljve.io - © 2010-2015 Marco Minetti and contributors. All rights reserved.');
+  if (false) {
     console.log('This program is licensed under AGPLv3. It\'s free software and comes with absolutely no warranty.\n\
 If you need commercial license for closed source projects or technical support, please contact\n\
 us at Novetica (http://www.novetica.org).');
   }
 };
-
-global.main.commands.logo.showLegal = false;
