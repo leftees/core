@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e36ad4c1-aed7-43d7-8930-9f5a51e652bc" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.name" afterPath="$PROJECT_DIR$/.idea/.name" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -93,11 +90,40 @@
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="options.splitter.details.proportions" value="0.2" />
   </component>
-  <component name="RunManager" selected="Node.js.ljve run - node 0.10 debugging">
+  <component name="RunManager" selected="Node.js.ljve run - node system debugging">
     <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" working-dir="">
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node 0.10 development" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.10.33/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="ljve run - node system development" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="/usr/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="ljve run - node system debugging" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="/usr/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="debugging" />
+      </envs>
+      <RunnerSettings RunnerId="Basic" />
+      <ConfigurationWrapper RunnerId="Basic" />
+      <method />
+    </configuration>
+    <configuration default="false" name="ljve test - node system testing" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="/usr/bin/node" path-to-js-file="main.server.js" application-parameters="test" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="ljve test - node system coverage" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="/usr/bin/node" path-to-js-file="main.server.js" application-parameters="coverage" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="ljve run - node system production" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="/usr/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+      <method />
+    </configuration>
+    <configuration default="false" name="ljve run - node 0.10 development" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.10.35/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="development" />
       </envs>
@@ -109,19 +135,21 @@
       <ConfigurationWrapper RunnerId="NodeJS.run" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node 0.10 debugging" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="$USER_HOME$/.nvm/v0.10.33/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="ljve run - node 0.10 debugging" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="$USER_HOME$/.nvm/v0.10.35/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="debugging" />
       </envs>
       <RunnerSettings RunnerId="Basic" />
       <RunnerSettings RunnerId="NodeJS.debug" />
       <RunnerSettings RunnerId="NodeJS.run" />
+      <RunnerSettings RunnerId="debuggableProgram" />
       <ConfigurationWrapper RunnerId="Basic" />
       <ConfigurationWrapper RunnerId="NodeJS.debug" />
       <ConfigurationWrapper RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="debuggableProgram" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve test - node 0.10 testing" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.10.33/bin/node" path-to-js-file="main.server.js" application-parameters="test" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="ljve test - node 0.10 testing" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.10.35/bin/node" path-to-js-file="main.server.js" application-parameters="test" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="development" />
       </envs>
@@ -133,55 +161,88 @@
       <ConfigurationWrapper RunnerId="NodeJS.run" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node 0.10 production" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.10.33/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="ljve test - node 0.10 coverage" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="$USER_HOME$/.nvm/v0.10.35/bin/node" path-to-js-file="main.server.js" application-parameters="coverage" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="ljve run - node 0.10 production" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.10.35/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
       <RunnerSettings RunnerId="Basic" />
       <RunnerSettings RunnerId="NodeJS.run" />
       <ConfigurationWrapper RunnerId="Basic" />
       <ConfigurationWrapper RunnerId="NodeJS.run" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node 0.11 development" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.11.13/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="ljve run - node 0.11 development" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.11.14/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="development" />
       </envs>
       <RunnerSettings RunnerId="Basic" />
       <RunnerSettings RunnerId="NodeJS.debug" />
       <RunnerSettings RunnerId="NodeJS.run" />
+      <RunnerSettings RunnerId="debuggableProgram" />
       <ConfigurationWrapper RunnerId="Basic" />
       <ConfigurationWrapper RunnerId="NodeJS.debug" />
       <ConfigurationWrapper RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="debuggableProgram" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node 0.11 debugging" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="$USER_HOME$/.nvm/v0.11.13/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="ljve run - node 0.11 debugging" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="$USER_HOME$/.nvm/v0.11.14/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="debugging" />
       </envs>
+      <RunnerSettings RunnerId="Basic" />
       <RunnerSettings RunnerId="NodeJS.run" />
+      <RunnerSettings RunnerId="debuggableProgram" />
+      <ConfigurationWrapper RunnerId="Basic" />
       <ConfigurationWrapper RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="debuggableProgram" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve test - node 0.11 testing" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.11.13/bin/node" path-to-js-file="main.server.js" application-parameters="test" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="ljve test - node 0.11 testing" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.11.14/bin/node" path-to-js-file="main.server.js" application-parameters="test" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="development" />
       </envs>
+      <RunnerSettings RunnerId="Basic" />
       <RunnerSettings RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="Basic" />
       <ConfigurationWrapper RunnerId="NodeJS.run" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node 0.11 production" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.11.13/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="ljve test - node 0.11 coverage" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="$USER_HOME$/.nvm/v0.11.14/bin/node" path-to-js-file="main.server.js" application-parameters="coverage" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <RunnerSettings RunnerId="Basic" />
+      <RunnerSettings RunnerId="debuggableProgram" />
+      <ConfigurationWrapper RunnerId="Basic" />
+      <ConfigurationWrapper RunnerId="debuggableProgram" />
+      <method />
+    </configuration>
+    <configuration default="false" name="ljve run - node 0.11 production" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.11.14/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+      <RunnerSettings RunnerId="Basic" />
       <RunnerSettings RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="Basic" />
       <ConfigurationWrapper RunnerId="NodeJS.run" />
       <method />
     </configuration>
-    <list size="8">
-      <item index="0" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.10 development" />
-      <item index="1" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.10 debugging" />
-      <item index="2" class="java.lang.String" itemvalue="Node.js.ljve test - node 0.10 testing" />
-      <item index="3" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.10 production" />
-      <item index="4" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.11 development" />
-      <item index="5" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.11 debugging" />
-      <item index="6" class="java.lang.String" itemvalue="Node.js.ljve test - node 0.11 testing" />
-      <item index="7" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.11 production" />
+    <list size="15">
+      <item index="0" class="java.lang.String" itemvalue="Node.js.ljve run - node system development" />
+      <item index="1" class="java.lang.String" itemvalue="Node.js.ljve run - node system debugging" />
+      <item index="2" class="java.lang.String" itemvalue="Node.js.ljve test - node system testing" />
+      <item index="3" class="java.lang.String" itemvalue="Node.js.ljve test - node system coverage" />
+      <item index="4" class="java.lang.String" itemvalue="Node.js.ljve run - node system production" />
+      <item index="5" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.10 development" />
+      <item index="6" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.10 debugging" />
+      <item index="7" class="java.lang.String" itemvalue="Node.js.ljve test - node 0.10 testing" />
+      <item index="8" class="java.lang.String" itemvalue="Node.js.ljve test - node 0.10 coverage" />
+      <item index="9" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.10 production" />
+      <item index="10" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.11 development" />
+      <item index="11" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.11 debugging" />
+      <item index="12" class="java.lang.String" itemvalue="Node.js.ljve test - node 0.11 testing" />
+      <item index="13" class="java.lang.String" itemvalue="Node.js.ljve test - node 0.11 coverage" />
+      <item index="14" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.11 production" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
