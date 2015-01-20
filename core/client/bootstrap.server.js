@@ -194,22 +194,6 @@ platform.client.bootstrap.seed = function() {
     content += '</script>';
     content += '<script type="text/javascript">if (window.attachEvent) window.attachEvent(\'onload\', bootstrap); else window.addEventListener(\'load\', bootstrap, true);</script>';
 
-    if (platform.configuration.addons.css.reset.enable === true){
-      content += '<style type="text/css">';
-
-      var reset_css_code = '';
-      var reset_css_path = '/lib/reset.css';
-      if (platform.io.cache.is(reset_css_path) == true) {
-        reset_css_code = platform.io.cache.get.string(reset_css_path, null, true);
-      } else {
-        reset_css_code = platform.io.get.string(reset_css_path);
-        platform.io.cache.set.string(reset_css_path,null,reset_css_code);
-      }
-      content += reset_css_code;
-
-      content += '</style>';
-    }
-
     content += '</head><body>';
 
     var bootstrap_ui_code = '';
