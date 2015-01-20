@@ -22,6 +22,7 @@
 platform.engine = platform.engine || {};
 
 if(platform.engine.id == null) {
+  //T: store to disk for hot-reboot and session invalidation
   platform.engine.id = native.uuid.v1();
 
   Object.defineProperty(platform.engine, "id", {
@@ -74,6 +75,7 @@ platform.engine.process.auth.basic = function(realm,username,password,callback){
 
 platform.engine.process.auth.digest = function(realm,username,callback){
   var md5 = native.crypto.createHash('md5');
+  //T: integrate with user system
   md5.update(username + ':' + realm + ':' + 'password');
   var digest = md5.digest('hex');
   callback(digest);
@@ -86,88 +88,91 @@ platform.engine.process.http = function () {
   var call = context.call;
   var server = context.server;
 
-  //T: check session is valid and get session object
-  var session = null;
-  if ((request.headers['x-platform-session'] != null && request.headers['x-platform-token'] != null) || (call.arguments['auth_session'] != null && call.arguments['auth_token'])) {
-    var session_id = request.headers['x-platform-session'] || call.arguments['auth_session'];
-    var session_token = request.headers['x-platform-token'] || call.arguments['auth_token'];
-    if (platform.session.exist(session_id) === true) {
-      session = platform.session.get(session_id);
-      if (session != null && session.identity.token === session_token) {
-        if (session._session.timeout > 0) {
-          if (session.state === 0) {
-            session._session.timeout = platform.configuration.engine.session.gc.state.http;
-            session.state = 1;
-            platform.statistics.counter('sessions.gen1').inc();
-            platform.statistics.counter('sessions.gen0').dec();
-            if(platform.configuration.server.debugging.session === true) {
-              console.debug('session %s moved to state 1 (http alive)', session.name);
-            }
-            //T: reauthenticate request from server?
-          }
-          session._session.lease = Date.now() + session._session.timeout;
-        }
-      } else {
-        //T: log intrusion attempt?
-        session = null;
-      }
-    }
-  }
-  if (session == null && context.request.headers ["x-platform-bootstrap"] != null) {
-    var bootstrap_id = request.headers['x-platform-bootstrap'] || call.arguments['auth_bootstrap'];
-    if (platform.client.bootstrap.isValid(bootstrap_id) === true) {
-      if (platform.client.bootstrap.exist(bootstrap_id) === true) {
-        session = platform.client.bootstrap.get(bootstrap_id);
-        if (session != null){
-          session._session.lease = Date.now() + session._session.timeout;
-        }
-      }
-    }
-  }
-  context.session = session;
-
-  if (session != null) {
-    session._session.working++;
-    request.on('end',function(){
-      session._session.working--;
-    });
-  }
-
-  //T: get identity
-  var identity = null;
-  if (session != null) {
-    //T: migrate classes and integrity checks from 0.3.x branch
-    identity = session.identity._store;
-  }
-  context.identity = identity;
-
-  //C: handling url path
-  switch(call.url.pathname){
-    case '/':
-      platform.kernel.get(platform.configuration.client.bootstrap.root)();
-      return;
-    case '/-':
-      platform.kernel.get(platform.configuration.client.bootstrap.loader)();
-      return;
-  }
-
   try {
-    var target = platform.kernel.get(call.url.pathname, null, '/');
-    var skip = false;
+    //T: check session is valid and get session object
+    var session = null;
+    if ((request.headers['x-platform-session'] != null && request.headers['x-platform-token'] != null) || (call.arguments['auth_session'] != null && call.arguments['auth_token'])) {
+      var session_id = request.headers['x-platform-session'] || call.arguments['auth_session'];
+      var session_token = request.headers['x-platform-token'] || call.arguments['auth_token'];
+      if (platform.session.exist(session_id) === true) {
+        session = platform.session.get(session_id);
+        if (session != null && session.identity.token === session_token) {
+          if (session._session.timeout > 0) {
+            if (session.state === 0) {
+              session._session.timeout = platform.configuration.engine.session.gc.state.http;
+              session.state = 1;
+              platform.statistics.counter('sessions.gen1').inc();
+              platform.statistics.counter('sessions.gen0').dec();
+              if(platform.configuration.server.debugging.session === true) {
+                console.debug('session %s moved to state 1 (http alive)', session.name);
+              }
+              //T: reauthenticate request from server?
+            }
+            session._session.lease = Date.now() + session._session.timeout;
+          }
+        } else {
+          //T: log intrusion attempt?
+          session = null;
+        }
+      }
+    }
+    if (session == null && context.request.headers ["x-platform-bootstrap"] != null) {
+      var bootstrap_id = request.headers['x-platform-bootstrap'] || call.arguments['auth_bootstrap'];
+      if (platform.client.bootstrap.isValid(bootstrap_id) === true) {
+        if (platform.client.bootstrap.exist(bootstrap_id) === true) {
+          session = platform.client.bootstrap.get(bootstrap_id);
+          if (session != null){
+            session._session.lease = Date.now() + session._session.timeout;
+          }
+        }
+      }
+    }
+    context.session = session;
 
-    //T: check if protected/unprotected
-
-    if (skip === false) {
-      call.data.get(function(err){
-        //T: handle errors
-        platform.engine.process.restful(target);
+    if (session != null) {
+      session._session.working++;
+      request.on('end',function(){
+        session._session.working--;
       });
+    }
+
+    //T: get identity
+    var identity = null;
+    if (session != null) {
+      //T: migrate classes and integrity checks from 0.3.x branch
+      identity = session.identity._store;
+    }
+    context.identity = identity;
+
+    //C: handling url path
+    switch(call.url.pathname){
+      case '/':
+        platform.kernel.get(platform.configuration.client.bootstrap.root)();
+        return;
+      case '/-':
+        platform.kernel.get(platform.configuration.client.bootstrap.loader)();
+        return;
+    }
+
+    if (platform.kernel.exist(call.url.pathname,null,'/') === true) {
+      var target = platform.kernel.get(call.url.pathname, null, '/');
+      var skip = false;
+
+      //T: check if protected/unprotected
+
+      if (skip === false) {
+        call.data.get(function(err){
+          //T: handle errors
+          platform.engine.process.restful(target);
+        });
+      }
     } else {
       platform.engine.process.fallback();
     }
   } catch(err) {
-    platform.engine.process.fallback();
+    platform.engine.process.error(err);
   }
+
 
 };
 
@@ -199,9 +204,7 @@ platform.engine.process.restful = function(target){
           if (argument === 'callback') {
             async_callback = true;
             response._async = true;
-            invoke_arguments.push(function (err, result) {
-              platform.engine.process.restful._callback(err,result);
-            });
+            invoke_arguments.push(platform.engine.process.restful._callback);
           } else {
             invoke_arguments.push(call.arguments[argument]);
           }
@@ -224,6 +227,36 @@ platform.engine.process.restful = function(target){
 };
 
 platform.engine.process.restful._callback = function(err,result){
+  if (err == null) {
+    var request = context.request;
+    var response = context.response;
+    var server = context.server;
+
+    response.setHeader('Content-Type','application/json');
+
+    var content = null;
+    content = JSON.stringify({
+      'result': result
+    });
+    var content_length = content.length;
+
+    var data_stream = response;
+    if (server.compression.enable === true && content_length > server.compression.limit && request.headers ['accept-encoding'] != null && request.headers ['accept-encoding'].contains ('gzip') === true) {
+      response.setHeader ('Content-Encoding', 'gzip');
+      data_stream = native.zlib.createGzip();
+      data_stream.pipe(response);
+    }
+
+    if (request.method !== 'HEAD') {
+      data_stream.write(content);
+    }
+    data_stream.end();
+  } else {
+    platform.engine.process.error(err);
+  }
+};
+
+platform.engine.process.error = function(err){
   var request = context.request;
   var response = context.response;
   var server = context.server;
@@ -231,17 +264,11 @@ platform.engine.process.restful._callback = function(err,result){
   response.setHeader('Content-Type','application/json');
 
   var content = null;
-  if (err == null) {
-    content = JSON.stringify({
-      'result': result
-    });
-  } else {
-    //T: return json, html or text depending on acceptable content type
-    response.statusCode = 500;
-    content = JSON.stringify({
-      'error': err
-    });
-  }
+  //T: return json, html or text depending on acceptable content type
+  response.statusCode = 500;
+  content = JSON.stringify({
+    'error': err.message
+  });
   var content_length = content.length;
 
   var data_stream = response;
@@ -255,6 +282,10 @@ platform.engine.process.restful._callback = function(err,result){
     data_stream.write(content);
   }
   data_stream.end();
+
+  if (platform.configuration.server.debugging.error === true) {
+    throw err;
+  }
 };
 
 platform.engine.process.file = function(){
@@ -262,7 +293,7 @@ platform.engine.process.file = function(){
   var response = context.response;
   var server = context.server;
   var path = context.call.url.pathname;
-  if (platform.io.exist(path) === true) {
+  if (platform.io.exist(path) === true && platform.io.info(path).isFile() === true) {
     var file_info = platform.io.info(path);
     var last_modified = file_info.atime;
     var content_type = platform.configuration.server.http.default.mimetypes[native.path.extname(path)] || 'text/plain';
@@ -295,5 +326,5 @@ platform.engine.process.websocket = function (request, server, websocket) {
   var count = request.id;
   var remoteAddress = request.client.address;
   var remotePort = request.client.port;
-  //websocket.close();
+  websocket.close();
 };
