@@ -194,37 +194,6 @@ JSON.parseAndNormalize = function(json_string,safe,evaluate) {
   }
 };
 
-//F: Returns a human readable timespan.
-Number.toHumanTime = function (elapsed) {
-  var labels = ['ms', 's', 'm', 'h', 'd'];
-  var sizes = [1000, 60, 60, 24 ];
-  var data = [];
-  sizes.forEach(/*#preprocessor.disable:*/function(value){
-    data.push(elapsed % value);
-    elapsed = parseInt(elapsed/value);
-  });
-  var pos = 0;
-  data.forEach(/*#preprocessor.disable:*/function(value,index){
-    if(value > 0){
-      pos = index;
-    }
-  });
-  var result = data[pos];
-  if (pos > 0) {
-    result += '.' + parseInt(data[pos-1]/sizes[pos-1]*10);
-  }
-  result += labels[pos];
-  return result;
-};
-
-//F: Returns human readable byte size.
-Number.toHumanSize = function (bytes) {
-  var labels = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  if (bytes === 0) return 'n/a';
-  var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-  return Math.round(bytes / Math.pow(1024, i), 2) + labels[i];
-};
-
 //C: extending String object (not prototype) with hashing implementations
 String.hash = {};
 
