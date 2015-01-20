@@ -48,6 +48,7 @@ bootstrap.post = function(){
   var time_start = Date.now();
 
   //C: logging
+  console.log('node initialized in %s',Number.toHumanTime(time_start-process.startTime));
   console.log('initializing core');
 
   //T: implement power-on-self-test
