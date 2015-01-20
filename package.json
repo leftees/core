@@ -41,11 +41,12 @@
     "libxmljs": "*",
     "measured": "*",
     "nan": "*",
-    "memwatch": "https://github.com/marcominetti/node-memwatch/tarball/master",
+    "memwatch": "*",
     "minimatch": "*",
     "mocha": "*",
     "mocha-lcov-sourcemap-reporter": "*",
     "mocha-htmlcov-sourcemap-reporter": "*",
+    "mocha-lcov-reporter": "*",
     "moment": "*",
     "multiparty": "*",
     "node-ide": "*",
@@ -58,6 +59,7 @@
     "semver": "*",
     "sloc": "*",
     "source-map": "*",
+    "source-map-support": "*",
     "sqlite3": "*",
     "underscore": "*",
     "universal-analytics": "*",
@@ -68,14 +70,15 @@
     "xmlhttprequest": "*",
     "yamlparser": "*",
     "yargs": "*",
-    "freeport": "*"
+    "freeport": "*",
+    "node-zlib-backport": "*"
   },
   "scripts": {
-    "coverage": "if [ -d \".git\" ]; then CWD=$(pwd)/tmp/test-root; NODE_ENV=testing node main.server.js coverage --reporter=mocha-htmlcov-sourcemap-reporter | sed \"s|$CWD/runtime/|$CWD/|g\" | sed \"s|$CWD/|/|g\" > project/stats/coverage.html; rm -rf tmp/test-root; wget `node_modules/sloc/bin/sloc --format json core | node project/tools/sloc.js` -O project/stats/comments.badge.png; wget http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat -O project/stats/coverage.badge.png; fi;",
+    "coverage": "if [ -d \".git\" ]; then CWD=$(pwd)/tmp/test-root; NODE_ENV=testing node main.server.js coverage --reporter=html-cov | sed \"s|$CWD/build/|$CWD/|g\" | sed \"s|$CWD/|/|g\" > project/stats/coverage.html; rm -rf tmp/test-root; wget `node_modules/sloc/bin/sloc --format json core | node project/tools/sloc.js` -O project/stats/comments.badge.png; wget http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat -O project/stats/coverage.badge.png; fi;",
     "test": "NODE_ENV=testing node main.server.js test"
   },
   "engines": {
-    "node": "=0.11.14"
+    "node": ">=0.10"
   },
   "preferGlobal": true,
   "private": false,
