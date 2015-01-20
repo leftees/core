@@ -20,14 +20,17 @@
 
  */
 
+//C: storing the current time as process start datetime
+process.startTime = Date.now();
+
 //C: exporting global require against server root (needed later)
 global.require = require;
 
 //C: backporting partial ECMAScript 6 features (through injection of hidden javascript file)
-global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/polyfill.server.js', { encoding: 'utf-8' }),__dirname + '/core/polyfill.server.js');
+global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/polyfill.server.js'),__dirname + '/core/polyfill.server.js');
 
 //C: starting executable stub (through injection of hidden javascript file)
-global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/exec.server.js', { encoding: 'utf-8' }));
+global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/exec.server.js'));
 
 //C: hiding ljve.io main javascript file from node.js runtime
 global.require.main.filename = null;

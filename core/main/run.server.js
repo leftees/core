@@ -48,6 +48,22 @@ global.main.commands.run = function(base){
 
   //C: deleting global.main namespace (not required)
   delete global.main;
+
+  //C: attaching on main process fail events
+  ['uncaughtException'].forEach(function(e) {
+    process.on(e, function(err) {
+      console.error('uncaught exception: %s', err.stack || err.message);
+      //T: implement graceful shutdown
+    });
+  });
+
+  //C: attaching on main process kill events to force exit
+  ['SIGTERM', 'SIGINT'].forEach(function(e) {
+    process.on(e, function() {
+      //T: implement graceful shutdown
+      process.exit();
+    });
+  });
 };
 
 //C: defining run CLI command manual

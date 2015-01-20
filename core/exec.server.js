@@ -44,8 +44,11 @@ process.execArgv.forEach(function(arg) {
 //C: detecting whether debugger should run because of environment
 if (process.env.NODE_ENV === 'debugging') {
   if (global.debugging === false) {
-    //C: starting debugger agent if not automatically done by node
-    process.kill(process.pid, 'SIGUSR1');
+    global.require('freeport')(function(err,port) {
+      //process.debugPort = port;
+      //C: starting debugger agent if not automatically done by node
+      process.kill(process.pid, 'SIGUSR1');
+    });
   }
   global.debugging = true;
   global.development = true;
@@ -59,30 +62,7 @@ if (process.env.NODE_ENV === 'testing') {
   global.development = true;
 }
 
-//C: getting current node process execArgv
-var execArgv = process.execArgv;
-
-global.require('freeport')(function(err,port){
+setImmediate(function(){
   //C: loading ljve application server executable module
-  try {
-    global.require.main._compile('\n'+require('fs').readFileSync(global.main.path.core + '/core/main.server.js', { encoding: 'utf-8' })/*,global.main.path.core + '/core/main.server.js'*/);
-  } catch (err) {
-    throw err;
-  }
-
-  //C: attaching on main process fail events
-  ['uncaughtException'].forEach(function(e) {
-    process.on(e, function(err) {
-      console.error('uncaught exception: %s', err.stack || err.message);
-      //T: implement graceful shutdown
-    });
-  });
-
-  //C: attaching on main process kill events to force exit
-  ['SIGTERM', 'SIGINT'].forEach(function(e) {
-    process.on(e, function() {
-      //T: implement graceful shutdown
-      process.exit();
-    });
-  });
+  global.require.main._compile('\n'+require('fs').readFileSync(global.main.path.core + '/core/main.server.js'));
 });

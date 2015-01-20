@@ -158,16 +158,9 @@ native.console.debug = native.console.log;
 
 //C: defining centralized print with level and color support (xterm int code as second argument)
 console.print = function (level,color,args) {
-  var formatted_message = native.util.format.apply(native.util, args);
-  /*var now = Date.now();
-  var elapsed = now - console.print._lasttime;
-  console.print._lasttime = now;
-  if (global.hasOwnProperty('platform') === true){
-    formatted_message = '[' + native.moment(now).format('YYYY-MM-DD HH:mm:ss.SSS') + '] [+' + Number.toHumanTime(elapsed) + '] [' + level + '] ' + formatted_message;
-  }*/
+  var formatted_message = native.util.format.apply(native.util, args);var now = Date.now();
   return native.console[level](native.cli.color.xterm(color)(formatted_message));
 };
-console.print._lasttime = null;
 
 //C: replacing console.log with coloured implementation
 console.log = function () {
