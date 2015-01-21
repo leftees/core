@@ -143,7 +143,7 @@ platform.configuration.server.http.ports = {
       'limit': 1024
     },
     //V: Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
-    'auth': 'basic',
+    'auth': false,
     //V: Define realm for HTTP authorization on specified ports.
     'realm': '',
     //V: Define port-specific regexp to reject request by URI (overrides defaults).

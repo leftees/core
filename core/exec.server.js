@@ -45,7 +45,8 @@ process.execArgv.forEach(function(arg) {
 if (process.env.NODE_ENV === 'debugging') {
   if (global.debugging === false) {
     global.require('freeport')(function(err,port) {
-      //process.debugPort = port;
+      //C: setting the debugger port
+      process.debugPort = port;
       //C: starting debugger agent if not automatically done by node
       process.kill(process.pid, 'SIGUSR1');
     });
