@@ -215,8 +215,12 @@ platform.io.info = function(path,callback){
         if (err) {
           callback(err);
         } else {
-          //C: invoking the callback with the result
-          callback(null,result);
+          if (result == null) {
+            callback(new Exception('resource %s does not exist', path));
+          } else {
+            //C: invoking the callback with the result
+            callback(null, result);
+          }
         }
       }
     );
