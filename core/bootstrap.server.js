@@ -30,6 +30,7 @@ Object.defineProperty(global,"platform",{
   value: {}
 });
 
+//T: implement side.[isServer|isClient]?
 //C: creating and enforcing readonly platform.side to enable node-type code awareness
 global.platform.side = 'server';
 Object.defineProperty(platform,"side",{
@@ -108,7 +109,6 @@ bootstrap.post = function(){
   platform.system.memory.collect();
 
   //T: switch to PXE (pre execution environment)
-  //T: PXE test http ports to prevent EADDRINUSE exception later
 
   //C: destroying global bootstrap namespace
   delete global.bootstrap;
@@ -177,7 +177,7 @@ bootstrap.load = function(path,root){
   var resource = bootstrap.get(native.path.join(root||'',path));
   try {
     //C: injecting code as hidden module
-    global.require.main._compile('\n'+resource.data ,resource.uri);
+    global.require.main._compile('\n'+resource.data);
   } catch (ex) {
     throw new Exception("error loading %s: %s", resource.uri, ex.message, ex);
   }
