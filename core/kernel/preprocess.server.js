@@ -153,7 +153,11 @@ platform.kernel.load = function(path,module,preprocess) {
   if(platform.configuration.server.debugging.load === true){
     console.debug('loading %s', path);
   }
-  return global.require(native.path.join(platform.kernel._backend.base,path));
+  var fullpath = native.path.join(platform.kernel._backend.base,path);
+  var result = global.require(fullpath);
+  //C: invalidating main file from require cache
+  delete global.require.cache[fullpath];
+  return result;
 };
 
 //C: registering 'runtime' store as new filesystem backend with app root path + /runtime/
