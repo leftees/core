@@ -109,12 +109,12 @@ Number.toHumanTime = function (elapsed) {
   var labels = ['ms', 's', 'm', 'h', 'd'];
   var sizes = [1000, 60, 60, 24 ];
   var data = [];
-  sizes.forEach(/*#preprocessor.disable:*/function(value){
+  sizes.forEach(function(value){
     data.push(elapsed % value);
     elapsed = parseInt(elapsed/value);
   });
   var pos = 0;
-  data.forEach(/*#preprocessor.disable:*/function(value,index){
+  data.forEach(function(value,index){
     if(value > 0){
       pos = index;
     }
@@ -129,7 +129,7 @@ Number.toHumanTime = function (elapsed) {
 
 //F: Returns human readable byte size.
 Number.toHumanSize = function (bytes) {
-  var labels = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  var labels = ['Bytes', 'kB', 'MB', 'GB', 'TB'];
   if (bytes === 0) return 'n/a';
   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
   return Math.round(bytes / Math.pow(1024, i), 2) + labels[i];
