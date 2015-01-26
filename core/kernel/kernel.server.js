@@ -223,5 +223,3 @@ platform.kernel.exist = function(name,root,divisor) {
   subname = tree [tree.length-1];
   return target.hasOwnProperty(subname);
 };
-
-platform.kernel.sudo = platform.kernel.invoke;
