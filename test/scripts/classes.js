@@ -52,13 +52,13 @@ describe('classes', function() {
   });
 
   it('exist for existing class should return true', function () {
-    var result = platform.classes.exist('test.myclass');
+    var result = platform.classes.exists('test.myclass');
     should.exist(result);
     result.should.equal(true);
   });
 
   it('exist for missing class should return false', function () {
-    var result = platform.classes.exist('test.yourclass');
+    var result = platform.classes.exists('test.yourclass');
     should.exist(result);
     result.should.equal(false);
   });

@@ -30,7 +30,7 @@ platform.classes._store = platform.classes._store || {};
 //A: [replace]: Specifies whether existing constructor should be replaced instead of throwing exception. Default is false.
 //R: Returns true if class is successfully registered.
 platform.classes.register = function(name,constructor,replace){
-  if (platform.classes.exist(name) === false || replace === true) {
+  if (platform.classes.exists(name) === false || replace === true) {
     platform.classes._store[name] = constructor;
     return true;
   } else {
@@ -42,7 +42,7 @@ platform.classes.register = function(name,constructor,replace){
 //A: name: Specifies name of class to unregister.
 //R: Returns true if class is successfully unregistered.
 platform.classes.unregister = function(name){
-  if (platform.classes.exist(name) === true) {
+  if (platform.classes.exists(name) === true) {
     return delete platform.classes._store[name];
   } else {
     throw new Exception('class %s does not exist',name);
@@ -53,7 +53,7 @@ platform.classes.unregister = function(name){
 //A: name: Specifies name of class to get.
 //R: Returns class constructor.
 platform.classes.get = function(name){
-  if (platform.classes.exist(name) === true) {
+  if (platform.classes.exists(name) === true) {
     return platform.classes._store[name];
   } else {
     throw new Exception('constructor for %s not found',name);
@@ -67,7 +67,7 @@ platform.classes.list = function(){
 //F: Checks whether a class is registered in current environment.
 //A: name: Specifies name of class to check.
 //R: Returns true if class is registered.
-platform.classes.exist = function(name){
+platform.classes.exists = function(name){
   return (platform.classes._store.hasOwnProperty(name) && typeof platform.classes._store[name] === 'function');
 };
 

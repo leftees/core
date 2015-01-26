@@ -32,7 +32,7 @@ describe('io', function() {
       });
 
       it('should be registered as core.io.store.file', function () {
-        platform.classes.exist('core.io.store.file').should.equal(true);
+        platform.classes.exists('core.io.store.file').should.equal(true);
       });
 
       it('should be instanced successfully while creating base path', function () {
@@ -62,12 +62,12 @@ describe('io', function() {
         });
 
         it('check for missing file should succeed', function () {
-          var result = backend.exist('file.txt');
+          var result = backend.exists('file.txt');
           result.should.equal(false);
         });
 
         it('check for missing directory should succeed', function () {
-          var result = backend.exist('dir');
+          var result = backend.exists('dir');
           result.should.equal(false);
         });
 
@@ -144,7 +144,7 @@ describe('io', function() {
         it('previous file should be successfully deleted', function () {
           var result = native.fs.existsSync(platform.runtime.path.app + '/tmp/test/filenew.txt');
           result.should.equal(false);
-          result = backend.exist('filenew.txt');
+          result = backend.exists('filenew.txt');
           result.should.equal(false);
         });
 
@@ -183,7 +183,7 @@ describe('io', function() {
         it('previous directory should be successfully deleted', function () {
           var result = native.fs.existsSync(platform.runtime.path.app + '/tmp/test/dirnew');
           result.should.equal(false);
-          result = backend.exist('dirnew');
+          result = backend.exists('dirnew');
           result.should.equal(false);
         });
 
@@ -287,14 +287,14 @@ describe('io', function() {
         });
 
         it('check for missing file should succeed', function (done) {
-          backend.exist('file.txt',function(result){
+          backend.exists('file.txt',function(result){
             result.should.equal(false);
             done();
           });
         });
 
         it('check for missing directory should succeed', function (done) {
-          backend.exist('dir',function(result){
+          backend.exists('dir',function(result){
             result.should.equal(false);
             done();
           });
@@ -392,7 +392,7 @@ describe('io', function() {
         it('previous file should be successfully deleted', function (done) {
           var result = native.fs.existsSync(platform.runtime.path.app + '/tmp/test/filenew.txt');
           result.should.equal(false);
-          backend.exist('filenew.txt',function(result){
+          backend.exists('filenew.txt',function(result){
             result.should.equal(false);
             done();
           });
@@ -442,7 +442,7 @@ describe('io', function() {
         it('previous directory should be successfully deleted', function (done) {
           var result = native.fs.existsSync(platform.runtime.path.app + '/tmp/test/dirnew');
           result.should.equal(false);
-          backend.exist('dirnew',function(result){
+          backend.exists('dirnew',function(result){
             result.should.equal(false);
             done();
           });

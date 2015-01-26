@@ -23,7 +23,7 @@ platform.engine.handlers = platform.engine.handlers || {};
 platform.engine.handlers._store = {};
 
 platform.engine.handlers.register = function(name,options){
-  if (platform.engine.handlers.exist(name) === false) {
+  if (platform.engine.handlers.exists(name) === false) {
     var handler = options;
 
     if (handler.daemon != null && handler.daemon.exec != null){
@@ -70,7 +70,7 @@ platform.engine.handlers.register = function(name,options){
 };
 
 platform.engine.handlers.unregister = function(name){
-  if (platform.engine.handlers.exist(name) === true) {
+  if (platform.engine.handlers.exists(name) === true) {
     var handler = platform.engine.handlers._store[name];
 
     //T: store statistics
@@ -102,12 +102,12 @@ platform.engine.handlers.list = function(){
   return Object.keys(platform.engine.handlers._store);
 };
 
-platform.engine.handlers.exist = function(name){
+platform.engine.handlers.exists = function(name){
   return (platform.engine.handlers._store.hasOwnProperty(name));
 };
 
 platform.engine.handlers.get = function(name){
-  if (platform.engine.handlers.exist(name) === true) {
+  if (platform.engine.handlers.exists(name) === true) {
     return platform.engine.handlers._store[name];
   } else {
     throw new Exception('handler %s does not exist',name);
@@ -264,7 +264,7 @@ platform.engine.handlers.data.clean = function(name){
 };
 
 platform.engine.handlers.process = function(name){
-  if (platform.engine.handlers.exist(name) === true) {
+  if (platform.engine.handlers.exists(name) === true) {
     var request = context.request;
     var response = context.response;
     var call = context.call;

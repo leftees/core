@@ -72,7 +72,7 @@ platform.messaging.mail.send.message = function(message, callback){
 
 platform.messaging.mail.send.template = function(message_template, callback){
   var template = null;
-  if (platform.messaging.mail.template.exist(message_template.template) === true) {
+  if (platform.messaging.mail.template.exists(message_template.template) === true) {
     template = platform.messaging.mail.template._store[message_template.template];
   } else {
     var err = new Exception('mail template %s does not exist',message_template.template);
@@ -170,7 +170,7 @@ platform.messaging.mail.template._store = {};
 
 platform.messaging.mail.template.register = function(name, text, html){
   //T: add support for buffer and streams
-  if (platform.messaging.mail.template.exist(name) === false) {
+  if (platform.messaging.mail.template.exists(name) === false) {
     if (text != null || html != null) {
       platform.messaging.mail.template._store[name] = {
         'text': text,
@@ -186,7 +186,7 @@ platform.messaging.mail.template.register = function(name, text, html){
 };
 
 platform.messaging.mail.template.unregister = function(name){
-  if (platform.messaging.mail.template.exist(name) === true) {
+  if (platform.messaging.mail.template.exists(name) === true) {
     return delete platform.messaging.mail.template._store[name];
   } else {
     throw new Exception('mail template %s does not exist',name);
@@ -197,12 +197,12 @@ platform.messaging.mail.template.list = function(){
   return Object.keys(platform.messaging.mail.template._store);
 };
 
-platform.messaging.mail.template.exist = function(name){
+platform.messaging.mail.template.exists = function(name){
   return (platform.messaging.mail.template._store.hasOwnProperty(name));
 };
 
 platform.messaging.mail.template.get = function(name){
-  if (platform.messaging.mail.template.exist(name) === true) {
+  if (platform.messaging.mail.template.exists(name) === true) {
     return platform.messaging.mail.template._store[name];
   } else {
     throw new Exception('mail template %s not found',name);

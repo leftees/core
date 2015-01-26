@@ -31,7 +31,7 @@ platform.sessions._validate_id_check = /^[a-zA-Z0-9]{8}\-[a-zA-Z0-9]{4}\-[a-zA-Z
 //R: Returns the session id and token separated by ':'.
 platform.sessions.register = function() {
   var session_id = native.uuid.v4();
-  while(platform.sessions.exist(session_id) === true) {
+  while(platform.sessions.exists(session_id) === true) {
     session_id = native.uuid.v4();
   }
 
@@ -112,7 +112,7 @@ platform.sessions.register = function() {
 //A: session_id: Specifies session id to unregister.
 platform.sessions.unregister = function(session_id) {
   if (platform.sessions.isValid(session_id) === true) {
-    if (platform.sessions.exist(session_id) === true) {
+    if (platform.sessions.exists(session_id) === true) {
       var session = platform.sessions._store[session_id];
 
       if (session.state === 4) {
@@ -156,7 +156,7 @@ platform.sessions.unregister = function(session_id) {
 //A: [persistent]: Specifies if session must be set to persistent state. Default is false.
 platform.sessions.promote = function(session_id,persistent) {
   if (platform.sessions.isValid(session_id) === true) {
-    if (platform.sessions.exist(session_id) === true) {
+    if (platform.sessions.exists(session_id) === true) {
       var session = platform.sessions._store[session_id];
 
       if (persistent === true) {
@@ -225,7 +225,7 @@ platform.sessions.isValid = function (session_id){
 //F: Checks whether a session is registered in current environment.
 //A: session_id: Specifies name of new class to check.
 //R: Returns true if session is registered.
-platform.sessions.exist = function(session_id){
+platform.sessions.exists = function(session_id){
   return platform.sessions._store.hasOwnProperty(session_id);
 };
 
@@ -234,7 +234,7 @@ platform.sessions.exist = function(session_id){
 //R: Returns the session object.
 platform.sessions.get = function(session_id) {
   if (platform.sessions.isValid(session_id) === true) {
-    if (platform.sessions.exist(session_id) === true) {
+    if (platform.sessions.exists(session_id) === true) {
       return platform.sessions._store[session_id];
     } else {
       throw new Exception('session %s does not exist',session_id);

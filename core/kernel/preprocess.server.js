@@ -127,7 +127,7 @@ platform.kernel.inject = function (code,file,module,preprocess) {
 platform.kernel.load = function(path,module,preprocess) {
   //preprocess = false;
   //C: checking whether the file exists
-  if (platform.io.exist(path) === false) {
+  if (platform.io.exists(path) === false) {
     throw new Exception('resource %s not found', path);
   }
   //C: detecting if file is already cached

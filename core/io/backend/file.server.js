@@ -38,7 +38,7 @@ var filesystem_backend = function(root) {
   //A: [callback(exists)]: Callback for async support. If missing, the function operates syncronously.
   //R: Returns true or false.
   //H: Implementation is based on native.fs.exists.
-  this.exist = function(path, callback) {
+  this.exists = function(path, callback) {
     //C: mapping path to base root of current instance
     var fullpath = native.path.join(base,path||'');
     //C: detecting if operate asynchronously or synchronously

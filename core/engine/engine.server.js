@@ -94,7 +94,7 @@ platform.engine.process.http = function () {
     if ((request.headers['x-platform-session'] != null && request.headers['x-platform-token'] != null) || (call.arguments['auth_session'] != null && call.arguments['auth_token'])) {
       var session_id = request.headers['x-platform-session'] || call.arguments['auth_session'];
       var session_token = request.headers['x-platform-token'] || call.arguments['auth_token'];
-      if (platform.session.exist(session_id) === true) {
+      if (platform.session.exists(session_id) === true) {
         session = platform.session.get(session_id);
         if (session != null && session.identity.token === session_token) {
           if (session._session.timeout > 0) {
@@ -119,7 +119,7 @@ platform.engine.process.http = function () {
     if (session == null && context.request.headers ["x-platform-bootstrap"] != null) {
       var bootstrap_id = request.headers['x-platform-bootstrap'] || call.arguments['auth_bootstrap'];
       if (platform.client.bootstrap.isValid(bootstrap_id) === true) {
-        if (platform.client.bootstrap.exist(bootstrap_id) === true) {
+        if (platform.client.bootstrap.exists(bootstrap_id) === true) {
           session = platform.client.bootstrap.get(bootstrap_id);
           if (session != null){
             session._session.lease = Date.now() + session._session.timeout;
@@ -154,7 +154,7 @@ platform.engine.process.http = function () {
         return;
     }
 
-    if (platform.kernel.exist(call.url.pathname,null,'/') === true) {
+    if (platform.kernel.exists(call.url.pathname,null,'/') === true) {
       var target = platform.kernel.get(call.url.pathname, null, '/');
       var skip = false;
 
@@ -295,7 +295,7 @@ platform.engine.process.file = function(){
   var response = context.response;
   var server = context.server;
   var path = context.call.url.pathname;
-  if (platform.io.exist(path) === true && platform.io.info(path).isFile() === true) {
+  if (platform.io.exists(path) === true && platform.io.info(path).isFile() === true) {
     var file_info = platform.io.info(path);
     var last_modified = file_info.atime;
     var content_type = platform.configuration.server.http.default.mimetypes[native.path.extname(path)] || 'text/plain';

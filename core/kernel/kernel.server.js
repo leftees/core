@@ -174,7 +174,7 @@ platform.kernel.new = function (name,args,root,divisor) {
 
   //C: looking for registered class names if no root has been specified
   if (target == null) {
-    if (platform.classes.exist(name) === true) {
+    if (platform.classes.exists(name) === true) {
       target = platform.classes.get(name);
       new_instance = Object.create(target.prototype);
       target.apply(new_instance, args);
@@ -200,7 +200,7 @@ platform.kernel.new = function (name,args,root,divisor) {
   return new_instance;
 };
 
-platform.kernel.exist = function(name,root,divisor) {
+platform.kernel.exists = function(name,root,divisor) {
   var target = root;
   var subname;
   var tree;

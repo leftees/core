@@ -27,7 +27,7 @@ platform.sessions.pools.register = function(name, session_list){
   var session_to_add = [];
   if (session_list != null) {
     session_to_add = session_list.filter(function (session_id) {
-      return (platform.sessions.isValid(session_id) && platform.sessions.exist(session_id));
+      return (platform.sessions.isValid(session_id) && platform.sessions.exists(session_id));
     });
   }
 
@@ -45,7 +45,7 @@ platform.sessions.pools.register = function(name, session_list){
     }
   } else {
     pool_id = native.uuid.v4();
-    while (platform.sessions.pools.exist(pool_id) === true || platform.sessions.exist(pool_id) === true) {
+    while (platform.sessions.pools.exists(pool_id) === true || platform.sessions.exists(pool_id) === true) {
       pool_id = native.uuid.v4();
     }
 
@@ -70,7 +70,7 @@ platform.sessions.pools.register = function(name, session_list){
 
 platform.sessions.pools.unregister = function(pool_id){
   if (platform.sessions.pools.isValid(pool_id) === true) {
-    if (platform.sessions.pools.exist(pool_id) === true) {
+    if (platform.sessions.pools.exists(pool_id) === true) {
       var pool = platform.sessions.pools._store[pool_id];
 
       //T: store statistics
@@ -95,13 +95,13 @@ platform.sessions.pools.isValid = function (pool_id){
   return (platform.sessions._validate_id_check.test(pool_id) && (platform.sessions._validate_id_check.lastIndex = 0) === 0);
 };
 
-platform.sessions.pools.exist = function(pool_id){
+platform.sessions.pools.exists = function(pool_id){
   return platform.sessions.pools._store.hasOwnProperty(pool_id);
 };
 
 platform.sessions.pools.get = function(pool_id) {
   if (platform.sessions.pools.isValid(pool_id) === true) {
-    if (platform.sessions.pools.exist(pool_id) === true) {
+    if (platform.sessions.pools.exists(pool_id) === true) {
       return platform.sessions.pools._store[pool_id];
     } else {
       throw new Exception('session pool %s does not exist',pool_id);
@@ -141,7 +141,7 @@ platform.sessions.pools.getByName = function(name) {
 
 platform.sessions.pools.add = function(session_id,pool_id){
   if (platform.sessions.isValid(session_id) === true) {
-    if (platform.sessions.exist(session_id) === true) {
+    if (platform.sessions.exists(session_id) === true) {
       if (pool_id == null){
         var pool_list = platform.sessions.pools.list(true);
         var result = true;
@@ -151,7 +151,7 @@ platform.sessions.pools.add = function(session_id,pool_id){
         return result;
       } else {
         if (platform.sessions.pools.isValid(pool_id) === true) {
-          if (platform.sessions.pools.exist(pool_id) === true) {
+          if (platform.sessions.pools.exists(pool_id) === true) {
             var pool = platform.sessions.pools.get(pool_id);
             if (pool.sessions.indexOf(session_id) !== -1) {
               return true;
@@ -176,7 +176,7 @@ platform.sessions.pools.add = function(session_id,pool_id){
 
 platform.sessions.pools.remove = function(session_id,pool_id){
   if (platform.sessions.isValid(session_id) === true) {
-    if (platform.sessions.exist(session_id) === true) {
+    if (platform.sessions.exists(session_id) === true) {
       if (pool_id == null){
         var pool_list = platform.sessions.pools.list(true);
         var result = true;
@@ -186,7 +186,7 @@ platform.sessions.pools.remove = function(session_id,pool_id){
         return result;
       } else {
         if (platform.sessions.pools.isValid(pool_id) === true) {
-          if (platform.sessions.pools.exist(pool_id) === true) {
+          if (platform.sessions.pools.exists(pool_id) === true) {
             var pool = platform.sessions.pools.get(pool_id);
             var session_index = pool.sessions.indexOf(session_id);
             if (session_index === -1) {
@@ -212,9 +212,9 @@ platform.sessions.pools.remove = function(session_id,pool_id){
 
 platform.sessions.pools.contains = function(session_id,pool_id){
   if (platform.sessions.isValid(session_id) === true) {
-    if (platform.sessions.exist(session_id) === true) {
+    if (platform.sessions.exists(session_id) === true) {
       if (platform.sessions.pools.isValid(pool_id) === true) {
-        if (platform.sessions.pools.exist(pool_id) === true) {
+        if (platform.sessions.pools.exists(pool_id) === true) {
           var pool = platform.sessions.pools._store[pool_id];
           return (pool.sessions.indexOf(session_id) !== -1);
         } else {
@@ -234,7 +234,7 @@ platform.sessions.pools.contains = function(session_id,pool_id){
 
 platform.sessions.pools.clear = function(pool_id){
   if (platform.sessions.pools.isValid(pool_id) === true) {
-    if (platform.sessions.pools.exist(pool_id) === true) {
+    if (platform.sessions.pools.exists(pool_id) === true) {
       var pool = platform.sessions.pools._store[pool_id];
       pool.sessions = [];
       return true;
@@ -251,14 +251,14 @@ platform.sessions.resolve = function(session_or_pool_id, include_hidden){
   var result = [];
 
   if (platform.sessions.isValid(session_or_pool_id) === true) {
-    if (platform.sessions.exist(session_or_pool_id) === true) {
+    if (platform.sessions.exists(session_or_pool_id) === true) {
       result.push(session_or_pool_id);
       return result;
     }
   }
 
   if (platform.sessions.pools.isValid(session_or_pool_id) === true) {
-    if (platform.sessions.pools.exist(session_or_pool_id) === true) {
+    if (platform.sessions.pools.exists(session_or_pool_id) === true) {
       var pool = platform.sessions.pools._store[session_or_pool_id];
       result = pool.sessions;
       return result;

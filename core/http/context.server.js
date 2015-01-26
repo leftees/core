@@ -113,7 +113,7 @@ platform.server.http.context.create = function(request, response, server){
       process.nextTick(function(){
         callback(null);
       });
-    } else if (platform.server.http.context.parsers.exist(call.type) === true) {
+    } else if (platform.server.http.context.parsers.exists(call.type) === true) {
       if (server.debug === true && platform.configuration.server.debugging.http === true) {
         console.debug('parsing data for client request http' + ((server.secure) ? 's' : '') + ':%s#%s', server.port, request.id);
       }
@@ -207,7 +207,7 @@ platform.server.http.context.parsers._store = {};
 //A: parseFunction<request,callback>: Specifies the parser as function.
 //R: Returns true if the parser is successfully registered.
 platform.server.http.context.parsers.register = function(type,parseFunction){
-  if (platform.server.http.context.parsers.exist(type) === false) {
+  if (platform.server.http.context.parsers.exists(type) === false) {
     platform.server.http.context.parsers._store[type] = parseFunction;
     return true;
   } else {
@@ -219,7 +219,7 @@ platform.server.http.context.parsers.register = function(type,parseFunction){
 //A: type: Specifies the content type of the parser to be unregistered.
 //R: Returns true if the backend has been unregistered.
 platform.server.http.context.parsers.unregister = function(type){
-  if (platform.server.http.context.parsers.exist(type) === true) {
+  if (platform.server.http.context.parsers.exists(type) === true) {
     return delete platform.server.http.context.parsers._store[type];
   } else {
     throw new Exception('type %s does not exist',type);
@@ -236,7 +236,7 @@ platform.server.http.context.parsers.list = function(){
 //A: type: Specifies the content type of the parser to be returned.
 //R: Returns the body parser function.
 platform.server.http.context.parsers.get = function(type){
-  if (platform.server.http.context.parsers.exist(type) === true) {
+  if (platform.server.http.context.parsers.exists(type) === true) {
     return platform.server.http.context.parsers._store[type];
   } else {
     throw new Exception('parser for %s not found',type);
@@ -246,7 +246,7 @@ platform.server.http.context.parsers.get = function(type){
 //F: Checks whether the parser is registered for a content type.
 //A: type: Specifies the content type of the parser to be checked.
 //R: Returns true if the body parser exists.
-platform.server.http.context.parsers.exist = function(type){
+platform.server.http.context.parsers.exists = function(type){
   return (platform.server.http.context.parsers._store.hasOwnProperty(type) && typeof platform.server.http.context.parsers._store[type] === 'function');
 };
 

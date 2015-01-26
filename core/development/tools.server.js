@@ -181,7 +181,7 @@ platform.development.tools.ide.start = function(port){
   if (platform.development.tools._is_running(name) === false) {
     //C: checking and creating brackets data folder (temporary, it should be replace with in-browser-filesystem)
     var data_fs = platform.io.store.getByName('app');
-    if (data_fs.exist('/data/ide/') === false){
+    if (data_fs.exists('/data/ide/') === false){
       data_fs.create('/data/ide/');
     }
     //C: executing tool separate process(es)

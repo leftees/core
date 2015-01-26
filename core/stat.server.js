@@ -36,7 +36,7 @@ var _resolution = 1000;
 //T: define standard specification for names (e.g. http.request.active)
 platform.statistics.register = function(type,name,options){
   //C: checking whether a metric with same name has been registered
-  if (platform.statistics.exist(name) === true && platform.statistics.get(name).type !== type) {
+  if (platform.statistics.exists(name) === true && platform.statistics.get(name).type !== type) {
     throw new Exception('metric %s already exists with type %s',name,type);
   } else {
     //T: check if every method is implemented (interface?)
@@ -70,7 +70,7 @@ platform.statistics.register = function(type,name,options){
 
 platform.statistics.unregister = function(name){
   //C: checking if metric exists
-  if (_store.exist(name) === true) {
+  if (_store.exists(name) === true) {
     //C: deleting metric object
     return delete _store[name];
   } else {
@@ -78,7 +78,7 @@ platform.statistics.unregister = function(name){
   }
 };
 
-platform.statistics.exist = function(name){
+platform.statistics.exists = function(name){
   return (_store.hasOwnProperty(name));
 };
 
@@ -93,7 +93,7 @@ platform.statistics.list = function(){
 
 platform.statistics.get = function(name){
   //C: checking whether metrics exists and returning its instance
-  if (platform.statistics.exist(name) === true) {
+  if (platform.statistics.exists(name) === true) {
     return _store[name];
   } else {
     throw new Exception('metric %s not found', name);
@@ -140,14 +140,14 @@ platform.statistics.toJSON = function(name,callback){
   } else {
     if (typeof callback !== 'function') {
       //C: checking whether metrics exists and returning its instance
-      if (platform.statistics.exist(name) === true) {
+      if (platform.statistics.exists(name) === true) {
         return _store[name].toJSON();
       } else {
         throw new Exception('metric %s not found', name);
       }
     } else {
       //C: checking whether metrics exists and returning its instance
-      if (platform.statistics.exist(name) === true) {
+      if (platform.statistics.exists(name) === true) {
         _store[name].toJSON(callback);
       } else {
         callback(new Exception('metric %s not found', name));

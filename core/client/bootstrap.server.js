@@ -77,7 +77,7 @@ platform.client.bootstrap.register = function() {
 //A: bootstrap_id: Specifies the bootstrap id to unregister.
 platform.client.bootstrap.unregister = function(bootstrap_id) {
   if (platform.client.bootstrap.isValid(bootstrap_id) === true) {
-    if (platform.client.bootstrap.exist(bootstrap_id) === true) {
+    if (platform.client.bootstrap.exists(bootstrap_id) === true) {
       var session = platform.client.bootstrap._store[bootstrap_id];
 
       if(platform.configuration.server.debugging.bootstrap === true) {
@@ -109,7 +109,7 @@ platform.client.bootstrap.isValid = function (bootstrap_id){
 //F: Checks whether a session is registered in current environment.
 //A: bootstrap_id: Specifies name of new class to check.
 //R: Returns true if session is registered.
-platform.client.bootstrap.exist = function(bootstrap_id){
+platform.client.bootstrap.exists = function(bootstrap_id){
   return (platform.client.bootstrap._store.hasOwnProperty(bootstrap_id));
 };
 
@@ -118,7 +118,7 @@ platform.client.bootstrap.exist = function(bootstrap_id){
 //R: Returns the bootstrap object.
 platform.client.bootstrap.get = function(bootstrap_id) {
   if (platform.client.bootstrap.isValid(bootstrap_id) === true) {
-    if (platform.client.bootstrap.exist(bootstrap_id) === true) {
+    if (platform.client.bootstrap.exists(bootstrap_id) === true) {
       return platform.client.bootstrap._store[bootstrap_id];
     } else {
       throw new Exception('bootstrap %s does not exist',bootstrap_id);
@@ -231,7 +231,7 @@ platform.client.bootstrap.release = function(statistics_data,oldsession_data,rel
   var bootstrap_id = context.session.id;
 
   if (platform.client.bootstrap.isValid(bootstrap_id) === true) {
-    if (platform.client.bootstrap.exist(bootstrap_id) === true) {
+    if (platform.client.bootstrap.exists(bootstrap_id) === true) {
       var early_session = platform.client.bootstrap._store[bootstrap_id];
 
       //T: store statistics somewhere (with client stats too)...
@@ -248,7 +248,7 @@ platform.client.bootstrap.release = function(statistics_data,oldsession_data,rel
         //T: engine id should be consistent for unmodified app servers (core modules)
         //if (platform.engine.id === engine_id) {
           if (platform.sessions.isValid(session_id) === true) {
-            if (platform.sessions.exist(session_id) === true) {
+            if (platform.sessions.exists(session_id) === true) {
               session = platform.sessions._store[session_id];
 
               if (session._session.token !== session_token) {

@@ -25,7 +25,7 @@ platform.sessions._saved = [];
 
 platform.sessions._export = function(session_id){
   if (platform.sessions.isValid(session_id) === true) {
-    if (platform.sessions.exist(session_id) === true) {
+    if (platform.sessions.exists(session_id) === true) {
       var session = platform.sessions.get(session_id);
 
       //T: choose final session persistency strategy (reboot or expire?)

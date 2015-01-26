@@ -49,7 +49,7 @@ describe('io', function() {
     });*/
 
     it('exist for missing store should succeed', function () {
-      var result = platform.io.store.exist('donotexist');
+      var result = platform.io.store.exists('donotexist');
       result.should.equal(false);
     });
 
@@ -78,7 +78,7 @@ describe('io', function() {
     });
 
     it('exist for existing store should succeed', function () {
-      var result = platform.io.store.exist('doexist');
+      var result = platform.io.store.exists('doexist');
       result.should.equal(true);
     });
 

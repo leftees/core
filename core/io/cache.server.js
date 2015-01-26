@@ -71,16 +71,16 @@ platform.io.cache.is = function(path, tag, callback){
   var cachetime = null;
   if (typeof callback !== 'function') {
     //C: getting ticks from mtime as cache version
-    if (platform.io.exist(path) === false) {
+    if (platform.io.exists(path) === false) {
       cachetime = 0;
     } else {
       cachetime = platform.io.info(path).mtime.getTime();
     }
 
     //C: checking for latest cached version of the file
-    return backend.exist(path + cachetag + '.' + cachetime);
+    return backend.exists(path + cachetag + '.' + cachetime);
   } else {
-    platform.io.exist(path,function(exists){
+    platform.io.exists(path,function(exists){
       if (exists === false) {
         cachetime = 0;
       } else {
@@ -90,7 +90,7 @@ platform.io.cache.is = function(path, tag, callback){
           } else {
             cachetime = stats.mtime.getTime();
           }
-          backend.exist(path + cachetag + '.' + cachetime,function(exists){
+          backend.exists(path + cachetag + '.' + cachetime,function(exists){
             callback(null,exists);
           });
         });
@@ -124,14 +124,14 @@ platform.io.cache.was = function(path, tag, callback){
 
   if (typeof callback !== 'function') {
     //C: checking whether file exists
-    if (backend.exist(filepath) === false) {
+    if (backend.exists(filepath) === false) {
       return false;
     }
 
     //C: searching cached versions of the file
     return (backend.list(filepath, null, false, filename + cachetag + '.*').length > 0);
   } else {
-    backend.exist(filepath,function(exists){
+    backend.exists(filepath,function(exists){
       if (exists === false) {
         callback(null,false);
       } else {
@@ -177,14 +177,14 @@ platform.io.cache.get.string = function(path, tag, decompress, callback){
   //C: detecting if operate asynchronously or synchronously
   if (typeof callback !== 'function') {
     //C: getting ticks from mtime as cache version
-    if (platform.io.exist(path) === false) {
+    if (platform.io.exists(path) === false) {
       cachetime = 0;
     } else {
       cachetime = platform.io.info(path).mtime.getTime();
     }
 
     //C: checking whether parent folder exists
-    if (backend.exist(path + cachetag + '.' + cachetime) === false) {
+    if (backend.exists(path + cachetag + '.' + cachetime) === false) {
       throw new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag);
     }
 
@@ -195,7 +195,7 @@ platform.io.cache.get.string = function(path, tag, decompress, callback){
       return backend.get.bytes(path + cachetag + '.' + cachetime).toString('utf8');
     }
   } else {
-    platform.io.exist(path,function(exists){
+    platform.io.exists(path,function(exists){
       if (exists === false) {
         cachetime = 0;
       } else {
@@ -205,7 +205,7 @@ platform.io.cache.get.string = function(path, tag, decompress, callback){
           } else {
             cachetime = stats.mtime.getTime();
           }
-          backend.exist(path + cachetag + '.' + cachetime,function(exists){
+          backend.exists(path + cachetag + '.' + cachetime,function(exists){
             if(exists === false){
               callback(new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag));
             } else {
@@ -259,14 +259,14 @@ platform.io.cache.get.bytes = function(path, tag, decompress, callback){
   //C: detecting if operate asynchronously or synchronously
   if (typeof callback !== 'function') {
     //C: getting ticks from mtime as cache version
-    if (platform.io.exist(path) === false) {
+    if (platform.io.exists(path) === false) {
       cachetime = 0;
     } else {
       cachetime = platform.io.info(path).mtime.getTime();
     }
 
     //C: checking whether parent folder exists
-    if (backend.exist(path + cachetag + '.' + cachetime) === false) {
+    if (backend.exists(path + cachetag + '.' + cachetime) === false) {
       throw new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag);
     }
 
@@ -277,7 +277,7 @@ platform.io.cache.get.bytes = function(path, tag, decompress, callback){
       return backend.get.bytes(path + cachetag + '.' + cachetime);
     }
   } else {
-    platform.io.exist(path,function(exists){
+    platform.io.exists(path,function(exists){
       if (exists === false) {
         cachetime = 0;
       } else {
@@ -287,7 +287,7 @@ platform.io.cache.get.bytes = function(path, tag, decompress, callback){
           } else {
             cachetime = stats.mtime.getTime();
           }
-          backend.exist(path + cachetag + '.' + cachetime,function(exists){
+          backend.exists(path + cachetag + '.' + cachetime,function(exists){
             if(exists === false){
               callback(new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag));
             } else {
@@ -341,14 +341,14 @@ platform.io.cache.get.stream = function(path, tag, decompress, callback){
   //C: detecting if operate asynchronously or synchronously
   if (typeof callback !== 'function') {
     //C: getting ticks from mtime as cache version
-    if (platform.io.exist(path) === false) {
+    if (platform.io.exists(path) === false) {
       cachetime = 0;
     } else {
       cachetime = platform.io.info(path).mtime.getTime();
     }
 
     //C: checking whether parent folder exists
-    if (backend.exist(path + cachetag + '.' + cachetime) === false) {
+    if (backend.exists(path + cachetag + '.' + cachetime) === false) {
       throw new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag);
     }
 
@@ -359,7 +359,7 @@ platform.io.cache.get.stream = function(path, tag, decompress, callback){
       return backend.get.stream(path + cachetag + '.' + cachetime);
     }
   } else {
-    platform.io.exist(path,function(exists){
+    platform.io.exists(path,function(exists){
       if (exists === false) {
         cachetime = 0;
       } else {
@@ -369,7 +369,7 @@ platform.io.cache.get.stream = function(path, tag, decompress, callback){
           } else {
             cachetime = stats.mtime.getTime();
           }
-          backend.exist(path + cachetag + '.' + cachetime,function(exists){
+          backend.exists(path + cachetag + '.' + cachetime,function(exists){
             if(exists === false){
               callback(new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag));
             } else {
@@ -425,7 +425,7 @@ platform.io.cache.got.string = function(path, tag, decompress, callback){
   //C: detecting if operate asynchronously or synchronously
   if (typeof callback !== 'function') {
     //C: checking whether parent folder exists
-    if (backend.exist(filepath) === false) {
+    if (backend.exists(filepath) === false) {
       throw new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag);
     }
 
@@ -443,7 +443,7 @@ platform.io.cache.got.string = function(path, tag, decompress, callback){
       return backend.get.bytes(filepath + native.path.sep + candidates[0]).toString('utf8');
     }
   } else {
-    backend.exist(filepath,function(exists){
+    backend.exists(filepath,function(exists){
       if (exists === false) {
         callback(new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag));
       } else {
@@ -499,7 +499,7 @@ platform.io.cache.got.bytes = function(path, tag, decompress, callback){
   //C: detecting if operate asynchronously or synchronously
   if (typeof callback !== 'function') {
     //C: checking whether parent folder exists
-    if (backend.exist(filepath) === false) {
+    if (backend.exists(filepath) === false) {
       throw new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag);
     }
 
@@ -517,7 +517,7 @@ platform.io.cache.got.bytes = function(path, tag, decompress, callback){
       return backend.get.bytes(filepath + native.path.sep + candidates[0]);
     }
   } else {
-    backend.exist(filepath,function(exists){
+    backend.exists(filepath,function(exists){
       if (exists === false) {
         callback(new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag));
       } else {
@@ -573,7 +573,7 @@ platform.io.cache.got.stream = function(path, tag, decompress, callback){
   //C: detecting if operate asynchronously or synchronously
   if (typeof callback !== 'function') {
     //C: checking whether parent folder exists
-    if (backend.exist(filepath) === false) {
+    if (backend.exists(filepath) === false) {
       throw new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag);
     }
 
@@ -591,7 +591,7 @@ platform.io.cache.got.stream = function(path, tag, decompress, callback){
       return backend.get.stream(filepath + native.path.sep + candidates[0]);
     }
   } else {
-    backend.exist(filepath,function(exists){
+    backend.exists(filepath,function(exists){
       if (exists === false) {
         callback(new Exception('resource %s not cached' + (cachetag === '') ? '' : ' with tag %s',path,tag));
       } else {
@@ -645,7 +645,7 @@ platform.io.cache.set.string = function(path, tag, data, callback){
   var cachetime = null;
   if (typeof callback !== 'function') {
     //C: getting ticks from mtime as cache version
-    if (platform.io.exist(path) === false) {
+    if (platform.io.exists(path) === false) {
       cachetime = 0;
     } else {
       cachetime = platform.io.info(path).mtime.getTime();
@@ -669,7 +669,7 @@ platform.io.cache.set.string = function(path, tag, data, callback){
     //C: compressing data and writing to cache
     backend.set.bytes(path + cachetag + '.' + cachetime, native.zlib.gzipSync(new Buffer(data, 'utf8')));
   } else {
-    platform.io.exist(path,function(exists){
+    platform.io.exists(path,function(exists){
       if (exists === false) {
         cachetime = 0;
       } else {
@@ -741,7 +741,7 @@ platform.io.cache.set.bytes = function(path, tag, data, callback){
   var cachetime = null;
   if (typeof callback !== 'function') {
     //C: getting ticks from mtime as cache version
-    if (platform.io.exist(path) === false) {
+    if (platform.io.exists(path) === false) {
       cachetime = 0;
     } else {
       cachetime = platform.io.info(path).mtime.getTime();
@@ -765,7 +765,7 @@ platform.io.cache.set.bytes = function(path, tag, data, callback){
     //C: compressing data and writing to cache
     backend.set.bytes(path + cachetag + '.' + cachetime, native.zlib.gzipSync(data));
   } else {
-    platform.io.exist(path,function(exists){
+    platform.io.exists(path,function(exists){
       if (exists === false) {
         cachetime = 0;
       } else {
@@ -837,7 +837,7 @@ platform.io.cache.set.stream = function(path, tag, callback){
   var stream = null;
   if (typeof callback !== 'function') {
     //C: getting ticks from mtime as cache version
-    if (platform.io.exist(path) === false) {
+    if (platform.io.exists(path) === false) {
       cachetime = 0;
     } else {
       cachetime = platform.io.info(path).mtime.getTime();
@@ -867,7 +867,7 @@ platform.io.cache.set.stream = function(path, tag, callback){
     });
     return stream;
   } else {
-    platform.io.exist(path,function(exists){
+    platform.io.exists(path,function(exists){
       if (exists === false) {
         cachetime = 0;
       } else {
@@ -930,7 +930,7 @@ platform.io.cache.unset = function(path, tag, callback) {
 
   if (typeof callback !== 'function') {
     //C: skipping search if file path doesn't exist
-    if (backend.exist(filepath) === false) {
+    if (backend.exists(filepath) === false) {
       return false;
     }
 
@@ -945,7 +945,7 @@ platform.io.cache.unset = function(path, tag, callback) {
       return true;
     }
   } else {
-    backend.exist(filepath,function(exists){
+    backend.exists(filepath,function(exists){
       if(exists === false) {
         callback(null,false);
       } else {

@@ -24,7 +24,7 @@ platform.development.change = platform.development.change || {};
 //T: MISSING CODE DOCUMENTATION
 platform.development.change.process = function(file){
   var type;
-  if (platform.io.system.exist(file) === true) {
+  if (platform.io.system.exists(file) === true) {
     type = 'change';
   } else {
     type = 'delete';

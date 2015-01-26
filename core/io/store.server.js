@@ -38,7 +38,7 @@ platform.io.store._backends = {};
 //H: Priority '0' and name 'app' are reserved for runtime backends.
 platform.io.store.register = function(name,backend,priority){
   //C: checking whether a backend with same name has been registered
-  if (platform.io.store.exist(name) === false) {
+  if (platform.io.store.exists(name) === false) {
     //C: sanitizing priority
     var newpriority = priority;
     if (typeof newpriority !== 'number'){
@@ -72,7 +72,7 @@ platform.io.store.register = function(name,backend,priority){
 //H: Backend with name 'app' is reserved and can't be unregistered.
 platform.io.store.unregister = function(name){
   //C: checking if backend exists and is not reserved
-  if (platform.io.store.exist(name) === true /*&& name !== 'app'*/) {
+  if (platform.io.store.exists(name) === true /*&& name !== 'app'*/) {
     //C: removing backend from priority array
     var oldindex = platform.io.store._priorities.indexOf(name);
     if (oldindex > -1) {
@@ -112,7 +112,7 @@ platform.io.store.listAll = function(){
 //F: Checks whether the backend is registered.
 //A: name: Specifies the name of the backend.
 //R: Returns true if the backend exists.
-platform.io.store.exist = function(name){
+platform.io.store.exists = function(name){
   return (platform.io.store._backends.hasOwnProperty(name));
 };
 
@@ -121,7 +121,7 @@ platform.io.store.exist = function(name){
 //R: Returns the backend instance.
 platform.io.store.getByName = function(name){
   //C: checking whether backend exists and returning its instance
-  if (platform.io.store.exist(name) === true) {
+  if (platform.io.store.exists(name) === true) {
     return platform.io.store._backends[name];
   } else {
     throw new Exception('store %s not found',name);
@@ -142,7 +142,7 @@ platform.io.store.getByPriority = function(priority){
   //C: getting name by priority
   var name = platform.io.store._priorities[newpriority];
   //C: checking whether the backend exists and returning it
-  if (platform.io.store.exist(name) === true) {
+  if (platform.io.store.exists(name) === true) {
     return platform.io.store._backends[name];
   } else {
     return null;
@@ -154,7 +154,7 @@ platform.io.store.getByPriority = function(priority){
 //R: Returns the priority of the backend.
 platform.io.store.getPriority = function(name){
   //C: checking whether backend exists and returning its priority
-  if (platform.io.store.exist(name) === true) {
+  if (platform.io.store.exists(name) === true) {
     return platform.io.store._priorities.indexOf(name);
   } else {
     throw new Exception('store %s not found',name);
@@ -166,7 +166,7 @@ platform.io.store.getPriority = function(name){
 //A: [priority]: Specifies the priority for the new backend. If missing or negative, the backend is registered but not used in overlay abstract filesystem.
 platform.io.store.setPriority = function(name,priority){
   //C: checking whether backend exists
-  if (platform.io.store.exist(name) === true) {
+  if (platform.io.store.exists(name) === true) {
     //C: sanitizing priority
     var newpriority = priority;
     if (typeof newpriority !== 'number'){

@@ -25,7 +25,7 @@ platform.sessions.pools._saved = [];
 
 platform.sessions.pools._export = function(pool_id){
   if (platform.sessions.pools.isValid(pool_id) === true) {
-    if (platform.sessions.pools.exist(pool_id) === true) {
+    if (platform.sessions.pools.exists(pool_id) === true) {
       var pool = platform.sessions.pools.get(pool_id);
 
       var data_to_store = pool;
@@ -49,7 +49,7 @@ platform.sessions.pools._import = function(pool_id){
       var pool = JSON.parse(platform.sessions.pools._backend.get.string(pool_id));
 
       pool.sessions = pool.sessions.filter(function(session_id){
-        return (platform.sessions.isValid(session_id) === true && platform.sessions.exist(session_id) === true);
+        return (platform.sessions.isValid(session_id) === true && platform.sessions.exists(session_id) === true);
       });
 
       platform.sessions.pools._store[pool_id] = pool;

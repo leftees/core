@@ -50,12 +50,12 @@ describe('io', function() {
   describe('sync', function () {
 
     it('check for missing file should succeed', function () {
-      var result = platform.io.exist('file.txt');
+      var result = platform.io.exists('file.txt');
       result.should.equal(false);
     });
 
     it('check for missing directory should succeed', function () {
-      var result = platform.io.exist('dir');
+      var result = platform.io.exists('dir');
       result.should.equal(false);
     });
 
@@ -104,7 +104,7 @@ describe('io', function() {
     });
 
     it('previous file should be successfully created as a file', function () {
-      var result = platform.io.exist('file.txt');
+      var result = platform.io.exists('file.txt');
       result.should.equal(true);
       result = platform.io.info('file.txt').isDirectory();
       result.should.equal(false);
@@ -117,9 +117,9 @@ describe('io', function() {
     });
 
     it('file should be successfully renamed', function () {
-      var result = platform.io.exist('file.txt');
+      var result = platform.io.exists('file.txt');
       result.should.equal(false);
-      result = platform.io.exist('filenew.txt');
+      result = platform.io.exists('filenew.txt');
       result.should.equal(true);
     });
 
@@ -130,9 +130,9 @@ describe('io', function() {
     });
 
     it('previous file should be successfully deleted', function () {
-      var result = platform.io.exist('filenew.txt');
+      var result = platform.io.exists('filenew.txt');
       result.should.equal(false);
-      result = platform.io.exist('filenew.txt');
+      result = platform.io.exists('filenew.txt');
       result.should.equal(false);
     });
 
@@ -143,7 +143,7 @@ describe('io', function() {
     });
 
     it('previous directory should be successfully created as a directory', function () {
-      var result = platform.io.exist('dir');
+      var result = platform.io.exists('dir');
       result.should.equal(true);
       result = platform.io.info('dir').isDirectory();
       result.should.equal(true);
@@ -156,9 +156,9 @@ describe('io', function() {
     });
 
     it('directory should be successfully renamed', function () {
-      var result = platform.io.exist('dir');
+      var result = platform.io.exists('dir');
       result.should.equal(false);
-      result = platform.io.exist('dirnew');
+      result = platform.io.exists('dirnew');
       result.should.equal(true);
     });
 
@@ -169,9 +169,9 @@ describe('io', function() {
     });
 
     it('previous directory should be successfully deleted', function () {
-      var result = platform.io.exist('dirnew');
+      var result = platform.io.exists('dirnew');
       result.should.equal(false);
-      result = platform.io.exist('dirnew');
+      result = platform.io.exists('dirnew');
       result.should.equal(false);
     });
 

@@ -61,7 +61,7 @@ platform.io.resolve = function(path,callback){
     for (index = 0; index < backends_length; index++) {
       backend = backends[index];
       //C: detecting if path exists in current backend
-      if (backend.exist(path) === true){
+      if (backend.exists(path) === true){
         return native.path.join(backend.base,path);
       }
     }
@@ -82,7 +82,7 @@ platform.io.resolve = function(path,callback){
         //C: getting current backend
         backend = backends[index];
         //C: checking if file exists in current backend
-        backend.exist(path,function(exists){
+        backend.exists(path,function(exists){
           if (exists === true){
             //C: storing found and resolved path
             result = native.path.join(backend.base,path);
@@ -107,7 +107,7 @@ platform.io.resolve = function(path,callback){
 //A: path: Specifies the target path.
 //A: [callback(err,exists)]: Callback for async support. If missing, the function operates syncronously.
 //R: Returns true or false.
-platform.io.exist = function(path,callback) {
+platform.io.exists = function(path,callback) {
   //C: getting backends by priority
   var backends = platform.io.store.list();
   var backends_length = backends.length;
@@ -120,7 +120,7 @@ platform.io.exist = function(path,callback) {
     for (index = 0; index < backends_length; index++) {
       backend = backends[index];
       //C: detecting if path exists in current backend
-      if (backend.exist(path) === true) {
+      if (backend.exists(path) === true) {
         return true;
       }
     }
@@ -141,7 +141,7 @@ platform.io.exist = function(path,callback) {
         //C: getting current backend
         backend = backends[index];
         //C: checking if file exists in current backend
-        backend.exist(path,function(exists){
+        backend.exists(path,function(exists){
           //C: storing found and resolved path
           result = exists;
           internal_callback(null);
@@ -177,7 +177,7 @@ platform.io.info = function(path,callback){
     for (index = 0; index < backends_length; index++) {
       backend = backends[index];
       //C: detecting if path exists in current backend
-      if (backend.exist(path) === true) {
+      if (backend.exists(path) === true) {
         return backend.info(path);
       }
     }
@@ -198,7 +198,7 @@ platform.io.info = function(path,callback){
         //C: getting current backend
         backend = backends[index];
         //C: checking if file exists in current backend
-        backend.exist(path,function(exists){
+        backend.exists(path,function(exists){
           if (exists === true){
             backend.info(path,function(err,stats){
               //C: storing found and resolved path
@@ -243,7 +243,7 @@ platform.io.get.string = function(path,callback){
     for (index = 0; index < backends_length; index++) {
       backend = backends[index];
       //C: detecting if path exists in current backend
-      if (backend.exist(path) === true) {
+      if (backend.exists(path) === true) {
         return backend.get.string(path);
       }
     }
@@ -264,7 +264,7 @@ platform.io.get.string = function(path,callback){
         //C: getting current backend
         backend = backends[index];
         //C: checking if file exists in current backend
-        backend.exist(path,function(exists){
+        backend.exists(path,function(exists){
           if (exists === true){
             backend.get.string(path,function(err,data){
               //C: storing found and resolved path
@@ -310,7 +310,7 @@ platform.io.get.bytes = function(path,callback){
     for (index = 0; index < backends_length; index++) {
       backend = backends[index];
       //C: detecting if path exists in current backend
-      if (backend.exist(path) === true) {
+      if (backend.exists(path) === true) {
         return backend.get.bytes(path);
       }
     }
@@ -331,7 +331,7 @@ platform.io.get.bytes = function(path,callback){
         //C: getting current backend
         backend = backends[index];
         //C: checking if file exists in current backend
-        backend.exist(path,function(exists){
+        backend.exists(path,function(exists){
           if (exists === true){
             backend.get.bytes(path,function(err,data){
               //C: storing found and resolved path
@@ -378,7 +378,7 @@ platform.io.get.stream = function(path,options,callback){
     for (index = 0; index < backends_length; index++) {
       backend = backends[index];
       //C: detecting if path exists in current backend
-      if (backend.exist(path) === true) {
+      if (backend.exists(path) === true) {
         return backend.get.stream(path, options);
       }
     }
@@ -403,7 +403,7 @@ platform.io.get.stream = function(path,options,callback){
         //C: getting current backend
         backend = backends[index];
         //C: checking if file exists in current backend
-        backend.exist(path,function(exists){
+        backend.exists(path,function(exists){
           if (exists === true){
             backend.get.stream(path,options,function(err,stream){
               //C: storing found and resolved path
@@ -563,7 +563,7 @@ platform.io.resolveAll = function(path,callback){
     for (index = 0; index < backends_length; index++) {
       backend = backends[index];
       //C: detecting if path exists in current backend
-      if (backend.exist(path) === true) {
+      if (backend.exists(path) === true) {
         result[backend.name] = native.path.join(backend.base, path);
       }
     }
@@ -582,7 +582,7 @@ platform.io.resolveAll = function(path,callback){
         //C: getting current backend
         backend = backends[index];
         //C: checking if file exists in current backend
-        backend.exist(path,function(exists){
+        backend.exists(path,function(exists){
           if (exists === true){
             //C: storing found and resolved path
             result[backend.name] = native.path.join(backend.base,path);
@@ -624,7 +624,7 @@ platform.io.listAll = function(path,type,deep,filter,callback){
     for (index = 0; index < backends_length; index++) {
       backend = backends[index];
       //C: detecting if path exists in current backend
-      if (backend.exist(path) === true){
+      if (backend.exists(path) === true){
         result[backend.name] = backend.list(path,deep,filter);
       }
     }

@@ -28,7 +28,7 @@ platform.database._store = platform.database._store || {};
 //A: db: Specifies the settings object for new database schema instance.
 //R: Returns true if database is successfully registered.
 platform.database.register = function(name,db){
-  if (platform.database.exist(name) === false) {
+  if (platform.database.exists(name) === false) {
     switch(db.driver){
       case 'sqlite3':
         platform.io.create(native.path.dirname(db.database)+native.path.sep);
@@ -46,7 +46,7 @@ platform.database.register = function(name,db){
 //A: name: Specifies name of database to unregister.
 //R: Returns true if database is successfully unregistered.
 platform.database.unregister = function(name){
-  if (platform.database.exist(name) === true) {
+  if (platform.database.exists(name) === true) {
     return delete platform.database._store[name];
   } else {
     throw new Exception('database %s does not exist',name);
@@ -57,7 +57,7 @@ platform.database.unregister = function(name){
 //A: name: Specifies name of database to get.
 //R: Returns database schema instance.
 platform.database.get = function(name){
-  if (platform.database.exist(name) === true) {
+  if (platform.database.exists(name) === true) {
     return platform.database._store[name];
   } else {
     throw new Exception('database %s not found',name);
@@ -71,7 +71,7 @@ platform.database.list = function(){
 //F: Checks whether a database is registered in current environment.
 //A: name: Specifies name of database to check.
 //R: Returns true if database is registered.
-platform.database.exist = function(name){
+platform.database.exists = function(name){
   return (platform.database._store.hasOwnProperty(name) && platform.database._store[name] != null && platform.database._store[name].constructor === native.database);
 };
 

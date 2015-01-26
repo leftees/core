@@ -73,7 +73,7 @@ platform.sessions.gc.collect = function(){
 //A: session_id: Specifies session id to collect.
 platform.sessions.collect = function(session_id) {
   if (platform.sessions.isValid(session_id) === true) {
-    if (platform.sessions.exist(session_id) === true) {
+    if (platform.sessions.exists(session_id) === true) {
       var session = platform.sessions.get(session_id);
       switch (session.state) {
         case 0:
