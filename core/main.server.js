@@ -90,7 +90,6 @@ native.parser.js.utils = require('esutils');
 native.parser.js.codegen = require('escodegen').generate;
 native.parser.js.sourcemap = require('source-map');
 native.uuid = require('node-uuid');
-native.metrics = require('measured');
 native.mail = require('nodemailer');
 native.async = require('async');
 native.watch = require('node-watch');
@@ -157,39 +156,39 @@ native.console = {};
 native.console.debug = native.console.log;
 
 //C: defining centralized print with level and color support (xterm int code as second argument)
-console.print = function (level,color,args) {
+console._format_and_print = function (level,color,args) {
   var formatted_message = native.util.format.apply(native.util, args);var now = Date.now();
   return native.console[level](native.cli.color.xterm(color)(formatted_message));
 };
 
 //C: replacing console.log with coloured implementation
 console.log = function () {
-  console.print('log',7, Array.prototype.slice.call(arguments));
+  console._format_and_print('log',7, Array.prototype.slice.call(arguments));
 };
 
 //C: replacing console.warn with coloured implementation
 console.warn = function () {
-  console.print('warn',220, Array.prototype.slice.call(arguments));
+  console._format_and_print('warn',220, Array.prototype.slice.call(arguments));
 };
 
 //C: replacing console.info with coloured implementation
 console.info = function () {
-  console.print('info',32, Array.prototype.slice.call(arguments));
+  console._format_and_print('info',32, Array.prototype.slice.call(arguments));
 };
 
 //C: replacing console.error with coloured implementation
 console.error = function () {
-  console.print('error',1, Array.prototype.slice.call(arguments));
+  console._format_and_print('error',1, Array.prototype.slice.call(arguments));
 };
 
 //C: replacing or defining console.debug with coloured implementation
 console.debug = function () {
-  console.print('debug',8, Array.prototype.slice.call(arguments));
+  console._format_and_print('debug',8, Array.prototype.slice.call(arguments));
 };
 
 //C: creating console.check with coloured implementation
 console.check = function () {
-  console.print('log',12, Array.prototype.slice.call(arguments));
+  console._format_and_print('log',12, Array.prototype.slice.call(arguments));
 };
 
 //C: creating supported CLI commands hashtable (will be populated afterwards)
