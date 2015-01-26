@@ -91,19 +91,18 @@ platform.sessions.register = function() {
     session._session.timeout = platform.configuration.engine.session.gc.state.time;
     session._session.lease = Date.now() + platform.configuration.engine.session.gc.state.time;
     session.state = 3;
-    platform.statistics.counter('session.gen3').inc();
+    platform.statistics.get('session.gen3').inc();
     if(platform.configuration.server.debugging.session === true) {
       console.debug('session %s moved to state 3 (time alive)', session.name);
     }
   } else {
-    platform.statistics.counter('session.gen1').inc();
+    platform.statistics.get('session.gen1').inc();
     if(platform.configuration.server.debugging.session === true) {
       console.debug('session %s moved to state 1 (http alive)', session.name);
     }
   }
 
-  platform.statistics.counter('sessions.total').inc();
-  platform.statistics.counter('sessions.active').inc();
+  platform.statistics.get('session.total').inc();
   //T: raise platform.event.raise('session.register');
 
   return session_id + ':' + session_token;
@@ -120,15 +119,15 @@ platform.sessions.unregister = function(session_id) {
         return false;
       }
 
-      platform.statistics.counter('sessions.active').dec();
-      platform.statistics.counter('sessions.gen' + session.state).dec();
+      platform.statistics.get('session.total').dec();
+      platform.statistics.get('session.gen' + session.state).dec();
 
-      if (session.identity.user == null) {
-        platform.statistics.counter('users.anonymous').dec();
-      } else {
-        platform.statistics.counter('users.logged').dec();
+      //if (session.identity.user == null) {
+        //platform.statistics.get('user.anonymous').dec();
+      //} else {
+        //platform.statistics.get('user.logged').dec();
         //T: Platform.Events.Raise('user.logout');
-      }
+      //}
 
       //T: platform.events.raise('session.unregister');
 
@@ -164,8 +163,8 @@ platform.sessions.promote = function(session_id,persistent) {
         session._session.timeout = 0;
         session._session.lease = 0;
         session.state = 4;
-        platform.statistics.counter('sessions.gen' + session.state).dec();
-        platform.statistics.counter('sessions.gen4').inc();
+        platform.statistics.get('session.gen' + session.state).dec();
+        platform.statistics.get('session.gen4').inc();
         if(platform.configuration.server.debugging.session === true) {
           console.debug('session %s moved to state 4 (persistent)', session.name);
         }
@@ -173,8 +172,8 @@ platform.sessions.promote = function(session_id,persistent) {
         session._session.timeout = platform.configuration.engine.session.gc.state.time;
         session._session.lease = Date.now() + platform.configuration.engine.session.gc.state.time;
         session.state = 3;
-        platform.statistics.counter('sessions.gen' + session.state).dec();
-        platform.statistics.counter('sessions.gen3').inc();
+        platform.statistics.get('session.gen' + session.state).dec();
+        platform.statistics.get('session.gen3').inc();
         if(platform.configuration.server.debugging.session === true) {
           console.debug('session %s moved to state 3 (time alive)', session.name);
         }
@@ -265,3 +264,10 @@ platform.sessions.getByName = function(session_name) {
   }
   return null;
 };
+
+platform.statistics.register('counter','session.total');
+platform.statistics.register('counter','session.gen0');
+platform.statistics.register('counter','session.gen1');
+platform.statistics.register('counter','session.gen2');
+platform.statistics.register('counter','session.gen3');
+platform.statistics.register('counter','session.gen4');

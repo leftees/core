@@ -101,8 +101,8 @@ platform.engine.process.http = function () {
             if (session.state === 0) {
               session._session.timeout = platform.configuration.engine.session.gc.state.http;
               session.state = 1;
-              platform.statistics.counter('sessions.gen1').inc();
-              platform.statistics.counter('sessions.gen0').dec();
+              platform.statistics.get('session.gen1').inc();
+              platform.statistics.get('session.gen0').dec();
               if(platform.configuration.server.debugging.session === true) {
                 console.debug('session %s moved to state 1 (http alive)', session.name);
               }
@@ -260,6 +260,8 @@ platform.engine.process.error = function(err){
   var request = context.request;
   var response = context.response;
   var server = context.server;
+
+  platform.statistics.get('http.request.error').inc();
 
   response.setHeader('Content-Type','application/json');
 

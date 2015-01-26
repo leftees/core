@@ -32,8 +32,9 @@ platform.client.bootstrap._validate_id_check = /^[a-zA-Z0-9]{8}\-[a-zA-Z0-9]{4}\
 //F: Registers a new bootstrap session.
 //R: Returns the bootstrap id.
 platform.client.bootstrap.register = function() {
-  platform.statistics.counter('bootstraps.total').inc();
-  platform.statistics.counter('bootstraps.active').inc();
+  platform.statistics.get('bootstrap.total').inc();
+  platform.statistics.get('bootstrap.active').inc();
+  platform.statistics.get('bootstrap.rate').mark();
 
   //C: create new bootstrap id and object
   var bootstrap_id = native.uuid.v4();
@@ -85,8 +86,8 @@ platform.client.bootstrap.unregister = function(bootstrap_id) {
 
       //T: store stats somewhere...
 
-      platform.statistics.counter('bootstraps.active').dec();
-      platform.statistics.counter('bootstraps.expired').inc();
+      platform.statistics.get('bootstrap.active').dec();
+      platform.statistics.get('bootstrap.expired').inc();
 
       return delete platform.client.bootstrap._store[bootstrap_id];
     } else {
@@ -128,12 +129,12 @@ platform.client.bootstrap.get = function(bootstrap_id) {
 };
 
 platform.client.bootstrap.seed = function() {
-  platform.statistics.counter('bootstraps.seed').inc();
+  platform.statistics.get('bootstrap.seed').inc();
 
   context.response.setHeader('Content-Type', 'text/html');
 
   if (platform.configuration.application.available === false) {
-   platform.statistics.counter('bootstraps.unavailable').inc();
+   platform.statistics.get('bootstrap.unavailable').inc();
    platform.client.bootstrap.sendpage('/core/client/unavailable.html',"ga('send', 'event', { 'eventCategory': 'app', 'eventAction': 'unavailable' });");
    return;
   }
@@ -144,7 +145,7 @@ platform.client.bootstrap.seed = function() {
 
   //C: checking if browser is supported
   if (platform.client.bootstrap.isSupported(browser) === false) {
-    platform.statistics.counter('bootstraps.unsupported').inc();
+    platform.statistics.get('bootstrap.unsupported').inc();
     //C: redirecting unsupported page
     platform.client.bootstrap.sendpage('/core/client/unsupported.html',"ga('send', 'event', { 'eventCategory': 'app', 'eventAction': 'unsupported' });");
     //T: store statistics for unsupported browsers
@@ -261,8 +262,8 @@ platform.client.bootstrap.release = function(statistics_data,oldsession_data,rel
                   session._session.lease = Date.now() + platform.configuration.engine.session.gc.state.http;
                   if (session.state == 0 || session.state == 2) {
                     session.state = 1;
-                    platform.statistics.counter('sessions.gen1').inc();
-                    platform.statistics.counter('sessions.gen' + session.state).dec();
+                    platform.statistics.get('session.gen1').inc();
+                    platform.statistics.get('session.gen' + session.state).dec();
                   }
                   if(platform.configuration.server.debugging.session === true) {
                     switch (session.state) {
@@ -299,8 +300,8 @@ platform.client.bootstrap.release = function(statistics_data,oldsession_data,rel
 
       //T: relogin
 
-      platform.statistics.counter('bootstraps.active').dec();
-      platform.statistics.counter('bootstraps.succeed').inc();
+      platform.statistics.get('bootstrap.active').dec();
+      platform.statistics.get('bootstrap.succeed').inc();
       delete (platform.client.bootstrap._store[bootstrap_id]);
 
       if (platform.configuration.server.debugging.bootstrap === true) {
@@ -364,3 +365,11 @@ platform.client.bootstrap.list = function() {
 
 platform.io.cache.unset('/bootloader.html');
 platform.io.cache.unset('/bootloader.js');
+
+platform.statistics.register('counter','bootstrap.total');
+platform.statistics.register('counter','bootstrap.active');
+platform.statistics.register('meter','bootstrap.rate');
+platform.statistics.register('counter','bootstrap.expired');
+platform.statistics.register('counter','bootstrap.seed');
+platform.statistics.register('counter','bootstrap.unavailable');
+platform.statistics.register('counter','bootstrap.unsupported');

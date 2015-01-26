@@ -87,8 +87,8 @@ platform.sessions.collect = function(session_id) {
           session._session.timeout = platform.configuration.engine.session.gc.state.dispose;
           session._session.lease = Date.now() + platform.configuration.engine.session.gc.state.dispose;
           session.state = 0;
-          platform.statistics.counter('sessions.gen0').inc();
-          platform.statistics.counter('sessions.gen1').dec();
+          platform.statistics.get('session.gen0').inc();
+          platform.statistics.get('session.gen1').dec();
           if(platform.configuration.server.debugging.session === true) {
             console.debug('session %s moved to state 0 (forgotten)', session.name);
           }
@@ -101,8 +101,8 @@ platform.sessions.collect = function(session_id) {
           session._session.timeout = platform.configuration.engine.session.gc.state.http;
           session._session.lease = Date.now() + platform.configuration.engine.session.gc.state.http;
           session.state = 1;
-          platform.statistics.counter('sessions.gen1').inc();
-          platform.statistics.counter('sessions.gen2').dec();
+          platform.statistics.get('session.gen1').inc();
+          platform.statistics.get('session.gen2').dec();
           if(platform.configuration.server.debugging.session === true) {
             console.debug('session %s moved to state 1 (http alive)', session.name);
           }

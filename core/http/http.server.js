@@ -230,8 +230,9 @@ platform.server.http.events.request = function (request, response) {
   var count = request.id = ++this.count;
 
   //C: updating stats
-  platform.statistics.counter('http.requests.total').inc();
-  platform.statistics.meter('http.requests.active').mark();
+  platform.statistics.get('http.request.total').inc();
+  platform.statistics.get('http.request.active').inc();
+  platform.statistics.get('http.request.rate').mark();
 
   //C: logging
   if (debug === true && platform.configuration.server.debugging.http === true) {
@@ -241,7 +242,7 @@ platform.server.http.events.request = function (request, response) {
   //C: extending request object with HTTP redirect function
   request.redirect = function (redirect_to) {
     //C: updating stats
-    platform.statistics.meter('http.redirects').mark();
+    platform.statistics.get('http.request.redirect').inc();
     if (debug === true && platform.configuration.server.debugging.http === true) {
       console.warn('redirected request http' + ((secure) ? 's' : '') + ':%s#%s for %s to %s', port, count, request.url, redirect_to);
     }
@@ -278,7 +279,7 @@ platform.server.http.events.request = function (request, response) {
   //C: validating URL
   if ((reject.url||platform.configuration.server.http.default.reject.url).test(cleaned_url) === true && ((reject.url||platform.configuration.server.http.default.reject.url).lastIndex = 0) === 0) {
     //C: updating stats
-    platform.statistics.meter('http.rejects').mark();
+    platform.statistics.get('http.request.reject').inc();
     //C: logging reject if debug enabled
     if (debug === true && platform.configuration.server.debugging.http === true) {
       console.warn('rejected client request http' + ((secure) ? 's' : '') + ':%s#%s with url %s not allowed', port, count, request.url);
@@ -305,7 +306,7 @@ platform.server.http.events.request = function (request, response) {
 
   domain.on('error', function (err) {
     //C: updating stats
-    platform.statistics.meter('http.errors.server').mark();
+    platform.statistics.get('http.request.error').inc();
     if(platform.configuration.server.debugging.error === true) {
       console.error('uncaught exception in request http' + ((secure) ? 's' : '') + ':%s#%s: %s', port, count, err.stack || err.message);
     }
@@ -320,6 +321,7 @@ platform.server.http.events.request = function (request, response) {
 
   //C: attaching to response finish event (request processing ended)
   response.on('finish', function () {
+    platform.statistics.get('http.request.active').dec();
     if (debug === true && platform.configuration.server.debugging.http === true) {
       console.debug('finished client request http' + ((secure) ? 's' : '') + ':%s#%s with status %s in %s' + ((domain._context['response']._async === true) ? ' (async)' : ' (sync)'), port, count, domain._context['response'].statusCode, Number.toHumanTime(Date.now()-domain._context['request'].start));
     }
@@ -335,6 +337,7 @@ platform.server.http.events.request = function (request, response) {
 
   //C: attaching to request close event
   request.on('close', function () {
+    platform.statistics.get('http.request.active').dec();
     if (debug === true && platform.configuration.server.debugging.http === true) {
       console.debug('closed client request http' + ((secure) ? 's' : '') + ':%s#%s', port, count);
     }
@@ -388,11 +391,10 @@ platform.server.http.events.upgrade = function(request, socket, upgradeHead) {
   //C: handling upgrade protocol
   switch(request.headers['upgrade']) {
     case 'websocket':
+      //C: updating stats
+      platform.statistics.get('http.upgrade.websocket').inc();
       //C: upgrading request to WebSocket
       agent_websocket.handleUpgrade(request, socket, upgradeHead, function (websocket) {
-        //C: updating stats
-        platform.statistics.meter('http.upgrades.websocket').mark();
-
         //C: logging new websocket if debug is enabled
         if (debug === true && platform.configuration.server.debugging.websocket === true) {
           console.debug('[ws' + ((secure) ? 's' : '') + ':%s] accepting new socket %s:%s', port, remote_address, remote_port);
@@ -405,7 +407,7 @@ platform.server.http.events.upgrade = function(request, socket, upgradeHead) {
       break;
     default:
       //C: updating stats
-      platform.statistics.meter('http.upgrades.unimplemented').mark();
+      platform.statistics.get('http.upgrade.unimplemented').inc();
       //C: rejecting unknown protocols
       request.reject(501,'Not implemented');
       break;
@@ -413,7 +415,10 @@ platform.server.http.events.upgrade = function(request, socket, upgradeHead) {
 };
 
 platform.server.http.events.connection = function (socket) {
-  console.debug('accepting new client %s:%s for listener http' + ((this.secure) ? 's' : '') + ':%s', socket.remoteAddress, socket.remotePort, this.port);
+  //C: logging connection if debug is enabled
+  if (this.debug === true && platform.configuration.server.debugging.http === true) {
+    console.debug('accepting new client %s:%s for listener http' + ((this.secure) ? 's' : '') + ':%s', socket.remoteAddress, socket.remotePort, this.port);
+  }
 };
 
 platform.server.http.events.error = function (exception, socket) {
@@ -421,7 +426,10 @@ platform.server.http.events.error = function (exception, socket) {
 };
 
 platform.server.http.events.close = function () {
-  console.debug('closed server for port %s', this.port);
+  //C: logging server shutdown if debug is enabled
+  if (this.debug === true && platform.configuration.server.debugging.http === true) {
+    console.debug('closed server for port %s', this.port);
+  }
 };
 
 //F: Redirect the request if any redirector matches.
@@ -476,3 +484,12 @@ platform.server.http._check_redirect = function(url,redirectors){
 //T: move init and HTTP(S) start in PXE events
 platform.server.http._init();
 platform.server.http.start();
+
+platform.statistics.register('counter','http.request.total');
+platform.statistics.register('counter','http.request.active');
+platform.statistics.register('meter','http.request.rate');
+platform.statistics.register('counter','http.request.redirect');
+platform.statistics.register('counter','http.request.reject');
+platform.statistics.register('counter','http.request.error');
+platform.statistics.register('counter','http.upgrade.websocket');
+platform.statistics.register('counter','http.upgrade.unimplemented');
