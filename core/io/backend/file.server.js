@@ -140,7 +140,6 @@ var filesystem_backend = function(root) {
   //A: path: Specifies the target path (directory if it ends with '/').
   //A: [callback(err)]: Callback for async support. If missing, the function operates synchronously.
   //H: Implementation is based on native.fs.ensureFile or native.fs.ensureDir (fs-extra) with no encoding.
-  //T: fix return value inconsistency across ensureFile and ensureDir
   this.create = function(path,callback) {
     //C: detecting if a directory should be created instead of file
     var directory = (path.charAt(path.length-1) === native.path.sep);
@@ -151,13 +150,16 @@ var filesystem_backend = function(root) {
       if (directory === true) {
         return native.fs.ensureDirSync(fullpath);
       } else {
-        return native.fs.ensureFileSync(fullpath);
+        native.fs.ensureFileSync(fullpath);
+        return fullpath;
       }
     } else {
       if (directory === true) {
         return native.fs.ensureDir(fullpath,callback);
       } else {
-        return native.fs.ensureFile(fullpath,callback);
+        return native.fs.ensureFile(fullpath,function(){
+          callback(null,fullpath);
+        });
       }
     }
   };
