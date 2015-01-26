@@ -32,5 +32,9 @@ global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/
 //C: starting executable stub (through injection of hidden javascript file)
 global.require.main._compile('\n'+require('fs').readFileSync(__dirname + '/core/exec.server.js'));
 
-//C: hiding ljve.io main javascript file from node.js runtime
-global.require.main.filename = null;
+//C: invalidating main file from require cache
+delete global.require.cache[global.require.main.filename];
+
+//C: replacing main javascript file to automatically open custom file to debugger
+global.require.main.filename = __dirname + '/main.readme.txt';
+
