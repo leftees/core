@@ -39,7 +39,6 @@
     "http-auth": "*",
     "jsdom": "*",
     "libxmljs": "*",
-    "measured": "*",
     "nan": "*",
     "memwatch": "*",
     "minimatch": "*",
