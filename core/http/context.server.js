@@ -110,7 +110,9 @@ platform.server.http.context.create = function(request, response, server){
     if (call.data.length === 0) {
       call.arguments = JSON.normalize(call.arguments,true);
       call.data.ready = true;
-      callback(null);
+      process.nextTick(function(){
+        callback(null);
+      });
     } else if (platform.server.http.context.parsers.exist(call.type) === true) {
       if (server.debug === true && platform.configuration.server.debugging.http === true) {
         console.debug('parsing data for client request http' + ((server.secure) ? 's' : '') + ':%s#%s', server.port, request.id);
