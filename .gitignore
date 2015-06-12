@@ -40,3 +40,5 @@ runtime
 data
 tmp
 bin
+app
+config
