@@ -20,31 +20,81 @@
 
 platform.database = platform.database || {};
 
-//O: Stores the registered database schemas.
+/**
+ * Stores the registered database schemas.
+ * @type {Object}
+*/
 platform.database._store = platform.database._store || {};
 
-//F: Registers a database into current environment.
-//A: name: Specifies name of new database to register.
-//A: db: Specifies the settings object for new database schema instance.
-//R: Returns true if database is successfully registered.
-platform.database.register = function(name,db){
+/**
+ * Registers a database into current environment.
+ * @param {} name Specifies name of new database to register.
+ * @param {} db Specifies the settings object for new database schema instance.
+ * @return {} Returns true if database is successfully registered.
+*/
+platform.database.register = async function(name,db){
   if (platform.database.exists(name) === false) {
     switch(db.driver){
+      case 'firebird':
+        await load('node-firebird');
+        break;
+      case 'mongodb':
+        await load('mongodb');
+        break;
+      case 'mongoose':
+        await load('mongoose');
+        break;
+      case 'mysql':
+      case 'mariadb':
+        await load('mysql');
+        break;
+      case 'couchdb':
+      case 'couch':
+      case 'nano':
+        await load('nano');
+        break;
+      case 'neo4j':
+        await load('neo4j');
+        break;
+      case 'postgres':
+        await load('pg');
+        break;
+      case 'redis':
+        await load('redis');
+        await load('hiredis');
+        break;
+      case 'rethink':
+      case 'rethinkdb':
+        await load('rethinkdb');
+        break;
+      case 'riak':
+        await load('riak-js');
+        break;
+      case 'sqlite':
       case 'sqlite3':
-        platform.io.create(native.path.dirname(db.database)+native.path.sep);
+        await load('sqlite3');
+        await platform.io.create(native.path.dirname(db.database)+native.path.sep);
         db.database = platform.io.map(db.database);
         break;
+      case 'tingodb':
+        await load('tingodb');
+        break;
+      default:
+        throw new Exception('database connector %s not available',db.driver);
+        break;
     }
-    platform.database._store[name] = new native.database(db.driver, db);
+    platform.database._store[name] = new native.database.Schema(db.driver, db);
     return true;
   } else {
     throw new Exception('database %s already exists',name);
   }
 };
 
-//F: Unregisters a database from current environment.
-//A: name: Specifies name of database to unregister.
-//R: Returns true if database is successfully unregistered.
+/**
+ * Unregisters a database from current environment.
+ * @param {} name Specifies name of database to unregister.
+ * @return {} Returns true if database is successfully unregistered.
+*/
 platform.database.unregister = function(name){
   if (platform.database.exists(name) === true) {
     return delete platform.database._store[name];
@@ -53,10 +103,13 @@ platform.database.unregister = function(name){
   }
 };
 
-//F: Gets a database from current environment.
-//A: name: Specifies name of database to get.
-//R: Returns database schema instance.
+/**
+ * Gets a database from current environment.
+ * @param {} name Specifies name of database to get.
+ * @return {} Returns database schema instance.
+*/
 platform.database.get = function(name){
+  console.log(name)
   if (platform.database.exists(name) === true) {
     return platform.database._store[name];
   } else {
@@ -68,18 +121,17 @@ platform.database.list = function(){
   return Object.keys(platform.database._store);
 };
 
-//F: Checks whether a database is registered in current environment.
-//A: name: Specifies name of database to check.
-//R: Returns true if database is registered.
+/**
+ * Checks whether a database is registered in current environment.
+ * @param {} name Specifies name of database to check.
+ * @return {} Returns true if database is registered.
+*/
 platform.database.exists = function(name){
-  return (platform.database._store.hasOwnProperty(name) && platform.database._store[name] != null && platform.database._store[name].constructor === native.database);
+  return (platform.database._store.hasOwnProperty(name) && platform.database._store[name] != null && platform.database._store[name].constructor === native.database.Schema);
 };
 
-platform.database._init = function(){
-  Object.keys(platform.configuration.server.databases).forEach(function(name){
-    platform.database.register(name,platform.configuration.server.databases[name]);
+platform.events.attach('core.ready','database.init', async function() {
+  await Object.keys(platform.configuration.database.schemas).forEachAwait(async function(name){
+    await platform.database.register(name,platform.configuration.database.schemas[name]);
   });
-};
-
-//T: call it on platform.ready event?
-platform.database._init();
+});
