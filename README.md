@@ -2,10 +2,10 @@
 
 (porting in progress, please do not mind about status below)  
 
-[![Build Status](http://img.shields.io/travis/marcominetti/ljve.io.png?style=flat)](https://travis-ci.org/marcominetti/ljve.io)  
-![Comment Coverage](https://raw.githubusercontent.com/marcominetti/ljve.io/master/project/stats/comments.badge.png)  
-[![Test Coverage](http://img.shields.io/codeclimate/coverage/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
-[![Code Climate](http://img.shields.io/codeclimate/github/marcominetti/ljve.io.png?style=flat)](https://codeclimate.com/github/marcominetti/ljve.io)  
+[![Build Status](http://img.shields.io/travis/ljveio/core.png?style=flat)](https://travis-ci.org/ljveio/core)  
+![Comment Coverage](https://raw.githubusercontent.com/ljveio/core/master/project/stats/comments.badge.png)  
+[![Test Coverage](http://img.shields.io/codeclimate/coverage/github/ljveio/core.png?style=flat)](https://codeclimate.com/github/ljveio/core)  
+[![Code Climate](http://img.shields.io/codeclimate/github/ljveio/core.png?style=flat)](https://codeclimate.com/github/ljveio/core)  
 
 [![Package Status](http://img.shields.io/npm/v/ljve.svg?style=flat)](https://www.npmjs.org/package/ljve) 
 
@@ -46,11 +46,10 @@ The following tools have been used to develop the ljve.io project:
 
 
 
-## License ![AGPLv3](https://raw.githubusercontent.com/marcominetti/ljve.io/master/LICENSE.AGPL.PNG)
+## License ![AGPLv3](https://raw.githubusercontent.com/ljveio/core/master/LICENSE.AGPL.PNG)
 
 ljve.io - Live Javascript Virtualized Environment  
 Copyright (C) 2010-2015 Marco Minetti <marco.minetti@novetica.org>
-Copyright (C) 2011-2013 Novetica  
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
