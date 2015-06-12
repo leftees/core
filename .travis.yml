@@ -1,4 +1,14 @@
 language: node_js
 node_js:
-  - "0.11"
-  - "0.10"
+  - 0.10
+  - 0.12
+  - 1.0.2
+  - 1.8
+  - 2.0
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/f0b2c3350fae9a885fb3
+    on_success: always
+    on_failure: always
+    on_start: true
