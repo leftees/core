@@ -1,0 +1,36 @@
+{
+  "tags": {
+    "allowUnknownTags" : true
+  },
+  "plugins": ["plugins/alert"],
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": true,
+    "default": {
+      "outputSourceFiles" : false
+    },
+    "applicationName": "ljve.io",
+    "disqus": "",
+    "googleAnalytics": "",
+    "openGraph": {
+      "title": "",
+      "type": "website",
+      "image": "",
+      "site_name": "",
+      "url": ""
+    },
+    "meta": {
+      "title": "",
+      "description": "",
+      "keyword": ""
+    },
+    "linenums": false
+  },
+  "opts": {
+    "destination": "./dist/docs/",
+    "encoding": "utf8",
+    "private": false,
+    "recurse": true,
+    "template": "./node_modules/ljve-jsdoc-template"
+  }
+}
