@@ -31,7 +31,7 @@
     "chai-as-promised": "*",
     "chokidar": "*",
     "codeclimate-test-reporter": "*",
-    "concat-with-sourcemaps": "https://github.com/marcominetti/concat-with-sourcemaps/tarball/master",
+    "concat-with-sourcemaps-next": "https://github.com/marcominetti/concat-with-sourcemaps/tarball/master",
     "convert-source-map": "*",
     "cookie": "*",
     "cookie-signature": "*",
@@ -99,9 +99,6 @@
     "coverage": "if [ -d \".git\" ]; then CWD=$(pwd)/tmp/test-root; NODE_ENV=testing node main.server.js coverage | sed \"s|$CWD/build/|$CWD/|g\" | sed \"s|$CWD/|/|g\" > project/stats/coverage.html; rm -rf tmp/test-root; wget `node_modules/sloc/bin/sloc --format json core | node project/tools/sloc.js` -O project/stats/comments.badge.png; wget http://img.shields.io/codeclimate/coverage/github/ljveio/core.png?style=flat -O project/stats/coverage.badge.png; fi;",
     "test": "NODE_ENV=testing node main.server.js test",
     "start": "node main.server.js"
-  },
-  "engines": {
-    "node": ">=1.0"
   },
   "preferGlobal": true,
   "private": false,
