@@ -17,6 +17,60 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
+//TODO: HANDLE ECMASCRIPT 6/7 NODE OBJECTS
+/*
+ LIST UPDATED ON: 2015/02/17
+ COMMIT: 208b9677ee83f279832af814d7b1d2d7d1ee2079
+ TESTS: tests.js, tests-6to5.js, tests-playground.js, tests-harmony.js
+
+ ECMAScript 7
+
+ ObjectPattern
+ SpreadProperty
+ +AwaitExpression
+ +FunctionDeclaration.async
+ +FunctionExpression.async
+ +ArrowFunctionExpression.async
+ ExportDeclaration
+ VirtualPropertyExpression
+ PrivateDeclaration
+ ClassDeclaration
+ ClassBody
+
+ Playground
+
+ MethodDefinition
+ BindMemberExpression
+ BindFunctionExpression
+
+ ECMAScript 6
+
+ TaggedTemplateExpression
+ TemplateLiteral
+ TemplateElement
+ ArrayPattern
+ AssignmentPattern
+ SequenceExpression
+ ComprehensionExpression
+ ComprehensionBlock
+ ArrayExpression
+ ObjectPattern
+ ExportDeclaration
+ ClassDeclaration
+ ClassBody
+ ClassExpression
+ ExportBatchSpecifier
+ ExportSpecifier
+ ImportDeclaration
+ ImportSpecifier
+ ImportBatchSpecifier
+ YieldExpression
+ +ForOfStatement
+ MethodDefinition
+ RestElement
+ +ParenthesizedExpression
+
+ */
 
 platform.parser = platform.parser || {};
 
@@ -48,6 +102,7 @@ platform.parser.js._block_check = function(node,parent,previous){
         && parent.type !== 'FunctionDeclaration'
         && parent.type !== 'DoWhileStatement'
         && parent.type !== 'ForInStatement'
+        && parent.type !== 'ForOfStatement'
         && parent.type !== 'ForStatement'
         && parent.type !== 'IfStatement'
         && parent.type !== 'SwitchStatement'
@@ -62,6 +117,7 @@ platform.parser.js._block_check = function(node,parent,previous){
     case 'VariableDeclaration':
       if (parent != null
         && parent.type !== 'ForInStatement'
+        && parent.type !== 'ForOfStatement'
         && parent.type !== 'ForStatement'){
         return true;
       }
@@ -109,8 +165,14 @@ platform.parser.js._name_get = function(node,parent,previous) {
           'enter': function(child_node,parent) {
             switch(child_node.type){
               case 'MemberExpression':
-              case 'UnaryExpression':
-              case 'UpdateExpression':
+                if (child_node.computed === true) {
+                  //if (child_node.property.type !== 'Literal') {
+                    skip = true;
+                  //}
+                }
+                break;
+              //case 'UnaryExpression':
+              //case 'UpdateExpression':
               case 'Literal':
               case 'Identifier':
                 break;
@@ -139,18 +201,37 @@ platform.parser.js._name_get = function(node,parent,previous) {
       var property_name = node.key.name || node.key.value;
       if (parent != null && parent._name != null){
         node.value._name = parent._name + '.' + property_name;
-      } else {
+      } /*else {
         node.value._name = '{}.' + property_name;
-      }
+      }*/
       node._name = node.value._name;
       break;
   }
 };
 
-platform.parser.js.parse = function(code) {
-  var ast = native.parser.js.parse(code,{ 'attachComment': true, 'range': true, 'comment': true, 'loc': true, 'tag': true, 'source': 'source.js' });
+platform.parser.js.parse = function(code,filename) {
+  var comments = [];
+  var tokens = [];
+  var ast = native.parser.js.parse(code,{
+    'allowImportExportEverywhere': false,
+    'allowReturnOutsideFunction': true,
+    'ecmaVersion': 7,
+    'playground': false,
+    'strictMode': false,
+    'onComment': comments,
+    'locations': true,
+    'onToken': tokens,
+    'ranges': true,
+    'preserveParens': false,
+    'sourceFile': filename||'unknown'
+  });
+
+  ast._sourceFilename = filename;
+
+  var ast = native.parser.js.merge(ast,comments,tokens);
+
   return platform.parser.js.normalizeAST(ast);
-}
+};
 
 platform.parser.js.normalizeAST = function(ast){
   delete ast.comments;
@@ -195,10 +276,11 @@ platform.parser.js.normalizeAST = function(ast){
         case 'DoWhileStatement':
         case 'ForStatement':
         case 'ForInStatement':
+        case 'ForOfStatement':
           if (node.body != null && node.body.type !== 'BlockStatement') {
             node.body = {
               type: 'BlockStatement',
-              body: node.body
+              body: [node.body]
             };
           }
           break;
@@ -206,22 +288,24 @@ platform.parser.js.normalizeAST = function(ast){
     }
   });
 
-  //C: keeps last function/program object
+  // keeps last function/program object
   var scopes = [];
   var variables = [];
 
-  //C: keeps current function index (level)
+  // keeps current function index (level)
   var level = 0;
 
   scopes[level] = ast;
   variables[level] = [];
   ast._vars = variables[level];
+  ast._prepend = [];
+  ast._append = [];
 
   native.parser.js.traverse(ast,{
     'enter': function(node,parent){
 
       if (previous != null){
-        if (platform.configuration.server.debugging.parser.js === true) {
+        if (platform.configuration.debug.parser.js === true) {
           console.debug('%s |%s found node #%s type %s',breadcrumb.length,' '.repeat(breadcrumb.length),node._id,node.type);
         }
       }
@@ -265,8 +349,6 @@ platform.parser.js.normalizeAST = function(ast){
 
       platform.parser.js._name_get(node,parent,previous);
 
-      node.prepend = [];
-      node.append = [];
       platform.parser.js._tree_ast_ref_enter(node,parent,previous);
       previous = node;
       delete node.trailingComments;
@@ -292,6 +374,17 @@ platform.parser.js.normalizeAST = function(ast){
           }
         });
       }
+      if (node._tags != null) {
+        switch (node.type){
+          case 'ExpressionStatement':
+            node.expression._tags = node._tags;
+            break;
+          case 'AssignmentExpression':
+            node.left._tags = node._tags;
+            node.right._tags = node._tags;
+            break;
+        }
+      }
     },
     'leave': function(node,parent){
       breadcrumb.pop();
@@ -303,13 +396,13 @@ platform.parser.js.normalizeAST = function(ast){
         --level;
       }
 
-      if (platform.configuration.server.debugging.parser.js === true) {
+      if (platform.configuration.debug.parser.js === true) {
         console.debug('%s |%s found node #%s type %s',breadcrumb.length,' '.repeat(breadcrumb.length),node._id,node.type);
       }
     }
   });
 
-  if (platform.configuration.server.debugging.parser.js === true) {
+  if (platform.configuration.debug.parser.js === true) {
     native.parser.js.traverse(ast, {
       'enter': function (node, parent) {
         var _tags_label = '0 _tags';
@@ -328,35 +421,45 @@ platform.parser.js.normalizeAST = function(ast){
   return ast;
 };
 
-platform.parser.js.stringify = function(ast,compact,tag){
-  if (compact == null){
-    compact = true;
+platform.parser.js.stringify = function(ast,sourcemap,inlineSourceMap,filename){
+  if (ast._prepend.length > 0) {
+    var ast_prepend = native.parser.js.parse(ast._prepend.join(';'),{
+      'allowImportExportEverywhere': false,
+      'allowReturnOutsideFunction': true,
+      'ecmaVersion': 7,
+      'playground': false,
+      'strictMode': false,
+      'onComment': null,
+      'locations': false,
+      'onToken': null,
+      'ranges': false,
+      'preserveParens': false
+    });
+    ast.body = ast_prepend.body.concat(ast.body);
   }
-  return native.parser.js.codegen(ast, {
-    format: {
-      indent: {
-        style: (compact === false) ? '  ' : '',
-        base: 0,
-        adjustMultilineComment: false
-      },
-      newline: '\n',
-      space: ' ',
-      json: false,
-      renumber: compact,
-      hexadecimal: compact,
-      quotes: 'single',
-      escapeless: compact,
-      compact: compact,
-      parentheses: !compact,
-      semicolons: !compact,
-      safeConcatenation: true
-    },
-    parse: null,
-    comment: !compact,
-    tag: tag || false,
-    sourceMap: true,
-    sourceMapWithCode: true,
-    directive: false,
-    verbatim: undefined
+  if (ast._append.length > 0) {
+    var ast_append = native.parser.js.parse(ast._append.join(';'),{
+      'allowImportExportEverywhere': false,
+      'allowReturnOutsideFunction': true,
+      'ecmaVersion': 7,
+      'playground': false,
+      'strictMode': false,
+      'onComment': null,
+      'locations': false,
+      'onToken': null,
+      'ranges': false,
+      'preserveParens': false
+    });
+    ast.body = ast.body.concat(ast_append.body);
+  }
+  var generated = native.parser.js.esnext.transform.fromAst(ast,null,{
+    'stage': 1,
+    'compact': false,
+    'sourceMaps': (sourcemap != null) ? sourcemap : false,
+    'sourceFileName': filename||ast._sourceFilename,
+    'code': true,
+    'ast': true,
+    'optional': native.compile.optional
   });
+  return generated;
 };
