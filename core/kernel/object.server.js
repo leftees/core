@@ -19,309 +19,298 @@
  */
 
 Object._property_store = Object._property_store || {};
+Object._runtime_map = Object._runtime_map || {};
 
-Object.definePropertyEx = function(obj_name, prop, descriptor, target){
-  var target_name;
+native.object = native.object || {};
+native.object.defineProperty = native.object.defineProperty || Object.defineProperty;
+native.object.getOwnPropertyDescriptor = native.object.getOwnPropertyDescriptor || Object.getOwnPropertyDescriptor;
+
+Object._isExtensibleDescriptor = function(descriptor){
+  if (descriptor.get != null || descriptor.set != null || descriptor.runtime != null) {
+    return true;
+  }
+  return false;
+};
+
+Object._defineProperty = function(obj, prop, descriptor){
   var strong_name;
-  var property_name;
+  var legacy_descriptor;
   var extended_descriptor;
 
-  var legacy_descriptor;
-  var property_store;
-
-  if (descriptor == null && prop != null && typeof prop === 'object' && typeof obj_name === 'string') {
-    extended_descriptor = prop;
-    var leaf_position = obj_name.lastIndexOf('.');
+  if (typeof obj === 'string' && prop != null && typeof prop === 'object' && descriptor == null){
+    descriptor = prop;
+    prop = null;
+    strong_name = obj;
+    var leaf_position = obj.lastIndexOf('.');
     if (leaf_position === -1) {
-      property_name = obj_name;
-      target_name = 'global';
-      target = target || global;
+      prop = obj;
+      obj = global;
     } else {
-      property_name = obj_name.slice(leaf_position+1);
-      target_name = obj_name.slice(0,leaf_position-1);
-      target = target || platform.kernel.get(target_name);
+      prop = obj.slice(leaf_position+1);
+      obj = platform.kernel.get(obj.slice(0,leaf_position));
     }
-    strong_name = obj_name;
-  } else {
-    extended_descriptor = descriptor;
-    property_name = prop;
-    target_name = obj_name;
-    target = target || platform.kernel.get(obj_name);
-    strong_name = target_name + '.' + property_name;
+  } else if (typeof obj === 'string' && typeof prop === 'string') {
+    strong_name = obj + '.' + prop;
+    obj = platform.kernel.get(obj);
   }
 
-  if (target == null || typeof target !== 'object' || target_name == null || typeof target_name !== 'string' || property_name == null || typeof property_name !== 'string' || extended_descriptor == null || typeof extended_descriptor !== 'object'){
+  if (obj == null || prop == null || descriptor == null){
     throw new Exception('invalid arguments');
   }
 
-  legacy_descriptor = {};
-  property_store = Object._property_store[strong_name] || {};
-  property_store.name = property_store.name || strong_name;
+  if(strong_name == null){
+    return native.object.defineProperty(obj, prop, descriptor);
+  }
 
-  if (property_store.configurable === false){
+  if (Object._isExtensibleDescriptor(descriptor) === false && Object._property_store.hasOwnProperty(strong_name) === false){
+    return native.object.defineProperty(obj, prop, descriptor);
+  }
+
+  extended_descriptor = Object._property_store[strong_name] || {};
+
+  legacy_descriptor = native.object.getOwnPropertyDescriptor(obj, prop) || {
+    'configurable': true,
+    'enumerable': true,
+    'writable': true,
+    'value': undefined
+  };
+
+  if (legacy_descriptor.configurable === false){
     throw new Exception('property %s is not configurable', strong_name);
   }
 
-  if (extended_descriptor.hasOwnProperty('configurable') === true) {
-    legacy_descriptor.configurable = extended_descriptor.configurable;
+  if (descriptor.hasOwnProperty('configurable') === true) {
+    legacy_descriptor.configurable = descriptor.configurable;
   }
 
-  if (extended_descriptor.hasOwnProperty('enumerable') === true) {
-    legacy_descriptor.enumerable = extended_descriptor.enumerable;
+  if (descriptor.hasOwnProperty('enumerable') === true) {
+    legacy_descriptor.enumerable = descriptor.enumerable;
   }
 
-  if (property_store.writable !== false) {
-    if (extended_descriptor.hasOwnProperty('value') === true) {
-      property_store.value = extended_descriptor.value;
-      /*} else if (extended_descriptor.hasOwnProperty('remote') === true && something === true) {
-       //T: get from session or register wrap?
-       */
-    } else {
-      try {
-        property_store.value = platform.kernel.get(strong_name);
-      } catch (err) {
-        property_store.value = undefined;
+  if (extended_descriptor.hasOwnProperty('writable') === false) {
+    if (descriptor.hasOwnProperty('value') === true) {
+      extended_descriptor.value = descriptor.value;
+    } else if (legacy_descriptor.hasOwnProperty('value') === true) {
+      extended_descriptor.value = legacy_descriptor.value;
+    } else if (extended_descriptor.hasOwnProperty('value') === true) {
+      if (platform.kernel.exists(strong_name) === true) {
+        extended_descriptor.value = platform.kernel.get(strong_name);
+      } else {
+        extended_descriptor.value = undefined;
       }
     }
-    if (platform.configuration.server.debugging.object.property.set === true) {
-      console.debug('setting property %s internal value to %s', strong_name, property_store.value);
+    if (platform.configuration.debug.object.property.set === true) {
+      console.debug('setting initial property %s internal value to %s', strong_name, extended_descriptor.value);
     }
   } else {
-    throw new Exception('property %s is not writable', strong_name);
-  }
-
-  if (extended_descriptor.hasOwnProperty('writable') === true) {
-    property_store.writable = extended_descriptor.writable;
-  }
-
-  if (extended_descriptor.hasOwnProperty('get') === true && extended_descriptor.get != null) {
-    if (extended_descriptor.get.constructor === Array) {
-      if (extended_descriptor.get.length > 0) {
-        if (property_store.get == null) {
-          property_store.get = [];
-        } else if (typeof property_store.get === 'function') {
-          property_store.get = [property_store.get];
-        }
-        extended_descriptor.get.forEach(function (child_function, index) {
-          if (child_function != null && typeof child_function.constructor === 'function') {
-            property_store.get.push(child_function);
-          } else {
-            throw new Exception('invalid get function at index %s', index);
-          }
-        });
+    if (descriptor.hasOwnProperty('value') === true) {
+      if (extended_descriptor.writable === true) {
+        extended_descriptor.value = descriptor.value;
+      } else {
+        throw new Exception('property %s is not writable', strong_name);
       }
-    } else if (typeof extended_descriptor.get === 'function') {
-      if (property_store.get == null) {
-        property_store.get = extended_descriptor.get;
-      } else if (property_store.get.constructor === Array) {
-          property_store.get.push(extended_descriptor.get);
-      } else if (typeof property_store.get === 'function') {
-          property_store.get = [property_store.get, extended_descriptor.get];
+    }
+  }
+
+  if (descriptor.hasOwnProperty('writable') === true) {
+    extended_descriptor.writable = descriptor.writable;
+  }
+
+  if (descriptor.get != null) {
+    if (descriptor.get.constructor === Function) {
+      if (typeof descriptor.accessor === 'string') {
+        descriptor.get.accessor = descriptor.accessor;
+      }
+      if (extended_descriptor.get == null) {
+        extended_descriptor.get = descriptor.get;
+      } else if (extended_descriptor.get.constructor === Array) {
+          extended_descriptor.get.push(descriptor.get);
+      } else if (extended_descriptor.get.constructor === Function) {
+          extended_descriptor.get = [extended_descriptor.get, descriptor.get];
       }
     } else {
-      throw new Exception('invalid get function');
+      throw new Exception('invalid get function for %s', strong_name);
     }
   }
 
-  if (extended_descriptor.hasOwnProperty('set') === true && extended_descriptor.set != null) {
-    if (extended_descriptor.set.constructor === Array) {
-      if (extended_descriptor.set.length > 0) {
-        if (property_store.set == null) {
-          property_store.set = [];
-        } else if (typeof property_store.set === 'function') {
-          property_store.set = [property_store.set];
-        }
-        extended_descriptor.set.forEach(function (child_function, index) {
-          if (child_function != null && typeof child_function.constructor === 'function') {
-            property_store.set.push(child_function);
-          } else {
-            throw new Exception('invalid set function at index %s', index);
-          }
-        });
+  if (descriptor.set != null) {
+    if (descriptor.set.constructor === Function) {
+      if (typeof descriptor.accessor === 'string') {
+        descriptor.set.accessor = descriptor.accessor;
       }
-    } else if (typeof extended_descriptor.set === 'function') {
-      if (property_store.set == null) {
-        property_store.set = extended_descriptor.set;
-      } else if (property_store.set.constructor === Array) {
-        property_store.set.push(extended_descriptor.set);
-      } else if (typeof property_store.set === 'function') {
-        property_store.set = [property_store.set, extended_descriptor.set];
+      if (extended_descriptor.set == null) {
+        extended_descriptor.set = descriptor.set;
+      } else if (extended_descriptor.set.constructor === Array) {
+        extended_descriptor.set.push(descriptor.set);
+      } else if (extended_descriptor.set.constructor === Function) {
+        extended_descriptor.set = [extended_descriptor.set, descriptor.set];
       }
     } else {
-      throw new Exception('invalid set function');
+      throw new Exception('invalid set function %s',strong_name);
     }
   }
 
-  if (extended_descriptor.hasOwnProperty('prelink') === true) {
-    if (typeof extended_descriptor.prelink === 'string') {
-      property_store.prelink = extended_descriptor.prelink;
-      if (global.hasOwnProperty(property_store.prelink) === true) {
-        delete global[property_store.prelink];
-        if (platform.configuration.server.debugging.object.property.set === true) {
-          console.warn('property %s resetting prelink %s', strong_name, property_store.prelink);
-        }
+  if (descriptor.runtime != null && typeof descriptor.runtime === 'string'){
+    extended_descriptor.runtime = descriptor.runtime;
+    Object._runtime_map[descriptor.runtime] = strong_name;
+    if (global.runtime != null) {
+      runtime.create(descriptor.runtime);
+//? if(CLUSTER) {
+      if (platform.configuration.debug.object.property.runtime === true) {
+        console.debug('subscribing to runtime variable %s', extended_descriptor.runtime);
       }
-      Object.defineProperty(global,property_store.prelink,{
-        get: Object.definePropertyEx._get_function.bind(null,strong_name),
-        set: Object.definePropertyEx._set_function.bind(null,strong_name)
-      });
-      if (platform.configuration.server.debugging.object.property.set === true) {
-        console.warn('property %s prelinked with %s', strong_name, property_store.prelink);
-      }
+      runtime.subscribe(descriptor.runtime);
+//? }
     } else {
-      throw new Exception('invalid prelink identifier');
+      //TODO: queue runtime subscription
+      console.error('TODO: queue runtime subscription after runtime stack is available');
     }
   }
 
-  if (extended_descriptor.hasOwnProperty('persist') === true) {
-    switch(extended_descriptor.persist){
-      case true:
-      case 'normal':
-        property_store.persist = 1;
-        break;
-      case 'critical':
-        property_store.persist = 2;
-        break;
-      default:
-        property_store.persist = false;
-        break;
-    }
-    //T: read value if stored
-    if (platform.configuration.server.debugging.object.property.persist === true){
-      console.debug('property %s value imported from persist store',strong_name);
-    }
-    if (property_store.persist === 2 && extended_descriptor.hasOwnProperty('value') === true) {
-      //T: store value to persistent store
-      if (platform.configuration.server.debugging.object.property.persist === true) {
-        console.debug('property %s value exported to persist store', strong_name);
-      }
-    }
+  if (legacy_descriptor.hasOwnProperty('writable') === true || legacy_descriptor.hasOwnProperty('value') === true) {
+    delete legacy_descriptor.writable;
+    delete legacy_descriptor.value;
   }
 
-  //T: support remote
+  if (Object._property_store.hasOwnProperty(strong_name) === false) {
+    delete obj[prop];
+  }
+  Object._property_store[strong_name] = extended_descriptor;
 
-  Object._property_store[strong_name] = property_store;
-
-  if (platform.configuration.server.debugging.object.property.define === true) {
+  if (platform.configuration.debug.object.property.define === true) {
     console.debug('property %s store updated', strong_name);
   }
 
-  legacy_descriptor.get = Object.definePropertyEx._get_function.bind(null,strong_name);
-  legacy_descriptor.set = Object.definePropertyEx._set_function.bind(null,strong_name);
+  legacy_descriptor.get = Object._defineProperty._get_function.bind(null,strong_name);
+  legacy_descriptor.set = Object._defineProperty._set_function.bind(null,strong_name);
 
-  Object.defineProperty(target,property_name,legacy_descriptor);
+  var result = native.object.defineProperty(obj, prop, legacy_descriptor);
 
-  if (platform.configuration.server.debugging.object.property.define === true) {
+  if (platform.configuration.debug.object.property.define === true) {
     console.debug('property %s configured', strong_name);
   }
 
+  return result;
 };
 
-//F: Implements default operations for building a member get function.
-/*#preprocessor.disable*/
-Object.definePropertyEx._get_function = function(strong_name) {
-  var property_store = Object._property_store[strong_name];
-  var stored_value = property_store.value;
+/**
+ * Implements default operations for building a member get function.
+*/
+Object._defineProperty._get_function = function(strong_name) {
+  var extended_descriptor = Object._property_store[strong_name];
+  var stored_value = extended_descriptor.value;
   var result = stored_value;
 
-  if (platform.configuration.server.debugging.object.property.get === true) {
+  if (platform.configuration.debug.object.property.get === true) {
     console.debug('getting property %s internal value %s', strong_name, result);
   }
 
-  if (property_store.get != null) {
-    if (property_store.get.constructor === Array) {
-      property_store.get.forEach(function(child_get){
+  if (extended_descriptor.get != null) {
+    if (extended_descriptor.get.constructor === Array) {
+      extended_descriptor.get.forEach(function(child_get, index){
         result = child_get(result,stored_value);
-        if (platform.configuration.server.debugging.object.property.get === true) {
-          console.debug('changing property %s return value to %s', strong_name, result);
+        if (platform.configuration.debug.object.property.get === true) {
+          console.debug('processing get stack for property %s: getter %s returned value %s', strong_name, index, result);
         }
       });
-    } else if(typeof property_store.get === 'function') {
-      result = property_store.get(result,stored_value);
-      if (platform.configuration.server.debugging.object.property.get === true) {
-        console.debug('changing property %s return value to %s', strong_name, result);
+    } else if(typeof extended_descriptor.get === 'function') {
+      result = extended_descriptor.get(result,stored_value);
+      if (platform.configuration.debug.object.property.get === true) {
+        console.debug('processing get stack for property %s: getter returned value %s', strong_name, result);
       }
     }
   }
 
-  if (platform.configuration.server.debugging.object.property.get === true) {
+  if (platform.configuration.debug.object.property.get === true) {
     console.debug('returning property %s value %s', strong_name, result);
   }
   return result;
 };
 
-//F: Implements default operations for building a member set function.
-//A: value: Specifies the value to be used in the template function construction.
-/*#preprocessor.disable*/
-Object.definePropertyEx._set_function = function(strong_name,new_value) {
-  var property_store = Object._property_store[strong_name];
-  var stored_value = property_store.value;
+/**
+ * Implements default operations for building a member set function.
+ * @param {} value Specifies the value to be used in the template function construction.
+*/
+Object._defineProperty._set_function = function(strong_name,new_value,runtime_update) {
+  var extended_descriptor = Object._property_store[strong_name];
+  var stored_value = extended_descriptor.value;
   var result = new_value;
 
-  if (property_store.writable === false){
+  //TODO: support extended serialization
+  if (extended_descriptor.runtime != null && typeof new_value === 'function') {
+    throw new Exception('setting runtime variable %s to functions is not currently supported',extended_descriptor.runtime);
+  }
+
+  if (extended_descriptor.writable === false /*|| extended_descriptor.set == null*/){
     throw new Exception('property %s is not writable', strong_name);
   }
 
-  if (platform.configuration.server.debugging.object.property.set === true) {
+  if (platform.configuration.debug.object.property.set === true) {
     console.debug('changing property %s new value to %s', strong_name, result);
   }
 
-  //T: security
-
-  if (property_store.set != null) {
-    if (PropertyStore.set.constructor === Array) {
-      property_store.set.forEach(function(child_set){
-        result = child_set(result,new_value,stored_value);
-        if (platform.configuration.server.debugging.object.property.set === true) {
-          console.debug('changing property %s new value to %s', strong_name, result);
+  if (extended_descriptor.set != null) {
+    if (extended_descriptor.set.constructor === Array) {
+      extended_descriptor.set.forEach(function(child_set){
+        result = child_set(new_value,result,stored_value,runtime_update);
+        if (platform.configuration.debug.object.property.set === true) {
+          console.debug('processing set stack for property %s: setter %s changed value to %s', strong_name, index, result);
         }
       });
-    } else if(typeof property_store.set === 'function') {
-      result = property_store.set(result,new_value,stored_value);
-      if (platform.configuration.server.debugging.object.property.set === true) {
-        console.debug('changing property %s new value to %s', strong_name, result);
+    } else if(typeof extended_descriptor.set === 'function') {
+      result = extended_descriptor.set(new_value,result,stored_value,runtime_update);
+      if (platform.configuration.debug.object.property.set === true) {
+        console.debug('processing set stack for property %s: setter changed value to %s', strong_name, result);
       }
     }
   }
 
-  if (platform.configuration.server.debugging.object.property.set === true) {
+  if (platform.configuration.debug.object.property.set === true) {
     console.debug('setting property %s internal value to %s', strong_name, result);
   }
-  property_store.value = result;
 
-  //T: remote set
-
-  if (property_store.persist === 2){
-    //T: store value to persistent store
-    if (platform.configuration.server.debugging.object.property.persist === true) {
-      console.debug('property %s value exported to persist store', strong_name);
+  if (runtime_update !== true && result !== stored_value && extended_descriptor.runtime != null) {
+    if (platform.configuration.debug.object.property.runtime === true) {
+      console.debug('setting runtime variable %s internal value to %s', extended_descriptor.runtime, result);
     }
+    runtime.set(extended_descriptor.runtime,new_value);
   }
+
+  extended_descriptor.value = result;
 
   return result;
 };
 
-Object.definePropertiesEx = function(obj_name,props) {
-  var target = platform.kernel.get(obj_name);
-  if (target == null || typeof target !== 'object') {
-    throw new Exception('%s is not a valid object',obj_name);
-  }
-  Object.keys(props).forEach(function(prop){
-    Object.definePropertyEx(obj_name, prop, props[prop], target);
-  });
-};
-
-Object.getOwnPropertyDescriptorEx = function(obj_name,prop){
+Object._getOwnPropertyDescriptor = function(obj,prop){
   var strong_name;
-  if (prop == null && typeof obj_name === 'string') {
-    strong_name = obj_name;
-  } else {
-    strong_name = obj_name + '.' + prop;
+  if (typeof obj === 'string' && prop != null && typeof prop === 'string'){
+    strong_name = obj + '.' + prop;
+    obj = obj = platform.kernel.get(obj);
+  }
+  if (prop == null && typeof obj === 'string') {
+    strong_name = obj;
+    var leaf_position = obj.lastIndexOf('.');
+    if (leaf_position === -1) {
+      prop = obj;
+      obj = global;
+    } else {
+      prop = obj.slice(leaf_position+1);
+      obj = platform.kernel.get(obj.slice(0,leaf_position));
+    }
   }
 
-  return Object._property_store[strong_name];
+  if (strong_name == null && Object._property_store.hasOwnProperty(strong_name) === false) {
+    return native.object.getOwnPropertyDescriptor(obj,prop);
+  } else {
+    var extended_descriptor = Object._property_store[strong_name];
+    var legacy_descriptor = native.object.getOwnPropertyDescriptor(obj,prop);
+    extended_descriptor.configurable = legacy_descriptor.configurable;
+    extended_descriptor.enumerable = legacy_descriptor.enumerable;
+    return extended_descriptor;
+  }
 };
 
-Object.isError = function(target){
-  return (target != null && typeof target === 'object' && target.constructor === Error);
-};
+Object.defineProperty = Object._defineProperty;
+Object.getOwnPropertyDescriptor = Object._getOwnPropertyDescriptor;
+
+//TODO: implement delete support as preprocessor to clean values
