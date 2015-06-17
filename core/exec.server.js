@@ -18,44 +18,54 @@
 
  */
 
-//C: creating temporary main namespace for modular CLI command support
+// loading native modules for main phase
+var child_process = require('child_process');
+var cluster = require('cluster');
+var fs = require('fs');
+var path = require('path');
+
+// creating temporary main namespace for modular CLI command support
 global.main = {};
 
-//C: storing root paths
+// storing root paths
 global.main.path = {};
-global.main.path.app = process.cwd();
-global.main.path.core = require('path').dirname(require.main.filename);
+global.main.path.root = process.cwd();
+global.main.path.core = path.dirname(require.main.filename);
 
-//C: detecting whether Node is running as development environment
+// detecting whether Node is running as development environment
 global.development = false;
 if (process.env.NODE_ENV === 'development') {
   global.development = true;
 }
 
-//C: detecting whether Node is running as debugging environment
+// setting the debugger port
+if (process.version.indexOf('v0.10.') === 0) {
+  // fixing cluster node debug ports
+  if (cluster.isWorker === true) {
+    process.debugPort += cluster.worker.id;
+  }
+}
+// detecting whether Node is running as debugging environment
 global.debugging = false;
-//C: detecting whether debugger is running through node args
+process.debugActive = false;
+// detecting whether debugger is running through node args
 process.execArgv.forEach(function(arg) {
-  if (arg.indexOf('--debug') === 0 || arg.indexOf('debug') === 0){
+  if (arg === '--debug' || arg.startsWith('--debug=') === true || arg === '--debug-brk' || arg.startsWith('--debug-brk=') === true){
+    process.debugActive = true;
     global.debugging = true;
     global.development = true;
   }
 });
-//C: detecting whether debugger should run because of environment
+// detecting whether debugger should run because of environment
 if (process.env.NODE_ENV === 'debugging') {
   if (global.debugging === false) {
-    global.require('freeport')(function(err,port) {
-      //C: setting the debugger port
-      process.debugPort = port;
-      //C: starting debugger agent if not automatically done by node
-      process.kill(process.pid, 'SIGUSR1');
-    });
+    process.debugActive = false;
   }
   global.debugging = true;
   global.development = true;
 }
 
-//C: detecting whether Node is running as testing environment
+// detecting whether Node is running as testing environment
 global.testing = false;
 if (process.env.NODE_ENV === 'testing') {
   global.testing = true;
@@ -63,7 +73,14 @@ if (process.env.NODE_ENV === 'testing') {
   global.development = true;
 }
 
-setImmediate(function(){
-  //C: loading ljve application server executable module
-  global.require.main._compile('\n'+require('fs').readFileSync(global.main.path.core + '/core/main.server.js'));
-});
+if (process.platform === 'win32') {
+  try {
+    process.name = child_process.execSync('powershell.exe -Command "Get-WmiObject Win32_PerfFormattedData_PerfProc_Process | where-object{ $_.IDProcess -eq ' +
+      process.pid + ' } | Format-Table Name,IDProcess -AutoSize -HideTableHeaders"').toString().replace(/\r\n/gi, '').match(/^.*?(?=\s)/)[0];
+  } catch(error) {
+    throw new Error('unable to get process name: please make sure powershell.exe and WMI stack is installed');
+  }
+}
+
+// loading ljve application server executable module
+global.require.main._compile('\n'+require('fs').readFileSync(global.main.path.core + '/core/main.server.js'), {encoding: 'utf-8'});
