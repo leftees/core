@@ -18,7 +18,10 @@
 
  */
 
-//N: Contains all methods and variables for mail management.
+/**
+ * Contains all methods and variables for mail management.
+ * @namespace
+*/
 platform.messaging = platform.messaging || {};
 platform.messaging.mail = platform.messaging.mail || {};
 
@@ -28,7 +31,7 @@ platform.messaging.mail.count  = 0;
 platform.messaging.mail.send = {};
 
 platform.messaging.mail.send.message = function(message, callback){
-  if (platform.configuration.engine.messaging.mail.enable === false) {
+  if (platform.configuration.messaging.mail.enable === false) {
     var err = new Exception('mail system disabled');
     if (typeof callback !== 'function') {
       throw err;
@@ -44,7 +47,7 @@ platform.messaging.mail.send.message = function(message, callback){
   var time_start = Date.now();
 
   platform.messaging.mail._transport.sendMail(message,function(err, info){
-    if(platform.configuration.server.debugging.messaging.mail === true) {
+    if(platform.configuration.debug.messaging.mail === true) {
       var time_stop = Date.now();
       var time_elapsed = Number.toHumanTime(time_stop-time_start);
       if (err) {
@@ -63,7 +66,7 @@ platform.messaging.mail.send.message = function(message, callback){
     }
   });
 
-  if(platform.configuration.server.debugging.messaging.mail === true) {
+  if(platform.configuration.debug.messaging.mail === true) {
     console.debug('new mail message #%s queued',count);
   }
 
@@ -159,8 +162,8 @@ platform.classes.register('core.messaging.mail.message.template',function(){
 },true);
 
 platform.messaging.mail._init = function() {
-  if (platform.configuration.engine.messaging.mail.enable === true) {
-    platform.messaging.mail._transport = native.mail.createTransport(require('nodemailer-smtp-pool')(platform.configuration.engine.messaging.mail.account));
+  if (platform.configuration.messaging.mail.enable === true) {
+    platform.messaging.mail._transport = native.mail.createTransport(native.smtp(platform.configuration.messaging.mail.account));
   }
 };
 
@@ -169,7 +172,7 @@ platform.messaging.mail.template = {};
 platform.messaging.mail.template._store = {};
 
 platform.messaging.mail.template.register = function(name, text, html){
-  //T: add support for buffer and streams
+  //TODO: add support for buffer and streams
   if (platform.messaging.mail.template.exists(name) === false) {
     if (text != null || html != null) {
       platform.messaging.mail.template._store[name] = {
@@ -209,6 +212,7 @@ platform.messaging.mail.template.get = function(name){
   }
 };
 
-platform.messaging.mail._init();
-
-//T: add default embedded templates
+platform.events.attach('core.ready','messaging.mail.init', function(){
+  platform.messaging.mail._init();
+  //TODO: add default embedded templates
+});
