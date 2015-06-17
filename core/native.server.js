@@ -160,7 +160,6 @@ defineNative(native.dom,'html','jsdom',function(){
     ProcessExternalResources: false
   };
 });
-native.dom.html = native.dom.html.jsdom;
 //native.dom.xml = require('libxmljs').parseXml;
 defineNative(native.dom,'xml','libxmljs','parseXml');
 //native.request = require('request');
