@@ -42,7 +42,7 @@ platform.configuration.bootstrap.config.generic = [
   'ipc.server.js',
   'cache.server.js',
   'system.server.js',
-  'devtools.server.js',
+  'development.server.js',
   'http.server.js',
   'database.server.js',
   'mail.server.js'
