@@ -18,130 +18,167 @@
 
  */
 
-//N: Provides IO helper with abstract filesystem and packaged module support.
+/**
+ * Provides IO helper with abstract filesystem and packaged module support.
+ * @namespace
+*/
 platform.io = platform.io || {};
 
-//N: Provides multistore IO support.
+/**
+ * Provides multistore IO support.
+ * @namespace
+*/
 platform.io.store = platform.io.store || {};
 
-//V: Stores backend priorities for overlay abstract filesystem.
-platform.io.store._priorities = [];
+/**
+ *  Stores backend priorities for overlay abstract filesystem.
+*/
+platform.io.store._priorities = platform.io.store._priorities || [];
 
-//V: Stores backends objects and instances.
-platform.io.store._backends = {};
+/**
+ *  Stores backends objects and instances.
+*/
+platform.io.backends = platform.io.store._backends = platform.io.store._backends || {};
 
-//F: Registers a new backend into multistore IO engine.
-//A: name: Specifies the name of the new backend.
-//A: backend: Specifies the new backend instance.
-//A: [priority]: Specifies the priority for the new backend. If missing or negative, the backend is registered but not used in overlay abstract filesystem.
-//R: Returns true if the backend is successfully registered.
-//H: Priority '0' and name 'app' are reserved for runtime backends.
-platform.io.store.register = function(name,backend,priority){
-  //C: checking whether a backend with same name has been registered
+/**
+ * Registers a new backend into multistore IO engine.
+ * @param {} name Specifies the name of the new backend.
+ * @param {} backend Specifies the new backend instance.
+ * @param {} [priority] Specifies the priority for the new backend. If missing or negative, the backend is registered but not used in overlay abstract filesystem.
+ * @param {} [force] Specifies whether to overwrite pre-existent events. Default is false.
+ * @return {} Returns true if the backend is successfully registered.
+ * @alert  Priority '0' and name 'root' are reserved for runtime backends.
+*/
+platform.io.store.register = function(name,backend,priority,force){
+  // checking whether a backend with same name has been registered
   if (platform.io.store.exists(name) === false) {
-    //C: sanitizing priority
+    // sanitizing priority
     var newpriority = priority;
     if (typeof newpriority !== 'number'){
       newpriority = -1;
     } else if (newpriority < 0) {
       newpriority = -1;
-    //C: preserving reserved backends
-    } /*else if ((newpriority === 0 && name !== 'app') || (newpriority !== 0 && name === 'app')) {
-      throw new Exception('store \'app\' with priority \'0\' cannot be modified');
+    // preserving reserved backends
+    } /*else if ((newpriority === 0 && name !== 'root') || (newpriority !== 0 && name === 'root')) {
+      throw new Exception('store \'root\' with priority \'0\' cannot be modified');
     }*/
 
-    //T: check if every method is implemented (interface?)
-    //C: storing backend instance and extending it with name
+    //TODO: check if every method is implemented (interface?)
+    // storing backend instance and extending it with name
     platform.io.store._backends[name] = backend;
     platform.io.store._backends[name].name = name;
 
-    //C: storing backend priority
+    // storing backend priority
     if (newpriority > -1) {
-      platform.io.store._priorities.splice(newpriority, 0, name);
+      if (platform.io.store._priorities[newpriority] == null) {
+        platform.io.store._priorities[newpriority] = name;
+      } else {
+        platform.io.store._priorities.splice(newpriority, 0, name);
+      }
     }
 
+    return true;
+  } else if(force === true) {
+    // storing backend instance and extending it with name
+    platform.io.store._backends[name] = backend;
+    platform.io.store._backends[name].name = name;
+
+    // storing backend priority
+    platform.io.store.setPriority(name,priority);
     return true;
   } else {
     throw new Exception('store %s already exists',name);
   }
 };
 
-//F: Unregisters a backend from multistore IO engine.
-//A: name: Specifies the name of the backend.
-//R: Returns true if the backend has been unregistered.
-//H: Backend with name 'app' is reserved and can't be unregistered.
+/**
+ * Unregisters a backend from multistore IO engine.
+ * @param {} name Specifies the name of the backend.
+ * @return {} Returns true if the backend has been unregistered.
+ * @alert  Backend with name 'root' is reserved and can't be unregistered.
+*/
 platform.io.store.unregister = function(name){
-  //C: checking if backend exists and is not reserved
-  if (platform.io.store.exists(name) === true /*&& name !== 'app'*/) {
-    //C: removing backend from priority array
+  // checking if backend exists and is not reserved
+  if (platform.io.store.exists(name) === true /*&& name !== 'root'*/) {
+    // removing backend from priority array
     var oldindex = platform.io.store._priorities.indexOf(name);
     if (oldindex > -1) {
       platform.io.store._priorities.splice(oldindex, 1);
     }
-    //C: deleting backend object
+    // deleting backend object
     return delete platform.io.store._backends[name];
   } else {
     throw new Exception('store %s does not exist',name);
   }
 };
 
-//F: Lists the backends registered in multistore IO engine.
-//R: Returns an array of backend names ordered by priority.
-//H: It doesn't include backends registered with no priority.
+/**
+ * Lists the backends registered in multistore IO engine.
+ * @return {} Returns an array of backend names ordered by priority.
+ * @alert  It doesn't include backends registered with no priority.
+*/
 platform.io.store.list = function(){
   var result = [];
-  //C: adding backend objects to results by priority
+  // adding backend objects to results by priority
   platform.io.store._priorities.forEach(function(name){
     result.push(platform.io.store._backends[name]);
   });
   return result;
 };
 
-//F: Lists all the backends registered.
-//R: Returns an array of backend instances.
-//H: It does include backends registered with no priority.
+/**
+ * Lists all the backends registered.
+ * @return {} Returns an array of backend instances.
+ * @alert  It does include backends registered with no priority.
+*/
 platform.io.store.listAll = function(){
   var result = [];
-  //C: adding backend objects to results by name
+  // adding backend objects to results by name
   Object.keys(platform.io.store._backends).forEach(function(name){
     result.push(platform.io.store._backends[name]);
   });
   return result;
 };
 
-//F: Checks whether the backend is registered.
-//A: name: Specifies the name of the backend.
-//R: Returns true if the backend exists.
+/**
+ * Checks whether the backend is registered.
+ * @param {} name Specifies the name of the backend.
+ * @return {} Returns true if the backend exists.
+*/
 platform.io.store.exists = function(name){
   return (platform.io.store._backends.hasOwnProperty(name));
 };
 
-//F: Gets a backend by name.
-//A: name: Specifies the name of the backend.
-//R: Returns the backend instance.
+/**
+ * Gets a backend by name.
+ * @param {} name Specifies the name of the backend.
+ * @return {} Returns the backend instance.
+*/
 platform.io.store.getByName = function(name){
-  //C: checking whether backend exists and returning its instance
+  // checking whether backend exists and returning its instance
   if (platform.io.store.exists(name) === true) {
     return platform.io.store._backends[name];
   } else {
-    throw new Exception('store %s not found',name);
+    throw new Exception('store %s does not exist',name);
   }
 };
 
-//F: Gets a backend by priority.
-//A: priority: Specifies the priority in multistore IO engine.
-//R: Returns the backend instance.
+/**
+ * Gets a backend by priority.
+ * @param {} priority Specifies the priority in multistore IO engine.
+ * @return {} Returns the backend instance.
+*/
 platform.io.store.getByPriority = function(priority){
-  //C: sanitizing priority
+  // sanitizing priority
   var newpriority = priority;
   if (typeof newpriority !== 'number'){
     return null;
   } else if (newpriority < 0 || newpriority >= platform.io.store._priorities.length) {
     return null;
   }
-  //C: getting name by priority
+  // getting name by priority
   var name = platform.io.store._priorities[newpriority];
-  //C: checking whether the backend exists and returning it
+  // checking whether the backend exists and returning it
   if (platform.io.store.exists(name) === true) {
     return platform.io.store._backends[name];
   } else {
@@ -149,51 +186,55 @@ platform.io.store.getByPriority = function(priority){
   }
 };
 
-//F: Gets the priority of a backend.
-//A: name: Specifies the name of the backend.
-//R: Returns the priority of the backend.
+/**
+ * Gets the priority of a backend.
+ * @param {} name Specifies the name of the backend.
+ * @return {} Returns the priority of the backend.
+*/
 platform.io.store.getPriority = function(name){
-  //C: checking whether backend exists and returning its priority
+  // checking whether backend exists and returning its priority
   if (platform.io.store.exists(name) === true) {
     return platform.io.store._priorities.indexOf(name);
   } else {
-    throw new Exception('store %s not found',name);
+    throw new Exception('store %s does not exist',name);
   }
 };
 
-//F: Sets the priority of a backend.
-//A: name: Specifies the name of the backend.
-//A: [priority]: Specifies the priority for the new backend. If missing or negative, the backend is registered but not used in overlay abstract filesystem.
+/**
+ * Sets the priority of a backend.
+ * @param {} name Specifies the name of the backend.
+ * @param {} [priority] Specifies the priority for the new backend. If missing or negative, the backend is registered but not used in overlay abstract filesystem.
+*/
 platform.io.store.setPriority = function(name,priority){
-  //C: checking whether backend exists
+  // checking whether backend exists
   if (platform.io.store.exists(name) === true) {
-    //C: sanitizing priority
+    // sanitizing priority
     var newpriority = priority;
     if (typeof newpriority !== 'number'){
       newpriority = -1;
     } else if (newpriority < 0) {
       newpriority = -1;
-    //C: preserving reserved backends
-    } /*else if (newpriority === 0 || name === 'app') {
-      throw new Exception('store \'app\' with priority \'0\' cannot be modified');
+    // preserving reserved backends
+    } /*else if (newpriority === 0 || name === 'root') {
+      throw new Exception('store \'root\' with priority \'0\' cannot be modified');
     }*/
-    //C: unsetting old priority
+    // unsetting old priority
     var oldindex = platform.io.store._priorities.indexOf(name);
     if (oldindex > -1) {
       platform.io.store._priorities.splice(oldindex, 1);
     }
-    //C: setting new priority (if any)
+    // setting new priority (if any)
     if (newpriority > -1) {
       platform.io.store._priorities.splice(newpriority, 0, name);
     }
   } else {
-    throw new Exception('store %s not found',name);
+    throw new Exception('store %s does not exist',name);
   }
 };
 
-//C: registering default app path runtime backends (this is reserved)
-platform.io.store.register('app',platform.kernel.new('core.io.store.file',[ platform.runtime.path.app ]),0);
-//C: registering default core path runtime backends
-platform.io.store.register('core',platform.kernel.new('core.io.store.file',[ platform.runtime.path.core ]),1);
+// registering default root path runtime backends (this is reserved)
+platform.io.store.register('root',platform.kernel.new('core.io.store.file',[ platform.configuration.runtime.path.root ]),0,true);
+// registering default core path runtime backends
+platform.io.store.register('core',platform.kernel.new('core.io.store.file',[ platform.configuration.runtime.path.core ]),1,true);
 
-//T: support multiple backends by configuration
+//TODO: support multiple backends by configuration
