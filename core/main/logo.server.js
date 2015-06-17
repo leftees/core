@@ -18,7 +18,7 @@
 
  */
 
-//C: defining logo CLI command
+// defining logo CLI command
 global.main.commands.logo = function(){
   console.log('ljve.io - © 2010-2015 Marco Minetti and contributors. All rights reserved.');
   if (false) {

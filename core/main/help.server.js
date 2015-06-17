@@ -18,7 +18,7 @@
 
  */
 
-//C: defining help CLI command
+// defining help CLI command
 global.main.commands.help = function() {
   global.main.commands.logo();
   console.log('\n\
@@ -27,15 +27,15 @@ Usage: ljve [command] [parameters]\n\
 Supported commands:\n');
   Object.keys(global.main.commands).forEach(function(command){
     if(typeof global.main.commands[command].man === 'function'){
-      console.info('  ' + command);
       global.main.commands[command].man();
       console.log();
     }
   });
 };
 
-//C: defining help CLI command manual
+// defining help CLI command manual
 global.main.commands.help.man = function() {
   console.log('\
+  help\n\
   Print this help message.');
 };

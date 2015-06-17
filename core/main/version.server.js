@@ -18,17 +18,17 @@
 
  */
 
-//C: defining version CLI command
+// defining version CLI command
 global.main.commands.version = function(){
-  //C: printing logo
+  // printing logo
   global.main.commands.logo();
-  //C: printing version
+  // printing version
   global.main.commands.version.print();
 };
 
-//C: prints the app, node and other significant versions
+// prints the server, node and other significant versions
 global.main.commands.version.print = function(){
-  //T: print versions through component list
+  //TODO: print versions through component list
   console.log('ljve: %s', global.require('./package.json').version);
   console.log('node: %s',process.versions.node);
   console.log('v8: %s',process.versions.v8);
@@ -37,8 +37,9 @@ global.main.commands.version.print = function(){
   console.log('zlib: %s',process.versions.zlib);
 };
 
-//C: defining version CLI command manual
+// defining version CLI command manual
 global.main.commands.version.man = function() {
   console.log('\
+  version\n\
   Print application and runtime version.');
 };

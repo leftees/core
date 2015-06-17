@@ -18,12 +18,11 @@
 
  */
 
-//C: defining legal CLI command
+// defining legal CLI command
 global.main.commands.legal = function(){
-  //T: read license from LICENSE file
+  //TODO: read license from LICENSE file
   console.log('ljve.io - Live Javascript Virtualized Environment\n\
 Copyright (C) 2010-2015 Marco Minetti <marco.minetti@novetica.org>\n\
-Copyright (C) 2011-2013 Novetica\n\
 \n\
 This program is free software: you can redistribute it and/or modify\n\
 it under the terms of the GNU Affero General Public License as published by\n\
@@ -39,8 +38,9 @@ You should have received a copy of the GNU Affero General Public License\n\
 along with this program.  If not, see <http://www.gnu.org/licenses/>.')
 };
 
-//C: defining legal CLI command manual
+// defining legal CLI command manual
 global.main.commands.legal.man = function() {
   console.log('\
+  legal\n\
   Print copyright and license.');
 };
