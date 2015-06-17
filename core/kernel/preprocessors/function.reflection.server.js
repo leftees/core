@@ -23,7 +23,7 @@ platform.kernel._preprocessors.server[2].function_reflection = function(ast,code
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && (node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node.tree.scope._tags['preprocessor.disable'].length === 0 || node.tree.scope._tags['preprocessor.disable'].indexOf('all') > -1)){
+    if (node._tags != null && node._tags['preprocessor.disable'] != null && (node._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node._tags['preprocessor.disable'].length === 0 || node._tags['preprocessor.disable'].indexOf('all') > -1)){
       skip = true;
     }
     if (skip === false) {
@@ -43,27 +43,31 @@ platform.kernel._preprocessors.server[2].function_reflection = function(ast,code
               });
             });
             var function_vars = [];
+            var function_varnames = [];
             native.parser.js.traverse(node,{
               'enter': function(child_node,parent) {
                 if (child_node.tree != null && child_node.tree.scope === node) {
                   switch (child_node.type) {
                     case 'VariableDeclarator':
-                      function_vars.push({
-                        'type': 'Literal',
-                        'value': child_node.id.name,
-                        'raw': '\''+child_node.id.name+'\''
-                      });
+                      if(function_varnames.indexOf(child_node.id.name) === -1) {
+                        function_varnames.push(child_node.id.name);
+                        function_vars.push({
+                          'type': 'Literal',
+                          'value': child_node.id.name,
+                          'raw': '\'' + child_node.id.name + '\''
+                        });
+                      }
                       break;
                   }
                 }
               }
             });
+            function_varnames = null;
             /* injecting:
               arguments.called = {
-               'name': '$function_name',
-               'function': arguments.callee,
-               'params': '[]function_params',
-               'vars': '[]function_vars'
+               'name': '$function_name'
+               //,'params': '[]function_params',
+               //'vars': '[]function_vars'
               };
             */
             var prepend_node = {
@@ -99,28 +103,7 @@ platform.kernel._preprocessors.server[2].function_reflection = function(ast,code
                         'raw': '\''+function_name+'\''
                       },
                       'kind': 'init'
-                    },
-                    {
-                      'type': 'Property',
-                      'key': {
-                        'type': 'Literal',
-                        'value': 'function',
-                        'raw': '\'function\''
-                      },
-                      'value': {
-                        'type': 'MemberExpression',
-                        'computed': false,
-                        'object': {
-                          'type': 'Identifier',
-                          'name': 'arguments'
-                        },
-                        'property': {
-                          'type': 'Identifier',
-                          'name': 'callee'
-                        }
-                      },
-                      'kind': 'init'
-                    },
+                    }/*,
                     {
                       'type': 'Property',
                       'key': {
@@ -130,7 +113,7 @@ platform.kernel._preprocessors.server[2].function_reflection = function(ast,code
                       },
                       'value': {
                         'type': 'ArrayExpression',
-                        'elements': function_vars
+                        'elements': function_params
                       },
                       'kind': 'init'
                     },
@@ -146,7 +129,7 @@ platform.kernel._preprocessors.server[2].function_reflection = function(ast,code
                         'elements': function_vars
                       },
                       'kind': 'init'
-                    }
+                    }*/
                   ]
                 }
               }

@@ -23,29 +23,38 @@ platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && (node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node.tree.scope._tags['preprocessor.disable'].length === 0 || node.tree.scope._tags['preprocessor.disable'].indexOf('all') > -1)){
+    if (node._tags != null && node._tags['preprocessor.disable'] != null && (node._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node._tags['preprocessor.disable'].length === 0 || node._tags['preprocessor.disable'].indexOf('all') > -1)){
       skip = true;
     }
     if (skip === false) {
       var function_dump = null;
+      var function_varnames = null;
       switch(node.type){
-        //T: avoid code duplication
-        case 'Program':
+        //TODO: avoid code duplication
+        /*case 'Program':
           if (node.body.length > 0) {
             function_dump = [];
+            [ 'exports', '__filename', '__dirname'].forEach(function(param){
+              function_dump.push('\'' + param + '\': ' + param);
+            });
+            function_varnames = [];
             native.parser.js.traverse(node, {
               'enter': function (child_node, parent) {
                 if (child_node.tree != null && child_node.tree.scope === node) {
                   switch (child_node.type) {
                     case 'VariableDeclarator':
-                      function_dump.push('\'' + child_node.id.name + '\': ' + child_node.id.name);
+                      if(function_varnames.indexOf(child_node.id.name) === -1) {
+                        function_varnames.push(child_node.id.name);
+                        function_dump.push('\'' + child_node.id.name + '\': ' + child_node.id.name);
+                      }
                       break;
                   }
                 }
               }
             });
+            function_varnames = null;
           }
-          break;
+          break;*/
         case 'FunctionExpression':
         case 'FunctionDeclaration':
         case 'ArrowFunctionExpression':
@@ -55,17 +64,22 @@ platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file
             node.params.forEach(function(param){
               function_dump.push('\'' + param.name + '\': ' + param.name);
             });
+            function_varnames = [];
             native.parser.js.traverse(node,{
               'enter': function(child_node,parent) {
                 if (child_node.tree != null && child_node.tree.scope === node) {
                   switch (child_node.type) {
                     case 'VariableDeclarator':
-                      function_dump.push('\'' + child_node.id.name + '\': ' + child_node.id.name);
+                      if(function_varnames.indexOf(child_node.id.name) === -1) {
+                        function_varnames.push(child_node.id.name);
+                        function_dump.push('\'' + child_node.id.name + '\': ' + child_node.id.name);
+                      }
                       break;
                   }
                 }
               }
             });
+            function_varnames = null;
           }
           break;
       }
@@ -77,75 +91,173 @@ platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file
         }
         /* injecting:
           try {
-          } catch (__exception_){
-            (function(){
+          } catch (__exception_inner_){
+            if(__exception_inner_.dump != null && platform.configuration.kernel.exception.inner === false) {
+              throw __exception_inner_;
+            }
+            (function(called){
+              var __exception_ = new Exception(__exception_inner_);
+              __exception_.inner = __exception_inner_;
               __exception_.date = new Date();
               __exception_.dump = {};
-              try {
-                var __function_code_ = arguments.callee.caller.toString();
-                if (__function_code_.endsWith('[native code] }') === false) {
-                  __exception_.block = __function_code_.match(new RegExp('__c_\\s*=\\s*' + __c_ + ';[\\n\\s]*(.*?)[\\n\\s]*(;[\\n\\s]*__c_\\s*=\\s*' + (__c_ + 1) + ';|;[\\n\\s]*\})'))[1];
-                }
-              } catch(err){}
-              __exception_.called = arguments.called;
+              __exception_.function = called;
+              try{
+                var exception_location = platform.kernel._debugger.getExceptionLocationFromStack(__exception_.stack);
+                __exception_.block = platform.kernel._debugger.getBlockFromLocation(exception_location);
+              } catch(e) {}
+              __exception_.block = __exception_.block || {};
+              if (platform.configuration.debug.exception === true){
+                console.error('uncaught exception: ', __exception_.stack || __exception_.message);
+                console.dir(__exception_.toJSON());
+              }
               throw __exception_;
-            })();
+            })(arguments.called);
           }
         */
         var prepend_node = {
-          "type": "TryStatement",
-          "block": {
-            "type": "BlockStatement",
-            "body": []
+          'type': 'TryStatement',
+          'block': {
+            'type': 'BlockStatement',
+            'body': []
           },
-          "guardedHandlers": [],
-          "handlers": [
+          'guardedHandlers': [],
+          'handlers': [
             {
-              "type": "CatchClause",
-              "param": {
-                "type": "Identifier",
-                "name": "__exception_"
+              'type': 'CatchClause',
+              'param': {
+                'type': 'Identifier',
+                'name': '__exception_inner_'
               },
-              "body": {
-                "type": "BlockStatement",
-                "body": [{
-                  "type": "ExpressionStatement",
-                  "expression": {
-                    "type": "CallExpression",
-                    "callee": {
-                      "type": "FunctionExpression",
-                      "id": null,
-                      "params": [],
-                      "defaults": [],
-                      "body": {
-                        "type": "BlockStatement",
-                        "body": [
+              'body': {
+                'type': 'BlockStatement',
+                'body': [{
+                  "type": "IfStatement",
+                  "test": {
+                    "type": "LogicalExpression",
+                    "operator": "&&",
+                    "left": {
+                      "type": "BinaryExpression",
+                      "operator": "!=",
+                      "left": {
+                        "type": "MemberExpression",
+                        "computed": false,
+                        "object": {
+                          "type": "Identifier",
+                          "name": "__exception_inner_"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "dump"
+                        }
+                      },
+                      "right": {
+                        "type": "Literal",
+                        "value": null,
+                        "raw": "null"
+                      }
+                    },
+                    "right": {
+                      "type": "BinaryExpression",
+                      "operator": "===",
+                      "left": {
+                        "type": "MemberExpression",
+                        "computed": false,
+                        "object": {
+                          "type": "MemberExpression",
+                          "computed": false,
+                          "object": {
+                            "type": "MemberExpression",
+                            "computed": false,
+                            "object": {
+                              "type": "MemberExpression",
+                              "computed": false,
+                              "object": {
+                                "type": "Identifier",
+                                "name": "platform"
+                              },
+                              "property": {
+                                "type": "Identifier",
+                                "name": "configuration"
+                              }
+                            },
+                            "property": {
+                              "type": "Identifier",
+                              "name": "kernel"
+                            }
+                          },
+                          "property": {
+                            "type": "Identifier",
+                            "name": "exception"
+                          }
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "inner"
+                        }
+                      },
+                      "right": {
+                        "type": "Literal",
+                        "value": false,
+                        "raw": "false"
+                      }
+                    }
+                  },
+                  "consequent": {
+                    "type": "BlockStatement",
+                    "body": [
+                      {
+                        "type": "ThrowStatement",
+                        "argument": {
+                          "type": "Identifier",
+                          "name": "__exception_inner_"
+                        }
+                      }
+                    ]
+                  },
+                  "alternate": null
+                },
+                {
+                  'type': 'ExpressionStatement',
+                  'expression': {
+                    'type': 'CallExpression',
+                    'callee': {
+                      'type': 'FunctionExpression',
+                      'id': null,
+                      'params': [
+                        {
+                          "type": "Identifier",
+                          "name": "called"
+                        }
+                      ],
+                      'defaults': [],
+                      'body': {
+                        'type': 'BlockStatement',
+                        'body': [
                           {
-                            "type": "ExpressionStatement",
-                            "expression": {
-                              "type": "AssignmentExpression",
-                              "operator": "=",
-                              "left": {
-                                "type": "MemberExpression",
-                                "computed": false,
-                                "object": {
+                            "type": "VariableDeclaration",
+                            "declarations": [
+                              {
+                                "type": "VariableDeclarator",
+                                "id": {
                                   "type": "Identifier",
                                   "name": "__exception_"
                                 },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "date"
+                                "init": {
+                                  "type": "NewExpression",
+                                  "callee": {
+                                    "type": "Identifier",
+                                    "name": "Exception"
+                                  },
+                                  "arguments": [
+                                    {
+                                      "type": "Identifier",
+                                      "name": "__exception_inner_"
+                                    }
+                                  ]
                                 }
-                              },
-                              "right": {
-                                "type": "NewExpression",
-                                "callee": {
-                                  "type": "Identifier",
-                                  "name": "Date"
-                                },
-                                "arguments": []
                               }
-                            }
+                            ],
+                            "kind": "var"
                           },
                           {
                             "type": "ExpressionStatement",
@@ -161,10 +273,83 @@ platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file
                                 },
                                 "property": {
                                   "type": "Identifier",
-                                  "name": "dump"
+                                  "name": "inner"
                                 }
                               },
-                              "right": native.parser.js.parse(function_dump).body[0].expression
+                              "right": {
+                                "type": "Identifier",
+                                "name": "__exception_inner_"
+                              }
+                            }
+                          },
+                          {
+                            'type': 'ExpressionStatement',
+                            'expression': {
+                              'type': 'AssignmentExpression',
+                              'operator': '=',
+                              'left': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'Identifier',
+                                  'name': '__exception_'
+                                },
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'date'
+                                }
+                              },
+                              'right': {
+                                'type': 'NewExpression',
+                                'callee': {
+                                  'type': 'Identifier',
+                                  'name': 'Date'
+                                },
+                                'arguments': []
+                              }
+                            }
+                          },
+                          {
+                            'type': 'ExpressionStatement',
+                            'expression': {
+                              'type': 'AssignmentExpression',
+                              'operator': '=',
+                              'left': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'Identifier',
+                                  'name': '__exception_'
+                                },
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'dump'
+                                }
+                              },
+                              'right': native.parser.js.parse(function_dump).body[0].expression
+                            }
+                          },
+                          {
+                            'type': 'ExpressionStatement',
+                            'expression': {
+                              'type': 'AssignmentExpression',
+                              'operator': '=',
+                              'left': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'Identifier',
+                                  'name': '__exception_'
+                                },
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'function'
+                                }
+                              },
+                              'right': {
+                                  'type': 'Identifier',
+                                  'name': 'called'
+                              }
                             }
                           },
                           {
@@ -179,7 +364,7 @@ platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file
                                       "type": "VariableDeclarator",
                                       "id": {
                                         "type": "Identifier",
-                                        "name": "__function_code_"
+                                        "name": "exception_location"
                                       },
                                       "init": {
                                         "type": "CallExpression",
@@ -194,71 +379,25 @@ platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file
                                               "computed": false,
                                               "object": {
                                                 "type": "Identifier",
-                                                "name": "arguments"
+                                                "name": "platform"
                                               },
                                               "property": {
                                                 "type": "Identifier",
-                                                "name": "callee"
+                                                "name": "kernel"
                                               }
                                             },
                                             "property": {
                                               "type": "Identifier",
-                                              "name": "caller"
+                                              "name": "_debugger"
                                             }
                                           },
                                           "property": {
                                             "type": "Identifier",
-                                            "name": "toString"
+                                            "name": "getExceptionLocationFromStack"
                                           }
                                         },
-                                        "arguments": []
-                                      }
-                                    }
-                                  ],
-                                  "kind": "var"
-                                },
-                                {
-                                  "type": "IfStatement",
-                                  "test": {
-                                    "type": "BinaryExpression",
-                                    "operator": "===",
-                                    "left": {
-                                      "type": "CallExpression",
-                                      "callee": {
-                                        "type": "MemberExpression",
-                                        "computed": false,
-                                        "object": {
-                                          "type": "Identifier",
-                                          "name": "__function_code_"
-                                        },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "endsWith"
-                                        }
-                                      },
-                                      "arguments": [
-                                        {
-                                          "type": "Literal",
-                                          "value": "[native code] }",
-                                          "raw": "'[native code] }'"
-                                        }
-                                      ]
-                                    },
-                                    "right": {
-                                      "type": "Literal",
-                                      "value": false,
-                                      "raw": "false"
-                                    }
-                                  },
-                                  "consequent": {
-                                    "type": "BlockStatement",
-                                    "body": [
-                                      {
-                                        "type": "ExpressionStatement",
-                                        "expression": {
-                                          "type": "AssignmentExpression",
-                                          "operator": "=",
-                                          "left": {
+                                        "arguments": [
+                                          {
                                             "type": "MemberExpression",
                                             "computed": false,
                                             "object": {
@@ -267,97 +406,70 @@ platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file
                                             },
                                             "property": {
                                               "type": "Identifier",
-                                              "name": "block"
-                                            }
-                                          },
-                                          "right": {
-                                            "type": "MemberExpression",
-                                            "computed": true,
-                                            "object": {
-                                              "type": "CallExpression",
-                                              "callee": {
-                                                "type": "MemberExpression",
-                                                "computed": false,
-                                                "object": {
-                                                  "type": "Identifier",
-                                                  "name": "__function_code_"
-                                                },
-                                                "property": {
-                                                  "type": "Identifier",
-                                                  "name": "match"
-                                                }
-                                              },
-                                              "arguments": [
-                                                {
-                                                  "type": "NewExpression",
-                                                  "callee": {
-                                                    "type": "Identifier",
-                                                    "name": "RegExp"
-                                                  },
-                                                  "arguments": [
-                                                    {
-                                                      "type": "BinaryExpression",
-                                                      "operator": "+",
-                                                      "left": {
-                                                        "type": "BinaryExpression",
-                                                        "operator": "+",
-                                                        "left": {
-                                                          "type": "BinaryExpression",
-                                                          "operator": "+",
-                                                          "left": {
-                                                            "type": "BinaryExpression",
-                                                            "operator": "+",
-                                                            "left": {
-                                                              "type": "Literal",
-                                                              "value": "__c_\\s*=\\s*",
-                                                              "raw": "'__c_\\\\s*=\\\\s*'"
-                                                            },
-                                                            "right": {
-                                                              "type": "Identifier",
-                                                              "name": "__c_"
-                                                            }
-                                                          },
-                                                          "right": {
-                                                            "type": "Literal",
-                                                            "value": ";[\\n\\s]*(.*?)[\\n\\s]*(;[\\n\\s]*__c_\\s*=\\s*",
-                                                            "raw": "';[\\\\n\\\\s]*(.*?)[\\\\n\\\\s]*(;[\\n\\s]*__c_\\\\s*=\\\\s*'"
-                                                          }
-                                                        },
-                                                        "right": {
-                                                          "type": "BinaryExpression",
-                                                          "operator": "+",
-                                                          "left": {
-                                                            "type": "Identifier",
-                                                            "name": "__c_"
-                                                          },
-                                                          "right": {
-                                                            "type": "Literal",
-                                                            "value": 1,
-                                                            "raw": "1"
-                                                          }
-                                                        }
-                                                      },
-                                                      "right": {
-                                                        "type": "Literal",
-                                                        "value": ";|;[\\n\\s]*})",
-                                                        "raw": "';|;[\\\\n\\\\s]*\\})'"
-                                                      }
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            },
-                                            "property": {
-                                              "type": "Literal",
-                                              "value": 1,
-                                              "raw": "1"
+                                              "name": "stack"
                                             }
                                           }
-                                        }
+                                        ]
                                       }
-                                    ]
-                                  },
-                                  "alternate": null
+                                    }
+                                  ],
+                                  "kind": "var"
+                                },
+                                {
+                                  "type": "ExpressionStatement",
+                                  "expression": {
+                                    "type": "AssignmentExpression",
+                                    "operator": "=",
+                                    "left": {
+                                      "type": "MemberExpression",
+                                      "computed": false,
+                                      "object": {
+                                        "type": "Identifier",
+                                        "name": "__exception_"
+                                      },
+                                      "property": {
+                                        "type": "Identifier",
+                                        "name": "block"
+                                      }
+                                    },
+                                    "right": {
+                                      "type": "CallExpression",
+                                      "callee": {
+                                        "type": "MemberExpression",
+                                        "computed": false,
+                                        "object": {
+                                          "type": "MemberExpression",
+                                          "computed": false,
+                                          "object": {
+                                            "type": "MemberExpression",
+                                            "computed": false,
+                                            "object": {
+                                              "type": "Identifier",
+                                              "name": "platform"
+                                            },
+                                            "property": {
+                                              "type": "Identifier",
+                                              "name": "kernel"
+                                            }
+                                          },
+                                          "property": {
+                                            "type": "Identifier",
+                                            "name": "_debugger"
+                                          }
+                                        },
+                                        "property": {
+                                          "type": "Identifier",
+                                          "name": "getBlockFromLocation"
+                                        }
+                                      },
+                                      "arguments": [
+                                        {
+                                          "type": "Identifier",
+                                          "name": "exception_location"
+                                        }
+                                      ]
+                                    }
+                                  }
                                 }
                               ]
                             },
@@ -367,14 +479,51 @@ platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file
                                 "type": "CatchClause",
                                 "param": {
                                   "type": "Identifier",
-                                  "name": "err"
+                                  "name": "e"
                                 },
                                 "body": {
                                   "type": "BlockStatement",
-                                  "body": []
+                                  "body": [
+                                  ]
                                 }
                               }
                             ],
+                            "handler": {
+                              "type": "CatchClause",
+                              "param": {
+                                "type": "Identifier",
+                                "name": "e"
+                              },
+                              "body": {
+                                "type": "BlockStatement",
+                                "body": [
+                                  {
+                                    "type": "ExpressionStatement",
+                                    "expression": {
+                                      "type": "AssignmentExpression",
+                                      "operator": "=",
+                                      "left": {
+                                        "type": "MemberExpression",
+                                        "computed": false,
+                                        "object": {
+                                          "type": "Identifier",
+                                          "name": "__exception_"
+                                        },
+                                        "property": {
+                                          "type": "Identifier",
+                                          "name": "block"
+                                        }
+                                      },
+                                      "right": {
+                                        "type": "Literal",
+                                        "value": "",
+                                        "raw": "''"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
                             "finalizer": null
                           },
                           {
@@ -391,51 +540,207 @@ platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file
                                 },
                                 "property": {
                                   "type": "Identifier",
-                                  "name": "called"
+                                  "name": "block"
                                 }
                               },
                               "right": {
-                                "type": "MemberExpression",
-                                "computed": false,
-                                "object": {
-                                  "type": "Identifier",
-                                  "name": "arguments"
+                                "type": "LogicalExpression",
+                                "operator": "||",
+                                "left": {
+                                  "type": "MemberExpression",
+                                  "computed": false,
+                                  "object": {
+                                    "type": "Identifier",
+                                    "name": "__exception_"
+                                  },
+                                  "property": {
+                                    "type": "Identifier",
+                                    "name": "block"
+                                  }
                                 },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "called"
+                                "right": {
+                                  "type": "ObjectExpression",
+                                  "properties": []
                                 }
                               }
                             }
                           },
                           {
-                            "type": "ThrowStatement",
-                            "argument": {
-                              "type": "Identifier",
-                              "name": "__exception_"
+                            "type": "IfStatement",
+                            "test": {
+                              "type": "BinaryExpression",
+                              "operator": "===",
+                              "left": {
+                                "type": "MemberExpression",
+                                "computed": false,
+                                "object": {
+                                  "type": "MemberExpression",
+                                  "computed": false,
+                                  "object": {
+                                    "type": "MemberExpression",
+                                    "computed": false,
+                                    "object": {
+                                      "type": "Identifier",
+                                      "name": "platform"
+                                    },
+                                    "property": {
+                                      "type": "Identifier",
+                                      "name": "configuration"
+                                    }
+                                  },
+                                  "property": {
+                                    "type": "Identifier",
+                                    "name": "debug"
+                                  }
+                                },
+                                "property": {
+                                  "type": "Identifier",
+                                  "name": "exception"
+                                }
+                              },
+                              "right": {
+                                "type": "Literal",
+                                "value": true,
+                                "raw": "true"
+                              }
+                            },
+                            "consequent": {
+                              "type": "BlockStatement",
+                              "body": [
+                                {
+                                  "type": "ExpressionStatement",
+                                  "expression": {
+                                    "type": "CallExpression",
+                                    "callee": {
+                                      "type": "MemberExpression",
+                                      "computed": false,
+                                      "object": {
+                                        "type": "Identifier",
+                                        "name": "console"
+                                      },
+                                      "property": {
+                                        "type": "Identifier",
+                                        "name": "error"
+                                      }
+                                    },
+                                    "arguments": [
+                                      {
+                                        "type": "Literal",
+                                        "value": "uncaught exception: ",
+                                        "raw": "'uncaught exception: '"
+                                      },
+                                      {
+                                        "type": "LogicalExpression",
+                                        "operator": "||",
+                                        "left": {
+                                          "type": "MemberExpression",
+                                          "computed": false,
+                                          "object": {
+                                            "type": "Identifier",
+                                            "name": "__exception_"
+                                          },
+                                          "property": {
+                                            "type": "Identifier",
+                                            "name": "stack"
+                                          }
+                                        },
+                                        "right": {
+                                          "type": "MemberExpression",
+                                          "computed": false,
+                                          "object": {
+                                            "type": "Identifier",
+                                            "name": "__exception_"
+                                          },
+                                          "property": {
+                                            "type": "Identifier",
+                                            "name": "message"
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "type": "ExpressionStatement",
+                                  "expression": {
+                                    "type": "CallExpression",
+                                    "callee": {
+                                      "type": "MemberExpression",
+                                      "computed": false,
+                                      "object": {
+                                        "type": "Identifier",
+                                        "name": "console"
+                                      },
+                                      "property": {
+                                        "type": "Identifier",
+                                        "name": "dir"
+                                      }
+                                    },
+                                    "arguments": [
+                                      {
+                                        "type": "CallExpression",
+                                        "callee": {
+                                          "type": "MemberExpression",
+                                          "computed": false,
+                                          "object": {
+                                            "type": "Identifier",
+                                            "name": "__exception_"
+                                          },
+                                          "property": {
+                                            "type": "Identifier",
+                                            "name": "toJSON"
+                                          }
+                                        },
+                                        "arguments": []
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            },
+                            "alternate": null
+                          },
+                          {
+                            'type': 'ThrowStatement',
+                            'argument': {
+                              'type': 'Identifier',
+                              'name': '__exception_'
                             }
                           }
                         ]
                       },
-                      "rest": null,
-                      "generator": false,
-                      "expression": false
+                      'rest': null,
+                      'generator': false,
+                      'expression': false
                     },
-                    "arguments": []
+                    'arguments': [
+                      {
+                        "type": "MemberExpression",
+                        "computed": false,
+                        "object": {
+                          "type": "Identifier",
+                          "name": "arguments"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "called"
+                        }
+                      }
+                    ]
                   }
                 }]
               }
             }
           ],
-          "finalizer": null
+          'finalizer': null
         };
-        if (node.type === 'Program'){
+        /*if (node.type === 'Program'){
           prepend_node.block.body = node.body;
           node.body = [ prepend_node ];
-        } else{
+        } else {*/
           prepend_node.block.body = node.body.body;
           node.body.body = [ prepend_node ];
-        }
+        //}
         prepend_node.block.body.forEach(function(child_node){
           if (child_node.tree != null) {
             child_node.tree.container = prepend_node.block.body;
@@ -447,4 +752,4 @@ platform.kernel._preprocessors.server[2].exception_dump = function(ast,code,file
   }
 };
 
-//T: push/store exception data somewhere
+//TODO: push/store exception data somewhere

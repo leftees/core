@@ -23,7 +23,7 @@ platform.kernel._preprocessors.server[2].function_logging = function(ast,code,fi
   var node = ast;
   while (node != null) {
     var skip = false;
-    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && (node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node.tree.scope._tags['preprocessor.disable'].length === 0 || node.tree.scope._tags['preprocessor.disable'].indexOf('all') > -1)){
+    if (node._tags != null && node._tags['preprocessor.disable'] != null && (node._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node._tags['preprocessor.disable'].length === 0 || node._tags['preprocessor.disable'].indexOf('all') > -1)){
       skip = true;
     }
     if (skip === false) {
@@ -35,748 +35,700 @@ platform.kernel._preprocessors.server[2].function_logging = function(ast,code,fi
           if (node.body.type === 'BlockStatement' && node.body.body.length > 0){
             /* injecting:
               if (global.bootstrap == null){
-                 if ((platform.configuration.server.debugging.kernel.function.named === true
-                   || (platform.configuration.server.debugging.kernel.function.named === false
+                 if ((platform.configuration.debug.kernel.function.named === true
+                   || (platform.configuration.debug.kernel.function.named === false
                    && (arguments.called != null && (arguments.called.name === 'unknown' || arguments.called.name.startsWith('{}') === true))))
-                   && (platform.configuration.server.debugging.kernel.function.unknown === true
-                   || (platform.configuration.server.debugging.kernel.function.unknown === false
+                   && (platform.configuration.debug.kernel.function.unknown === true
+                   || (platform.configuration.debug.kernel.function.unknown === false
                    && (arguments.called != null && arguments.called.name !== 'unknown')))
-                   && (platform.configuration.server.debugging.kernel.function.object === true
-                   || (platform.configuration.server.debugging.kernel.function.object === false
+                   && (platform.configuration.debug.kernel.function.object === true
+                   || (platform.configuration.debug.kernel.function.object === false
                    && (arguments.called != null && arguments.called.name.startsWith('{}') === false)))) {
                  console.debug('function %s() called', (arguments.called != null) ? arguments.called.name : 'unknown');
                  }
               }
             */
             var prepend_node = {
-              "type": "IfStatement",
-              "test": {
-                "type": "BinaryExpression",
-                "operator": "==",
-                "left": {
-                  "type": "MemberExpression",
-                  "computed": false,
-                  "object": {
-                    "type": "Identifier",
-                    "name": "global"
+              'type': 'IfStatement',
+              'test': {
+                'type': 'BinaryExpression',
+                'operator': '==',
+                'left': {
+                  'type': 'MemberExpression',
+                  'computed': false,
+                  'object': {
+                    'type': 'Identifier',
+                    'name': 'global'
                   },
-                  "property": {
-                    "type": "Identifier",
-                    "name": "bootstrap"
+                  'property': {
+                    'type': 'Identifier',
+                    'name': 'bootstrap'
                   }
                 },
-                "right": {
-                  "type": "Literal",
-                  "value": null,
-                  "raw": "null"
+                'right': {
+                  'type': 'Literal',
+                  'value': null,
+                  'raw': 'null'
                 }
               },
-              "consequent": {
-                "type": "BlockStatement",
-                "body": [
+              'consequent': {
+                'type': 'BlockStatement',
+                'body': [
                   {
-                    "type": "IfStatement",
-                    "test": {
-                      "type": "LogicalExpression",
-                      "operator": "&&",
-                      "left": {
-                        "type": "LogicalExpression",
-                        "operator": "&&",
-                        "left": {
-                          "type": "LogicalExpression",
-                          "operator": "||",
-                          "left": {
-                            "type": "BinaryExpression",
-                            "operator": "===",
-                            "left": {
-                              "type": "MemberExpression",
-                              "computed": false,
-                              "object": {
-                                "type": "MemberExpression",
-                                "computed": false,
-                                "object": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "MemberExpression",
-                                        "computed": false,
-                                        "object": {
-                                          "type": "Identifier",
-                                          "name": "platform"
-                                        },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "configuration"
-                                        }
+                    'type': 'IfStatement',
+                    'test': {
+                      'type': 'LogicalExpression',
+                      'operator': '&&',
+                      'left': {
+                        'type': 'LogicalExpression',
+                        'operator': '&&',
+                        'left': {
+                          'type': 'LogicalExpression',
+                          'operator': '||',
+                          'left': {
+                            'type': 'BinaryExpression',
+                            'operator': '===',
+                            'left': {
+                              'type': 'MemberExpression',
+                              'computed': false,
+                              'object': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'platform'
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "server"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'configuration'
                                       }
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "debugging"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'debug'
                                     }
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "kernel"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'kernel'
                                   }
                                 },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "function"
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'function'
                                 }
                               },
-                              "property": {
-                                "type": "Identifier",
-                                "name": "named"
+                              'property': {
+                                'type': 'Identifier',
+                                'name': 'named'
                               }
                             },
-                            "right": {
-                              "type": "Literal",
-                              "value": true,
-                              "raw": "true"
+                            'right': {
+                              'type': 'Literal',
+                              'value': true,
+                              'raw': 'true'
                             }
                           },
-                          "right": {
-                            "type": "LogicalExpression",
-                            "operator": "&&",
-                            "left": {
-                              "type": "BinaryExpression",
-                              "operator": "===",
-                              "left": {
-                                "type": "MemberExpression",
-                                "computed": false,
-                                "object": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "MemberExpression",
-                                        "computed": false,
-                                        "object": {
-                                          "type": "MemberExpression",
-                                          "computed": false,
-                                          "object": {
-                                            "type": "Identifier",
-                                            "name": "platform"
-                                          },
-                                          "property": {
-                                            "type": "Identifier",
-                                            "name": "configuration"
-                                          }
+                          'right': {
+                            'type': 'LogicalExpression',
+                            'operator': '&&',
+                            'left': {
+                              'type': 'BinaryExpression',
+                              'operator': '===',
+                              'left': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'MemberExpression',
+                                        'computed': false,
+                                        'object': {
+                                          'type': 'Identifier',
+                                          'name': 'platform'
                                         },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "server"
+                                        'property': {
+                                          'type': 'Identifier',
+                                          'name': 'configuration'
                                         }
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "debugging"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'debug'
                                       }
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "kernel"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'kernel'
                                     }
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "function"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'function'
                                   }
                                 },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "named"
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'named'
                                 }
                               },
-                              "right": {
-                                "type": "Literal",
-                                "value": false,
-                                "raw": "false"
+                              'right': {
+                                'type': 'Literal',
+                                'value': false,
+                                'raw': 'false'
                               }
                             },
-                            "right": {
-                              "type": "LogicalExpression",
-                              "operator": "&&",
-                              "left": {
-                                "type": "BinaryExpression",
-                                "operator": "!=",
-                                "left": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "Identifier",
-                                    "name": "arguments"
+                            'right': {
+                              'type': 'LogicalExpression',
+                              'operator': '&&',
+                              'left': {
+                                'type': 'BinaryExpression',
+                                'operator': '!=',
+                                'left': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'Identifier',
+                                    'name': 'arguments'
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "called"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'called'
                                   }
                                 },
-                                "right": {
-                                  "type": "Literal",
-                                  "value": null,
-                                  "raw": "null"
+                                'right': {
+                                  'type': 'Literal',
+                                  'value': null,
+                                  'raw': 'null'
                                 }
                               },
-                              "right": {
-                                "type": "LogicalExpression",
-                                "operator": "||",
-                                "left": {
-                                  "type": "BinaryExpression",
-                                  "operator": "===",
-                                  "left": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "Identifier",
-                                        "name": "arguments"
+                              'right': {
+                                'type': 'LogicalExpression',
+                                'operator': '||',
+                                'left': {
+                                  'type': 'BinaryExpression',
+                                  'operator': '===',
+                                  'left': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'arguments'
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "called"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'called'
                                       }
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "name"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'name'
                                     }
                                   },
-                                  "right": {
-                                    "type": "Literal",
-                                    "value": "unknown",
-                                    "raw": "'unknown'"
+                                  'right': {
+                                    'type': 'Literal',
+                                    'value': 'unknown',
+                                    'raw': '\'unknown\''
                                   }
                                 },
-                                "right": {
-                                  "type": "BinaryExpression",
-                                  "operator": "===",
-                                  "left": {
-                                    "type": "CallExpression",
-                                    "callee": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "MemberExpression",
-                                        "computed": false,
-                                        "object": {
-                                          "type": "MemberExpression",
-                                          "computed": false,
-                                          "object": {
-                                            "type": "Identifier",
-                                            "name": "arguments"
+                                'right': {
+                                  'type': 'BinaryExpression',
+                                  'operator': '===',
+                                  'left': {
+                                    'type': 'CallExpression',
+                                    'callee': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'MemberExpression',
+                                        'computed': false,
+                                        'object': {
+                                          'type': 'MemberExpression',
+                                          'computed': false,
+                                          'object': {
+                                            'type': 'Identifier',
+                                            'name': 'arguments'
                                           },
-                                          "property": {
-                                            "type": "Identifier",
-                                            "name": "called"
+                                          'property': {
+                                            'type': 'Identifier',
+                                            'name': 'called'
                                           }
                                         },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "name"
+                                        'property': {
+                                          'type': 'Identifier',
+                                          'name': 'name'
                                         }
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "startsWith"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'startsWith'
                                       }
                                     },
-                                    "arguments": [
+                                    'arguments': [
                                       {
-                                        "type": "Literal",
-                                        "value": "{}",
-                                        "raw": "'{}'"
+                                        'type': 'Literal',
+                                        'value': '{}',
+                                        'raw': '\'{}\''
                                       }
                                     ]
                                   },
-                                  "right": {
-                                    "type": "Literal",
-                                    "value": true,
-                                    "raw": "true"
+                                  'right': {
+                                    'type': 'Literal',
+                                    'value': true,
+                                    'raw': 'true'
                                   }
                                 }
                               }
                             }
                           }
                         },
-                        "right": {
-                          "type": "LogicalExpression",
-                          "operator": "||",
-                          "left": {
-                            "type": "BinaryExpression",
-                            "operator": "===",
-                            "left": {
-                              "type": "MemberExpression",
-                              "computed": false,
-                              "object": {
-                                "type": "MemberExpression",
-                                "computed": false,
-                                "object": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "MemberExpression",
-                                        "computed": false,
-                                        "object": {
-                                          "type": "Identifier",
-                                          "name": "platform"
-                                        },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "configuration"
-                                        }
+                        'right': {
+                          'type': 'LogicalExpression',
+                          'operator': '||',
+                          'left': {
+                            'type': 'BinaryExpression',
+                            'operator': '===',
+                            'left': {
+                              'type': 'MemberExpression',
+                              'computed': false,
+                              'object': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'platform'
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "server"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'configuration'
                                       }
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "debugging"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'debug'
                                     }
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "kernel"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'kernel'
                                   }
                                 },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "function"
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'function'
                                 }
                               },
-                              "property": {
-                                "type": "Identifier",
-                                "name": "unknown"
+                              'property': {
+                                'type': 'Identifier',
+                                'name': 'unknown'
                               }
                             },
-                            "right": {
-                              "type": "Literal",
-                              "value": true,
-                              "raw": "true"
+                            'right': {
+                              'type': 'Literal',
+                              'value': true,
+                              'raw': 'true'
                             }
                           },
-                          "right": {
-                            "type": "LogicalExpression",
-                            "operator": "&&",
-                            "left": {
-                              "type": "BinaryExpression",
-                              "operator": "===",
-                              "left": {
-                                "type": "MemberExpression",
-                                "computed": false,
-                                "object": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "MemberExpression",
-                                        "computed": false,
-                                        "object": {
-                                          "type": "MemberExpression",
-                                          "computed": false,
-                                          "object": {
-                                            "type": "Identifier",
-                                            "name": "platform"
-                                          },
-                                          "property": {
-                                            "type": "Identifier",
-                                            "name": "configuration"
-                                          }
+                          'right': {
+                            'type': 'LogicalExpression',
+                            'operator': '&&',
+                            'left': {
+                              'type': 'BinaryExpression',
+                              'operator': '===',
+                              'left': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'MemberExpression',
+                                        'computed': false,
+                                        'object': {
+                                          'type': 'Identifier',
+                                          'name': 'platform'
                                         },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "server"
+                                        'property': {
+                                          'type': 'Identifier',
+                                          'name': 'configuration'
                                         }
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "debugging"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'debug'
                                       }
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "kernel"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'kernel'
                                     }
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "function"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'function'
                                   }
                                 },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "unknown"
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'unknown'
                                 }
                               },
-                              "right": {
-                                "type": "Literal",
-                                "value": false,
-                                "raw": "false"
+                              'right': {
+                                'type': 'Literal',
+                                'value': false,
+                                'raw': 'false'
                               }
                             },
-                            "right": {
-                              "type": "LogicalExpression",
-                              "operator": "&&",
-                              "left": {
-                                "type": "BinaryExpression",
-                                "operator": "!=",
-                                "left": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "Identifier",
-                                    "name": "arguments"
+                            'right': {
+                              'type': 'LogicalExpression',
+                              'operator': '&&',
+                              'left': {
+                                'type': 'BinaryExpression',
+                                'operator': '!=',
+                                'left': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'Identifier',
+                                    'name': 'arguments'
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "called"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'called'
                                   }
                                 },
-                                "right": {
-                                  "type": "Literal",
-                                  "value": null,
-                                  "raw": "null"
+                                'right': {
+                                  'type': 'Literal',
+                                  'value': null,
+                                  'raw': 'null'
                                 }
                               },
-                              "right": {
-                                "type": "BinaryExpression",
-                                "operator": "!==",
-                                "left": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "Identifier",
-                                      "name": "arguments"
+                              'right': {
+                                'type': 'BinaryExpression',
+                                'operator': '!==',
+                                'left': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'Identifier',
+                                      'name': 'arguments'
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "called"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'called'
                                     }
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "name"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'name'
                                   }
                                 },
-                                "right": {
-                                  "type": "Literal",
-                                  "value": "unknown",
-                                  "raw": "'unknown'"
+                                'right': {
+                                  'type': 'Literal',
+                                  'value': 'unknown',
+                                  'raw': '\'unknown\''
                                 }
                               }
                             }
                           }
                         }
                       },
-                      "right": {
-                        "type": "LogicalExpression",
-                        "operator": "||",
-                        "left": {
-                          "type": "BinaryExpression",
-                          "operator": "===",
-                          "left": {
-                            "type": "MemberExpression",
-                            "computed": false,
-                            "object": {
-                              "type": "MemberExpression",
-                              "computed": false,
-                              "object": {
-                                "type": "MemberExpression",
-                                "computed": false,
-                                "object": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "Identifier",
-                                        "name": "platform"
-                                      },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "configuration"
-                                      }
+                      'right': {
+                        'type': 'LogicalExpression',
+                        'operator': '||',
+                        'left': {
+                          'type': 'BinaryExpression',
+                          'operator': '===',
+                          'left': {
+                            'type': 'MemberExpression',
+                            'computed': false,
+                            'object': {
+                              'type': 'MemberExpression',
+                              'computed': false,
+                              'object': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'Identifier',
+                                      'name': 'platform'
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "server"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'configuration'
                                     }
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "debugging"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'debug'
                                   }
                                 },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "kernel"
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'kernel'
                                 }
                               },
-                              "property": {
-                                "type": "Identifier",
-                                "name": "function"
+                              'property': {
+                                'type': 'Identifier',
+                                'name': 'function'
                               }
                             },
-                            "property": {
-                              "type": "Identifier",
-                              "name": "object"
+                            'property': {
+                              'type': 'Identifier',
+                              'name': 'object'
                             }
                           },
-                          "right": {
-                            "type": "Literal",
-                            "value": true,
-                            "raw": "true"
+                          'right': {
+                            'type': 'Literal',
+                            'value': true,
+                            'raw': 'true'
                           }
                         },
-                        "right": {
-                          "type": "LogicalExpression",
-                          "operator": "&&",
-                          "left": {
-                            "type": "BinaryExpression",
-                            "operator": "===",
-                            "left": {
-                              "type": "MemberExpression",
-                              "computed": false,
-                              "object": {
-                                "type": "MemberExpression",
-                                "computed": false,
-                                "object": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "MemberExpression",
-                                        "computed": false,
-                                        "object": {
-                                          "type": "Identifier",
-                                          "name": "platform"
-                                        },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "configuration"
-                                        }
+                        'right': {
+                          'type': 'LogicalExpression',
+                          'operator': '&&',
+                          'left': {
+                            'type': 'BinaryExpression',
+                            'operator': '===',
+                            'left': {
+                              'type': 'MemberExpression',
+                              'computed': false,
+                              'object': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'platform'
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "server"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'configuration'
                                       }
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "debugging"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'debug'
                                     }
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "kernel"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'kernel'
                                   }
                                 },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "function"
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'function'
                                 }
                               },
-                              "property": {
-                                "type": "Identifier",
-                                "name": "object"
+                              'property': {
+                                'type': 'Identifier',
+                                'name': 'object'
                               }
                             },
-                            "right": {
-                              "type": "Literal",
-                              "value": false,
-                              "raw": "false"
+                            'right': {
+                              'type': 'Literal',
+                              'value': false,
+                              'raw': 'false'
                             }
                           },
-                          "right": {
-                            "type": "LogicalExpression",
-                            "operator": "&&",
-                            "left": {
-                              "type": "BinaryExpression",
-                              "operator": "!=",
-                              "left": {
-                                "type": "MemberExpression",
-                                "computed": false,
-                                "object": {
-                                  "type": "Identifier",
-                                  "name": "arguments"
+                          'right': {
+                            'type': 'LogicalExpression',
+                            'operator': '&&',
+                            'left': {
+                              'type': 'BinaryExpression',
+                              'operator': '!=',
+                              'left': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'Identifier',
+                                  'name': 'arguments'
                                 },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "called"
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'called'
                                 }
                               },
-                              "right": {
-                                "type": "Literal",
-                                "value": null,
-                                "raw": "null"
+                              'right': {
+                                'type': 'Literal',
+                                'value': null,
+                                'raw': 'null'
                               }
                             },
-                            "right": {
-                              "type": "BinaryExpression",
-                              "operator": "===",
-                              "left": {
-                                "type": "CallExpression",
-                                "callee": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "Identifier",
-                                        "name": "arguments"
+                            'right': {
+                              'type': 'BinaryExpression',
+                              'operator': '===',
+                              'left': {
+                                'type': 'CallExpression',
+                                'callee': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'arguments'
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "called"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'called'
                                       }
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "name"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'name'
                                     }
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "startsWith"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'startsWith'
                                   }
                                 },
-                                "arguments": [
+                                'arguments': [
                                   {
-                                    "type": "Literal",
-                                    "value": "{}",
-                                    "raw": "'{}'"
+                                    'type': 'Literal',
+                                    'value': '{}',
+                                    'raw': '\'{}\''
                                   }
                                 ]
                               },
-                              "right": {
-                                "type": "Literal",
-                                "value": false,
-                                "raw": "false"
+                              'right': {
+                                'type': 'Literal',
+                                'value': false,
+                                'raw': 'false'
                               }
                             }
                           }
                         }
                       }
                     },
-                    "consequent": {
-                      "type": "BlockStatement",
-                      "body": [
+                    'consequent': {
+                      'type': 'BlockStatement',
+                      'body': [
                         {
-                          "type": "ExpressionStatement",
-                          "expression": {
-                            "type": "CallExpression",
-                            "callee": {
-                              "type": "MemberExpression",
-                              "computed": false,
-                              "object": {
-                                "type": "Identifier",
-                                "name": "console"
+                          'type': 'ExpressionStatement',
+                          'expression': {
+                            'type': 'CallExpression',
+                            'callee': {
+                              'type': 'MemberExpression',
+                              'computed': false,
+                              'object': {
+                                'type': 'Identifier',
+                                'name': 'console'
                               },
-                              "property": {
-                                "type": "Identifier",
-                                "name": "debug"
+                              'property': {
+                                'type': 'Identifier',
+                                'name': 'debug'
                               }
                             },
-                            "arguments": [
+                            'arguments': [
                               {
-                                "type": "Literal",
-                                "value": "function %s() called",
-                                "raw": "'function %s() called'"
+                                'type': 'Literal',
+                                'value': 'function %s() called',
+                                'raw': '\'function %s() called\''
                               },
                               {
-                                "type": "ConditionalExpression",
-                                "test": {
-                                  "type": "BinaryExpression",
-                                  "operator": "!=",
-                                  "left": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "Identifier",
-                                      "name": "arguments"
+                                'type': 'ConditionalExpression',
+                                'test': {
+                                  'type': 'BinaryExpression',
+                                  'operator': '!=',
+                                  'left': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'Identifier',
+                                      'name': 'arguments'
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "called"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'called'
                                     }
                                   },
-                                  "right": {
-                                    "type": "Literal",
-                                    "value": null,
-                                    "raw": "null"
+                                  'right': {
+                                    'type': 'Literal',
+                                    'value': null,
+                                    'raw': 'null'
                                   }
                                 },
-                                "consequent": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "Identifier",
-                                      "name": "arguments"
+                                'consequent': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'Identifier',
+                                      'name': 'arguments'
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "called"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'called'
                                     }
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "name"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'name'
                                   }
                                 },
-                                "alternate": {
-                                  "type": "Literal",
-                                  "value": "unknown",
-                                  "raw": "'unknown'"
+                                'alternate': {
+                                  'type': 'Literal',
+                                  'value': 'unknown',
+                                  'raw': '\'unknown\''
                                 }
                               }
                             ]
@@ -784,11 +736,11 @@ platform.kernel._preprocessors.server[2].function_logging = function(ast,code,fi
                         }
                       ]
                     },
-                    "alternate": null
+                    'alternate': null
                   }
                 ]
               },
-              "alternate": null
+              'alternate': null
             };
             node.body.body.unshift(prepend_node);
           }
@@ -799,4 +751,4 @@ platform.kernel._preprocessors.server[2].function_logging = function(ast,code,fi
   }
 };
 
-//T: add support log level for function logging
+//TODO: add support log level for function logging

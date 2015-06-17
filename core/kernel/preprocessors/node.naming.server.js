@@ -21,14 +21,8 @@
 platform.kernel._preprocessors.server[0].node_naming = function(ast,code,file,module,preprocessor){
   var node = ast;
   while (node != null) {
-    var skip = false;
-    if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && (node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node.tree.scope._tags['preprocessor.disable'].length === 0 || node.tree.scope._tags['preprocessor.disable'].indexOf('all') > -1)){
-      skip = true;
-    }
-    if (skip === false) {
-      if (node._tags != null && node._tags['name'] != null && node._tags['name'].length > 0) {
-        node._name = node._tags['name'][0];
-      }
+    if (node._tags != null && node._tags['name'] != null && node._tags['name'].length > 0) {
+      node._name = node._tags['name'][0];
     }
     node = node.tree.next;
   }

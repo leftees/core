@@ -21,6 +21,9 @@
 platform.kernel._preprocessors.server[2].code_profile = function(ast,code,file,module,preprocessor){
 
   var node = ast;
+  ast._prepend.push('platform.metrics = platform.metrics || {};');
+  ast._prepend.push('platform.metrics.code = platform.metrics.code || {};');
+  ast._prepend.push('platform.metrics.code._data = platform.metrics.code._data || [];');
   while (node != null) {
     var skip = false;
     if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && (node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node.tree.scope._tags['preprocessor.disable'].length === 0 || node.tree.scope._tags['preprocessor.disable'].indexOf('all') > -1)){
@@ -29,443 +32,106 @@ platform.kernel._preprocessors.server[2].code_profile = function(ast,code,file,m
     if (skip === false) {
       if (node._tags != null && node._tags['profile'] != null) {
         if (node._is_exec_block === true){
-          //T: append code to the closest safe node (backward)
+          //TODO: append code to the closest safe node (backward)
           /* injecting
-            if (platform.configuration.server.kernel.profile === true) {
+            if (platform.configuration.kernel.profile === true) {
               (function () {
                 var time_start = Date.now();
-                platform.kernel._preprocessors.server[2].code_profile._data.push(time_start);
+                platform.metrics.code._data.push(time_start);
               })();
             }
           */
           var prepend_node = {
-            "type": "IfStatement",
-            "test": {
-              "type": "BinaryExpression",
-              "operator": "===",
-              "left": {
-                "type": "MemberExpression",
-                "computed": false,
-                "object": {
-                  "type": "MemberExpression",
-                  "computed": false,
-                  "object": {
-                    "type": "MemberExpression",
-                    "computed": false,
-                    "object": {
-                      "type": "MemberExpression",
-                      "computed": false,
-                      "object": {
-                        "type": "Identifier",
-                        "name": "platform"
-                      },
-                      "property": {
-                        "type": "Identifier",
-                        "name": "configuration"
-                      }
+            'type': 'IfStatement',
+            'test': {
+              'type': 'BinaryExpression',
+              'operator': '===',
+              'left': {
+                'type': 'MemberExpression',
+                'computed': false,
+                'object': {
+                  'type': 'MemberExpression',
+                  'computed': false,
+                  'object': {
+                    'type': 'MemberExpression',
+                    'computed': false,
+                    'object': {
+                      'type': 'Identifier',
+                      'name': 'platform'
                     },
-                    "property": {
-                      "type": "Identifier",
-                      "name": "server"
+                    'property': {
+                      'type': 'Identifier',
+                      'name': 'configuration'
                     }
                   },
-                  "property": {
-                    "type": "Identifier",
-                    "name": "kernel"
+                  'property': {
+                    'type': 'Identifier',
+                    'name': 'kernel'
                   }
                 },
-                "property": {
-                  "type": "Identifier",
-                  "name": "profile"
+                'property': {
+                  'type': 'Identifier',
+                  'name': 'profile'
                 }
               },
-              "right": {
-                "type": "Literal",
-                "value": true,
-                "raw": "true"
+              'right': {
+                'type': 'Literal',
+                'value': true,
+                'raw': 'true'
               }
             },
-            "consequent": {
-              "type": "BlockStatement",
-              "body": [
+            'consequent': {
+              'type': 'BlockStatement',
+              'body': [
                 {
-                  "type": "ExpressionStatement",
-                  "expression": {
-                    "type": "CallExpression",
-                    "callee": {
-                      "type": "FunctionExpression",
-                      "id": null,
-                      "params": [],
-                      "defaults": [],
-                      "body": {
-                        "type": "BlockStatement",
-                        "body": [
+                  'type': 'ExpressionStatement',
+                  'expression': {
+                    'type': 'CallExpression',
+                    'callee': {
+                      'type': 'FunctionExpression',
+                      'id': null,
+                      'params': [],
+                      'defaults': [],
+                      'body': {
+                        'type': 'BlockStatement',
+                        'body': [
                           {
-                            "type": "VariableDeclaration",
-                            "declarations": [
+                            'type': 'VariableDeclaration',
+                            'declarations': [
                               {
-                                "type": "VariableDeclarator",
-                                "id": {
-                                  "type": "Identifier",
-                                  "name": "time_start"
+                                'type': 'VariableDeclarator',
+                                'id': {
+                                  'type': 'Identifier',
+                                  'name': 'time_start'
                                 },
-                                "init": {
-                                  "type": "CallExpression",
-                                  "callee": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "Identifier",
-                                      "name": "Date"
+                                'init': {
+                                  'type': 'CallExpression',
+                                  'callee': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'Identifier',
+                                      'name': 'Date'
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "now"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'now'
                                     }
                                   },
-                                  "arguments": []
+                                  'arguments': []
                                 }
                               }
                             ],
-                            "kind": "var"
+                            'kind': 'var'
                           },
                           {
-                            "type": "ExpressionStatement",
-                            "expression": {
-                              "type": "CallExpression",
-                              "callee": {
+                            'type': 'ExpressionStatement',
+                            'expression': {
+                              'type': 'CallExpression',
+                              'callee': {
                                 "type": "MemberExpression",
                                 "computed": false,
                                 "object": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": true,
-                                      "object": {
-                                        "type": "MemberExpression",
-                                        "computed": false,
-                                        "object": {
-                                          "type": "MemberExpression",
-                                          "computed": false,
-                                          "object": {
-                                            "type": "MemberExpression",
-                                            "computed": false,
-                                            "object": {
-                                              "type": "Identifier",
-                                              "name": "platform"
-                                            },
-                                            "property": {
-                                              "type": "Identifier",
-                                              "name": "kernel"
-                                            }
-                                          },
-                                          "property": {
-                                            "type": "Identifier",
-                                            "name": "_preprocessors"
-                                          }
-                                        },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "server"
-                                        }
-                                      },
-                                      "property": {
-                                        "type": "Literal",
-                                        "value": 2,
-                                        "raw": "2"
-                                      }
-                                    },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "code_profile"
-                                    }
-                                  },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "_data"
-                                  }
-                                },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "push"
-                                }
-                              },
-                              "arguments": [
-                                {
-                                  "type": "Identifier",
-                                  "name": "time_start"
-                                }
-                              ]
-                            }
-                          }
-                        ]
-                      },
-                      "rest": null,
-                      "generator": false,
-                      "expression": false
-                    },
-                    "arguments": []
-                  }
-                }
-              ]
-            },
-            "alternate": null
-          };
-          /* injecting:
-          if (platform.configuration.server.kernel.profile === true) {
-            (function(){
-              var key = '$0';
-              var time_stop = Date.now();
-              var time_start = platform.kernel._preprocessors.server[2].code_profile._data.pop();
-              var time_elapsed =  time_stop - time_start;
-              //C: updating metrics statistics
-              if (platform.metrics.code.hasOwnProperty(key) === false) {
-                platform.metrics.code[key] = {
-                  'min': time_elapsed,
-                  'max': time_elapsed,
-                  'avg': time_elapsed,
-                  'count': 1
-                };
-              } else {
-                var data = platform.metrics.code[key];
-                data.avg = (data.avg * data.count + time_elapsed) / (++data.count);
-                if (data.min > time_elapsed) {
-                  data.min = time_elapsed;
-                }
-                if (data.max < time_elapsed) {
-                  data.max = time_elapsed;
-                }
-              }
-              if (platform.configuration.server.debugging.kernel.profile === true) {
-                console.debug('code profile block %s required %s ms',key,time_elapsed);
-              }
-            })();
-          }
-          */
-          var append_node = {
-            "type": "IfStatement",
-            "test": {
-              "type": "BinaryExpression",
-              "operator": "===",
-              "left": {
-                "type": "MemberExpression",
-                "computed": false,
-                "object": {
-                  "type": "MemberExpression",
-                  "computed": false,
-                  "object": {
-                    "type": "MemberExpression",
-                    "computed": false,
-                    "object": {
-                      "type": "MemberExpression",
-                      "computed": false,
-                      "object": {
-                        "type": "Identifier",
-                        "name": "platform"
-                      },
-                      "property": {
-                        "type": "Identifier",
-                        "name": "configuration"
-                      }
-                    },
-                    "property": {
-                      "type": "Identifier",
-                      "name": "server"
-                    }
-                  },
-                  "property": {
-                    "type": "Identifier",
-                    "name": "kernel"
-                  }
-                },
-                "property": {
-                  "type": "Identifier",
-                  "name": "profile"
-                }
-              },
-              "right": {
-                "type": "Literal",
-                "value": true,
-                "raw": "true"
-              }
-            },
-            "consequent": {
-              "type": "BlockStatement",
-              "body": [
-                {
-                  "type": "ExpressionStatement",
-                  "expression": {
-                    "type": "CallExpression",
-                    "callee": {
-                      "type": "FunctionExpression",
-                      "id": null,
-                      "params": [],
-                      "defaults": [],
-                      "body": {
-                        "type": "BlockStatement",
-                        "body": [
-                          {
-                            "type": "VariableDeclaration",
-                            "declarations": [
-                              {
-                                "type": "VariableDeclarator",
-                                "id": {
-                                  "type": "Identifier",
-                                  "name": "key"
-                                },
-                                "init": {
-                                  "type": "Literal",
-                                  "value": node._tags['profile'][0],
-                                  "raw": '\''+node._tags['profile'][0]+'\''
-                                }
-                              }
-                            ],
-                            "kind": "var"
-                          },
-                          {
-                            "type": "VariableDeclaration",
-                            "declarations": [
-                              {
-                                "type": "VariableDeclarator",
-                                "id": {
-                                  "type": "Identifier",
-                                  "name": "time_stop"
-                                },
-                                "init": {
-                                  "type": "CallExpression",
-                                  "callee": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "Identifier",
-                                      "name": "Date"
-                                    },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "now"
-                                    }
-                                  },
-                                  "arguments": []
-                                }
-                              }
-                            ],
-                            "kind": "var"
-                          },
-                          {
-                            "type": "VariableDeclaration",
-                            "declarations": [
-                              {
-                                "type": "VariableDeclarator",
-                                "id": {
-                                  "type": "Identifier",
-                                  "name": "time_start"
-                                },
-                                "init": {
-                                  "type": "CallExpression",
-                                  "callee": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "MemberExpression",
-                                        "computed": false,
-                                        "object": {
-                                          "type": "MemberExpression",
-                                          "computed": true,
-                                          "object": {
-                                            "type": "MemberExpression",
-                                            "computed": false,
-                                            "object": {
-                                              "type": "MemberExpression",
-                                              "computed": false,
-                                              "object": {
-                                                "type": "MemberExpression",
-                                                "computed": false,
-                                                "object": {
-                                                  "type": "Identifier",
-                                                  "name": "platform"
-                                                },
-                                                "property": {
-                                                  "type": "Identifier",
-                                                  "name": "kernel"
-                                                }
-                                              },
-                                              "property": {
-                                                "type": "Identifier",
-                                                "name": "_preprocessors"
-                                              }
-                                            },
-                                            "property": {
-                                              "type": "Identifier",
-                                              "name": "server"
-                                            }
-                                          },
-                                          "property": {
-                                            "type": "Literal",
-                                            "value": 2,
-                                            "raw": "2"
-                                          }
-                                        },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "code_profile"
-                                        }
-                                      },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "_data"
-                                      }
-                                    },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "pop"
-                                    }
-                                  },
-                                  "arguments": []
-                                }
-                              }
-                            ],
-                            "kind": "var"
-                          },
-                          {
-                            "type": "VariableDeclaration",
-                            "declarations": [
-                              {
-                                "type": "VariableDeclarator",
-                                "id": {
-                                  "type": "Identifier",
-                                  "name": "time_elapsed"
-                                },
-                                "init": {
-                                  "type": "BinaryExpression",
-                                  "operator": "-",
-                                  "left": {
-                                    "type": "Identifier",
-                                    "name": "time_stop"
-                                  },
-                                  "right": {
-                                    "type": "Identifier",
-                                    "name": "time_start"
-                                  }
-                                }
-                              }
-                            ],
-                            "kind": "var"
-                          },
-                          {
-                            "type": "IfStatement",
-                            "test": {
-                              "type": "BinaryExpression",
-                              "operator": "===",
-                              "left": {
-                                "type": "CallExpression",
-                                "callee": {
                                   "type": "MemberExpression",
                                   "computed": false,
                                   "object": {
@@ -490,33 +156,184 @@ platform.kernel._preprocessors.server[2].code_profile = function(ast,code,file,m
                                   },
                                   "property": {
                                     "type": "Identifier",
-                                    "name": "hasOwnProperty"
+                                    "name": "_data"
                                   }
                                 },
-                                "arguments": [
-                                  {
-                                    "type": "Identifier",
-                                    "name": "key"
-                                  }
-                                ]
+                                "property": {
+                                  "type": "Identifier",
+                                  "name": "push"
+                                }
                               },
-                              "right": {
-                                "type": "Literal",
-                                "value": false,
-                                "raw": "false"
-                              }
-                            },
-                            "consequent": {
-                              "type": "BlockStatement",
-                              "body": [
+                              'arguments': [
                                 {
-                                  "type": "ExpressionStatement",
-                                  "expression": {
-                                    "type": "AssignmentExpression",
-                                    "operator": "=",
-                                    "left": {
+                                  'type': 'Identifier',
+                                  'name': 'time_start'
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      'rest': null,
+                      'generator': false,
+                      'expression': false
+                    },
+                    'arguments': []
+                  }
+                }
+              ]
+            },
+            'alternate': null
+          };
+          /* injecting:
+          if (platform.configuration.kernel.profile === true) {
+            (function(){
+              var key = '$0';
+              var time_stop = Date.now();
+              var time_start = platform.metrics.code._data.pop();
+              var time_elapsed =  time_stop - time_start;
+              // updating metrics statistics
+              if (platform.metrics.code.hasOwnProperty(key) === false) {
+                platform.metrics.code[key] = {
+                  'min': time_elapsed,
+                  'max': time_elapsed,
+                  'avg': time_elapsed,
+                  'count': 1
+                };
+              } else {
+                var data = platform.metrics.code[key];
+                data.avg = (data.avg * data.count + time_elapsed) / (++data.count);
+                if (data.min > time_elapsed) {
+                  data.min = time_elapsed;
+                }
+                if (data.max < time_elapsed) {
+                  data.max = time_elapsed;
+                }
+              }
+              if (platform.configuration.debug.kernel.profile === true) {
+                console.debug('code profile block %s required %s ms',key,time_elapsed);
+              }
+            })();
+          }
+          */
+          var append_node = {
+            'type': 'IfStatement',
+            'test': {
+              'type': 'BinaryExpression',
+              'operator': '===',
+              'left': {
+                'type': 'MemberExpression',
+                'computed': false,
+                'object': {
+                  'type': 'MemberExpression',
+                  'computed': false,
+                    'object': {
+                    'type': 'MemberExpression',
+                    'computed': false,
+                    'object': {
+                      'type': 'Identifier',
+                      'name': 'platform'
+                    },
+                    'property': {
+                      'type': 'Identifier',
+                      'name': 'configuration'
+                    }
+                  },
+                  'property': {
+                    'type': 'Identifier',
+                    'name': 'kernel'
+                  }
+                },
+                'property': {
+                  'type': 'Identifier',
+                  'name': 'profile'
+                }
+              },
+              'right': {
+                'type': 'Literal',
+                'value': true,
+                'raw': 'true'
+              }
+            },
+            'consequent': {
+              'type': 'BlockStatement',
+              'body': [
+                {
+                  'type': 'ExpressionStatement',
+                  'expression': {
+                    'type': 'CallExpression',
+                    'callee': {
+                      'type': 'FunctionExpression',
+                      'id': null,
+                      'params': [],
+                      'defaults': [],
+                      'body': {
+                        'type': 'BlockStatement',
+                        'body': [
+                          {
+                            'type': 'VariableDeclaration',
+                            'declarations': [
+                              {
+                                'type': 'VariableDeclarator',
+                                'id': {
+                                  'type': 'Identifier',
+                                  'name': 'key'
+                                },
+                                'init': {
+                                  'type': 'Literal',
+                                  'value': node._tags['profile'][0],
+                                  'raw': '\''+node._tags['profile'][0]+'\''
+                                }
+                              }
+                            ],
+                            'kind': 'var'
+                          },
+                          {
+                            'type': 'VariableDeclaration',
+                            'declarations': [
+                              {
+                                'type': 'VariableDeclarator',
+                                'id': {
+                                  'type': 'Identifier',
+                                  'name': 'time_stop'
+                                },
+                                'init': {
+                                  'type': 'CallExpression',
+                                  'callee': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'Identifier',
+                                      'name': 'Date'
+                                    },
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'now'
+                                    }
+                                  },
+                                  'arguments': []
+                                }
+                              }
+                            ],
+                            'kind': 'var'
+                          },
+                          {
+                            'type': 'VariableDeclaration',
+                            'declarations': [
+                              {
+                                'type': 'VariableDeclarator',
+                                'id': {
+                                  'type': 'Identifier',
+                                  'name': 'time_start'
+                                },
+                                'init': {
+                                  'type': 'CallExpression',
+                                  'callee': {
+                                    "type": "MemberExpression",
+                                    "computed": false,
+                                    "object": {
                                       "type": "MemberExpression",
-                                      "computed": true,
+                                      "computed": false,
                                       "object": {
                                         "type": "MemberExpression",
                                         "computed": false,
@@ -539,64 +356,184 @@ platform.kernel._preprocessors.server[2].code_profile = function(ast,code,file,m
                                       },
                                       "property": {
                                         "type": "Identifier",
-                                        "name": "key"
+                                        "name": "_data"
                                       }
                                     },
-                                    "right": {
-                                      "type": "ObjectExpression",
-                                      "properties": [
+                                    "property": {
+                                      "type": "Identifier",
+                                      "name": "pop"
+                                    }
+                                  },
+                                  'arguments': []
+                                }
+                              }
+                            ],
+                            'kind': 'var'
+                          },
+                          {
+                            'type': 'VariableDeclaration',
+                            'declarations': [
+                              {
+                                'type': 'VariableDeclarator',
+                                'id': {
+                                  'type': 'Identifier',
+                                  'name': 'time_elapsed'
+                                },
+                                'init': {
+                                  'type': 'BinaryExpression',
+                                  'operator': '-',
+                                  'left': {
+                                    'type': 'Identifier',
+                                    'name': 'time_stop'
+                                  },
+                                  'right': {
+                                    'type': 'Identifier',
+                                    'name': 'time_start'
+                                  }
+                                }
+                              }
+                            ],
+                            'kind': 'var'
+                          },
+                          {
+                            'type': 'IfStatement',
+                            'test': {
+                              'type': 'BinaryExpression',
+                              'operator': '===',
+                              'left': {
+                                'type': 'CallExpression',
+                                'callee': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'platform'
+                                      },
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'metrics'
+                                      }
+                                    },
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'code'
+                                    }
+                                  },
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'hasOwnProperty'
+                                  }
+                                },
+                                'arguments': [
+                                  {
+                                    'type': 'Identifier',
+                                    'name': 'key'
+                                  }
+                                ]
+                              },
+                              'right': {
+                                'type': 'Literal',
+                                'value': false,
+                                'raw': 'false'
+                              }
+                            },
+                            'consequent': {
+                              'type': 'BlockStatement',
+                              'body': [
+                                {
+                                  'type': 'ExpressionStatement',
+                                  'expression': {
+                                    'type': 'AssignmentExpression',
+                                    'operator': '=',
+                                    'left': {
+                                      'type': 'MemberExpression',
+                                      'computed': true,
+                                      'object': {
+                                        'type': 'MemberExpression',
+                                        'computed': false,
+                                        'object': {
+                                          'type': 'MemberExpression',
+                                          'computed': false,
+                                          'object': {
+                                            'type': 'Identifier',
+                                            'name': 'platform'
+                                          },
+                                          'property': {
+                                            'type': 'Identifier',
+                                            'name': 'metrics'
+                                          }
+                                        },
+                                        'property': {
+                                          'type': 'Identifier',
+                                          'name': 'code'
+                                        }
+                                      },
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'key'
+                                      }
+                                    },
+                                    'right': {
+                                      'type': 'ObjectExpression',
+                                      'properties': [
                                         {
-                                          "type": "Property",
-                                          "key": {
-                                            "type": "Literal",
-                                            "value": "min",
-                                            "raw": "'min'"
+                                          'type': 'Property',
+                                          'key': {
+                                            'type': 'Literal',
+                                            'value': 'min',
+                                            'raw': '\'min\''
                                           },
-                                          "value": {
-                                            "type": "Identifier",
-                                            "name": "time_elapsed"
+                                          'value': {
+                                            'type': 'Identifier',
+                                            'name': 'time_elapsed'
                                           },
-                                          "kind": "init"
+                                          'kind': 'init'
                                         },
                                         {
-                                          "type": "Property",
-                                          "key": {
-                                            "type": "Literal",
-                                            "value": "max",
-                                            "raw": "'max'"
+                                          'type': 'Property',
+                                          'key': {
+                                            'type': 'Literal',
+                                            'value': 'max',
+                                            'raw': '\'max\''
                                           },
-                                          "value": {
-                                            "type": "Identifier",
-                                            "name": "time_elapsed"
+                                          'value': {
+                                            'type': 'Identifier',
+                                            'name': 'time_elapsed'
                                           },
-                                          "kind": "init"
+                                          'kind': 'init'
                                         },
                                         {
-                                          "type": "Property",
-                                          "key": {
-                                            "type": "Literal",
-                                            "value": "avg",
-                                            "raw": "'avg'"
+                                          'type': 'Property',
+                                          'key': {
+                                            'type': 'Literal',
+                                            'value': 'avg',
+                                            'raw': '\'avg\''
                                           },
-                                          "value": {
-                                            "type": "Identifier",
-                                            "name": "time_elapsed"
+                                          'value': {
+                                            'type': 'Identifier',
+                                            'name': 'time_elapsed'
                                           },
-                                          "kind": "init"
+                                          'kind': 'init'
                                         },
                                         {
-                                          "type": "Property",
-                                          "key": {
-                                            "type": "Literal",
-                                            "value": "count",
-                                            "raw": "'count'"
+                                          'type': 'Property',
+                                          'key': {
+                                            'type': 'Literal',
+                                            'value': 'count',
+                                            'raw': '\'count\''
                                           },
-                                          "value": {
-                                            "type": "Literal",
-                                            "value": 1,
-                                            "raw": "1"
+                                          'value': {
+                                            'type': 'Literal',
+                                            'value': 1,
+                                            'raw': '1'
                                           },
-                                          "kind": "init"
+                                          'kind': 'init'
                                         }
                                       ]
                                     }
@@ -604,354 +541,338 @@ platform.kernel._preprocessors.server[2].code_profile = function(ast,code,file,m
                                 }
                               ]
                             },
-                            "alternate": {
-                              "type": "BlockStatement",
-                              "body": [
+                            'alternate': {
+                              'type': 'BlockStatement',
+                              'body': [
                                 {
-                                  "type": "VariableDeclaration",
-                                  "declarations": [
+                                  'type': 'VariableDeclaration',
+                                  'declarations': [
                                     {
-                                      "type": "VariableDeclarator",
-                                      "id": {
-                                        "type": "Identifier",
-                                        "name": "data"
+                                      'type': 'VariableDeclarator',
+                                      'id': {
+                                        'type': 'Identifier',
+                                        'name': 'data'
                                       },
-                                      "init": {
-                                        "type": "MemberExpression",
-                                        "computed": true,
-                                        "object": {
-                                          "type": "MemberExpression",
-                                          "computed": false,
-                                          "object": {
-                                            "type": "MemberExpression",
-                                            "computed": false,
-                                            "object": {
-                                              "type": "Identifier",
-                                              "name": "platform"
+                                      'init': {
+                                        'type': 'MemberExpression',
+                                        'computed': true,
+                                        'object': {
+                                          'type': 'MemberExpression',
+                                          'computed': false,
+                                          'object': {
+                                            'type': 'MemberExpression',
+                                            'computed': false,
+                                            'object': {
+                                              'type': 'Identifier',
+                                              'name': 'platform'
                                             },
-                                            "property": {
-                                              "type": "Identifier",
-                                              "name": "metrics"
+                                            'property': {
+                                              'type': 'Identifier',
+                                              'name': 'metrics'
                                             }
                                           },
-                                          "property": {
-                                            "type": "Identifier",
-                                            "name": "code"
+                                          'property': {
+                                            'type': 'Identifier',
+                                            'name': 'code'
                                           }
                                         },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "key"
+                                        'property': {
+                                          'type': 'Identifier',
+                                          'name': 'key'
                                         }
                                       }
                                     }
                                   ],
-                                  "kind": "var"
+                                  'kind': 'var'
                                 },
                                 {
-                                  "type": "ExpressionStatement",
-                                  "expression": {
-                                    "type": "AssignmentExpression",
-                                    "operator": "=",
-                                    "left": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "Identifier",
-                                        "name": "data"
+                                  'type': 'ExpressionStatement',
+                                  'expression': {
+                                    'type': 'AssignmentExpression',
+                                    'operator': '=',
+                                    'left': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'data'
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "avg"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'avg'
                                       }
                                     },
-                                    "right": {
-                                      "type": "BinaryExpression",
-                                      "operator": "/",
-                                      "left": {
-                                        "type": "BinaryExpression",
-                                        "operator": "+",
-                                        "left": {
-                                          "type": "BinaryExpression",
-                                          "operator": "*",
-                                          "left": {
-                                            "type": "MemberExpression",
-                                            "computed": false,
-                                            "object": {
-                                              "type": "Identifier",
-                                              "name": "data"
+                                    'right': {
+                                      'type': 'BinaryExpression',
+                                      'operator': '/',
+                                      'left': {
+                                        'type': 'BinaryExpression',
+                                        'operator': '+',
+                                        'left': {
+                                          'type': 'BinaryExpression',
+                                          'operator': '*',
+                                          'left': {
+                                            'type': 'MemberExpression',
+                                            'computed': false,
+                                            'object': {
+                                              'type': 'Identifier',
+                                              'name': 'data'
                                             },
-                                            "property": {
-                                              "type": "Identifier",
-                                              "name": "avg"
+                                            'property': {
+                                              'type': 'Identifier',
+                                              'name': 'avg'
                                             }
                                           },
-                                          "right": {
-                                            "type": "MemberExpression",
-                                            "computed": false,
-                                            "object": {
-                                              "type": "Identifier",
-                                              "name": "data"
+                                          'right': {
+                                            'type': 'MemberExpression',
+                                            'computed': false,
+                                            'object': {
+                                              'type': 'Identifier',
+                                              'name': 'data'
                                             },
-                                            "property": {
-                                              "type": "Identifier",
-                                              "name": "count"
+                                            'property': {
+                                              'type': 'Identifier',
+                                              'name': 'count'
                                             }
                                           }
                                         },
-                                        "right": {
-                                          "type": "Identifier",
-                                          "name": "time_elapsed"
+                                        'right': {
+                                          'type': 'Identifier',
+                                          'name': 'time_elapsed'
                                         }
                                       },
-                                      "right": {
-                                        "type": "UpdateExpression",
-                                        "operator": "++",
-                                        "argument": {
-                                          "type": "MemberExpression",
-                                          "computed": false,
-                                          "object": {
-                                            "type": "Identifier",
-                                            "name": "data"
+                                      'right': {
+                                        'type': 'UpdateExpression',
+                                        'operator': '++',
+                                        'argument': {
+                                          'type': 'MemberExpression',
+                                          'computed': false,
+                                          'object': {
+                                            'type': 'Identifier',
+                                            'name': 'data'
                                           },
-                                          "property": {
-                                            "type": "Identifier",
-                                            "name": "count"
+                                          'property': {
+                                            'type': 'Identifier',
+                                            'name': 'count'
                                           }
                                         },
-                                        "prefix": true
+                                        'prefix': true
                                       }
                                     }
                                   }
                                 },
                                 {
-                                  "type": "IfStatement",
-                                  "test": {
-                                    "type": "BinaryExpression",
-                                    "operator": ">",
-                                    "left": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "Identifier",
-                                        "name": "data"
+                                  'type': 'IfStatement',
+                                  'test': {
+                                    'type': 'BinaryExpression',
+                                    'operator': '>',
+                                    'left': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'data'
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "min"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'min'
                                       }
                                     },
-                                    "right": {
-                                      "type": "Identifier",
-                                      "name": "time_elapsed"
+                                    'right': {
+                                      'type': 'Identifier',
+                                      'name': 'time_elapsed'
                                     }
                                   },
-                                  "consequent": {
-                                    "type": "BlockStatement",
-                                    "body": [
+                                  'consequent': {
+                                    'type': 'BlockStatement',
+                                    'body': [
                                       {
-                                        "type": "ExpressionStatement",
-                                        "expression": {
-                                          "type": "AssignmentExpression",
-                                          "operator": "=",
-                                          "left": {
-                                            "type": "MemberExpression",
-                                            "computed": false,
-                                            "object": {
-                                              "type": "Identifier",
-                                              "name": "data"
+                                        'type': 'ExpressionStatement',
+                                        'expression': {
+                                          'type': 'AssignmentExpression',
+                                          'operator': '=',
+                                          'left': {
+                                            'type': 'MemberExpression',
+                                            'computed': false,
+                                            'object': {
+                                              'type': 'Identifier',
+                                              'name': 'data'
                                             },
-                                            "property": {
-                                              "type": "Identifier",
-                                              "name": "min"
+                                            'property': {
+                                              'type': 'Identifier',
+                                              'name': 'min'
                                             }
                                           },
-                                          "right": {
-                                            "type": "Identifier",
-                                            "name": "time_elapsed"
+                                          'right': {
+                                            'type': 'Identifier',
+                                            'name': 'time_elapsed'
                                           }
                                         }
                                       }
                                     ]
                                   },
-                                  "alternate": null
+                                  'alternate': null
                                 },
                                 {
-                                  "type": "IfStatement",
-                                  "test": {
-                                    "type": "BinaryExpression",
-                                    "operator": "<",
-                                    "left": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "Identifier",
-                                        "name": "data"
+                                  'type': 'IfStatement',
+                                  'test': {
+                                    'type': 'BinaryExpression',
+                                    'operator': '<',
+                                    'left': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'data'
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "max"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'max'
                                       }
                                     },
-                                    "right": {
-                                      "type": "Identifier",
-                                      "name": "time_elapsed"
+                                    'right': {
+                                      'type': 'Identifier',
+                                      'name': 'time_elapsed'
                                     }
                                   },
-                                  "consequent": {
-                                    "type": "BlockStatement",
-                                    "body": [
+                                  'consequent': {
+                                    'type': 'BlockStatement',
+                                    'body': [
                                       {
-                                        "type": "ExpressionStatement",
-                                        "expression": {
-                                          "type": "AssignmentExpression",
-                                          "operator": "=",
-                                          "left": {
-                                            "type": "MemberExpression",
-                                            "computed": false,
-                                            "object": {
-                                              "type": "Identifier",
-                                              "name": "data"
+                                        'type': 'ExpressionStatement',
+                                        'expression': {
+                                          'type': 'AssignmentExpression',
+                                          'operator': '=',
+                                          'left': {
+                                            'type': 'MemberExpression',
+                                            'computed': false,
+                                            'object': {
+                                              'type': 'Identifier',
+                                              'name': 'data'
                                             },
-                                            "property": {
-                                              "type": "Identifier",
-                                              "name": "max"
+                                            'property': {
+                                              'type': 'Identifier',
+                                              'name': 'max'
                                             }
                                           },
-                                          "right": {
-                                            "type": "Identifier",
-                                            "name": "time_elapsed"
+                                          'right': {
+                                            'type': 'Identifier',
+                                            'name': 'time_elapsed'
                                           }
                                         }
                                       }
                                     ]
                                   },
-                                  "alternate": null
+                                  'alternate': null
                                 }
                               ]
                             }
                           },
                           {
-                            "type": "IfStatement",
-                            "test": {
-                              "type": "BinaryExpression",
-                              "operator": "===",
-                              "left": {
-                                "type": "MemberExpression",
-                                "computed": false,
-                                "object": {
-                                  "type": "MemberExpression",
-                                  "computed": false,
-                                  "object": {
-                                    "type": "MemberExpression",
-                                    "computed": false,
-                                    "object": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "MemberExpression",
-                                        "computed": false,
-                                        "object": {
-                                          "type": "Identifier",
-                                          "name": "platform"
-                                        },
-                                        "property": {
-                                          "type": "Identifier",
-                                          "name": "configuration"
-                                        }
+                            'type': 'IfStatement',
+                            'test': {
+                              'type': 'BinaryExpression',
+                              'operator': '===',
+                              'left': {
+                                'type': 'MemberExpression',
+                                'computed': false,
+                                'object': {
+                                  'type': 'MemberExpression',
+                                  'computed': false,
+                                  'object': {
+                                    'type': 'MemberExpression',
+                                    'computed': false,
+                                    'object': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'platform'
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "server"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'configuration'
                                       }
                                     },
-                                    "property": {
-                                      "type": "Identifier",
-                                      "name": "debugging"
+                                    'property': {
+                                      'type': 'Identifier',
+                                      'name': 'debug'
                                     }
                                   },
-                                  "property": {
-                                    "type": "Identifier",
-                                    "name": "kernel"
+                                  'property': {
+                                    'type': 'Identifier',
+                                    'name': 'kernel'
                                   }
                                 },
-                                "property": {
-                                  "type": "Identifier",
-                                  "name": "profile"
+                                'property': {
+                                  'type': 'Identifier',
+                                  'name': 'profile'
                                 }
                               },
-                              "right": {
-                                "type": "Literal",
-                                "value": true,
-                                "raw": "true"
+                              'right': {
+                                'type': 'Literal',
+                                'value': true,
+                                'raw': 'true'
                               }
                             },
-                            "consequent": {
-                              "type": "BlockStatement",
-                              "body": [
+                            'consequent': {
+                              'type': 'BlockStatement',
+                              'body': [
                                 {
-                                  "type": "ExpressionStatement",
-                                  "expression": {
-                                    "type": "CallExpression",
-                                    "callee": {
-                                      "type": "MemberExpression",
-                                      "computed": false,
-                                      "object": {
-                                        "type": "Identifier",
-                                        "name": "console"
+                                  'type': 'ExpressionStatement',
+                                  'expression': {
+                                    'type': 'CallExpression',
+                                    'callee': {
+                                      'type': 'MemberExpression',
+                                      'computed': false,
+                                      'object': {
+                                        'type': 'Identifier',
+                                        'name': 'console'
                                       },
-                                      "property": {
-                                        "type": "Identifier",
-                                        "name": "debug"
+                                      'property': {
+                                        'type': 'Identifier',
+                                        'name': 'debug'
                                       }
                                     },
-                                    "arguments": [
+                                    'arguments': [
                                       {
-                                        "type": "Literal",
-                                        "value": "code profile block %s required %s ms",
-                                        "raw": "'code profile block %s required %s ms'"
+                                        'type': 'Literal',
+                                        'value': 'code profile block %s required %s ms',
+                                        'raw': '\'code profile block %s required %s ms\''
                                       },
                                       {
-                                        "type": "Identifier",
-                                        "name": "key"
+                                        'type': 'Identifier',
+                                        'name': 'key'
                                       },
                                       {
-                                        "type": "Identifier",
-                                        "name": "time_elapsed"
+                                        'type': 'Identifier',
+                                        'name': 'time_elapsed'
                                       }
                                     ]
                                   }
                                 }
                               ]
                             },
-                            "alternate": null
+                            'alternate': null
                           }
                         ]
                       },
-                      "rest": null,
-                      "generator": false,
-                      "expression": false
+                      'rest': null,
+                      'generator': false,
+                      'expression': false
                     },
-                    "arguments": []
+                    'arguments': []
                   }
                 }
               ]
             },
-            "alternate": null
+            'alternate': null
           };
           node.tree.container.splice(node.tree.container.indexOf(node)+1,0,append_node);
           node.tree.container.splice(node.tree.container.indexOf(node),0,prepend_node);
-        } else {
-          console.warn('profile tag ignored for node at line %s in %s',node.loc.start.line,(file == null) ? 'eval code' : ('file ' + file));
         }
       }
     }
     node = node.tree.next;
   }
 };
-
-platform.kernel._preprocessors.server[2].code_profile._data = [];
-
-platform.metrics = platform.metrics || {};
-
-platform.metrics.code = platform.metrics.code || {};

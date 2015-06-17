@@ -28,52 +28,51 @@ platform.kernel._preprocessors.server[2].code_breakpoint = function(ast,code,fil
     if (skip === false) {
       if (node._tags != null && node._tags['b'] != null) {
         if (node._is_exec_block === true){
-          //T: append code to the closest safe node (backward)
-          // injecting: if (platform.runtime.debugging === true) { debugger; }
+          //TODO: append code to the closest safe node (backward)
+          //TODO: log to console we're going to debugger!!!?
+          // injecting: if (platform.configuration.runtime.debugging === true) { debugger; }
           var prepend_node = {
-            "type": "IfStatement",
-            "test": {
-              "type": "BinaryExpression",
-              "operator": "===",
-              "left": {
-                "type": "MemberExpression",
-                "computed": false,
-                "object": {
-                  "type": "MemberExpression",
-                  "computed": false,
-                  "object": {
-                    "type": "Identifier",
-                    "name": "platform"
+            'type': 'IfStatement',
+            'test': {
+              'type': 'BinaryExpression',
+              'operator': '===',
+              'left': {
+                'type': 'MemberExpression',
+                'computed': false,
+                'object': {
+                  'type': 'MemberExpression',
+                  'computed': false,
+                  'object': {
+                    'type': 'Identifier',
+                    'name': 'platform'
                   },
-                  "property": {
-                    "type": "Identifier",
-                    "name": "runtime"
+                  'property': {
+                    'type': 'Identifier',
+                    'name': 'runtime'
                   }
                 },
-                "property": {
-                  "type": "Identifier",
-                  "name": "debugging"
+                'property': {
+                  'type': 'Identifier',
+                  'name': 'debugging'
                 }
               },
-              "right": {
-                "type": "Literal",
-                "value": true,
-                "raw": "true"
+              'right': {
+                'type': 'Literal',
+                'value': true,
+                'raw': 'true'
               }
             },
-            "consequent": {
-              "type": "BlockStatement",
-              "body": [
+            'consequent': {
+              'type': 'BlockStatement',
+              'body': [
                 {
-                  "type": "DebuggerStatement"
+                  'type': 'DebuggerStatement'
                 }
               ]
             },
-            "alternate": null
+            'alternate': null
           };
           node.tree.container.splice(node.tree.container.indexOf(node),0,prepend_node);
-        } else {
-          console.warn('breakpoint tag ignored for node at line %s in %s',node.loc.start.line,(file == null) ? 'eval code' : ('file ' + file));
         }
       }
     }

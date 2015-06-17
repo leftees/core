@@ -22,9 +22,19 @@ platform.kernel._preprocessors.server[2].change_me = function(ast,code,file,modu
   var node = ast;
   while (node != null) {
     var skip = false;
+    // at scope
     if (node.tree.scope != null && node.tree.scope._tags != null && node.tree.scope._tags['preprocessor.disable'] != null && (node.tree.scope._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node.tree.scope._tags['preprocessor.disable'].length === 0 || node.tree.scope._tags['preprocessor.disable'].indexOf('all') > -1)){
       skip = true;
     }
+    // at node
+    if (node._tags != null && node._tags['preprocessor.disable'] != null && (node._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node._tags['preprocessor.disable'].length === 0 || node._tags['preprocessor.disable'].indexOf('all') > -1)){
+      skip = true;
+    }
+    // at parent
+    if (node.tree.parent != null && node.tree.parent._tags != null && node.tree.parent._tags['preprocessor.disable'] != null && (node.tree.parent._tags['preprocessor.disable'].indexOf(preprocessor) > -1 || node.tree.parent._tags['preprocessor.disable'].length === 0 || node.tree.parent._tags['preprocessor.disable'].indexOf('all') > -1)){
+      skip = true;
+    }
+
     if (skip === false) {
 
     }

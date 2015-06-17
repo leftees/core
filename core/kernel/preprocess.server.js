@@ -18,7 +18,10 @@
 
  */
 
-//N: Provides kernel functions to execute and manage environment.
+/**
+ * Provides kernel functions to execute and manage environment.
+ * @namespace
+*/
 platform.kernel = platform.kernel || {};
 
 platform.kernel._preprocessors = platform.kernel._preprocessors || {};
@@ -32,23 +35,57 @@ platform.kernel._preprocessors.server[0] = platform.kernel._preprocessors.server
 platform.kernel._preprocessors.server[1] = platform.kernel._preprocessors.server[1] || {};
 platform.kernel._preprocessors.server[2] = platform.kernel._preprocessors.server[2] || {};
 
-//F: Augments Javascript code for injection to current environment.
-//A: code: Specifies Javascript code to be augmented.
-//A: [path]: Specifies the file name containing code to be augmented.
-//A: [module]: Specifies name of the module that is augmenting code
-//R: Returns the augmented code.
-platform.kernel.preprocess = function(code, path, module){
-  //C: logging
-  if(platform.configuration.server.debugging.preprocess === true) {
-    if (path == null) {
-      console.debug('preprocessing runtime code');
+/**
+ * Augments Javascript code for injection to current environment.
+ * @param {} code Specifies Javascript code to be augmented.
+ * @param {} [path] Specifies the file name containing code to be augmented.
+ * @param {} [module] Specifies name of the module that is augmenting code
+ * @return {} Returns the augmented code.
+*/
+platform.kernel.preprocess = async function(path, module, code){
+  var source_code = code;
+  if (path != null && platform.io.cache.isCachedSync(path, 'built') === true) {
+    return;
+  }
+
+  var shortpath = null;
+  var resolved_path_object = null;
+  if (source_code == null) {
+    if (path != null) {
+      resolved_path_object = await platform.io.resolve(path);
+      if (resolved_path_object == null) {
+        throw new Exception('resource %s not found', path);
+      }
+      shortpath = resolved_path_object.shortpath;
+      source_code = platform.io.get.stringSync(path);
     } else {
-      console.debug('preprocessing %s', path);
+      throw new Exception('nothing to preprocess');
     }
   }
 
-  //C: compacting code and adding line marker as preprocessor
-  var ast = platform.parser.js.parse(code);
+  var fullpath = (resolved_path_object != null) ? resolved_path_object.fullpath : null;
+
+  if (fullpath != null && native.compile.scope != null){
+    var meta_code = native.metascript.transform(source_code, fullpath, native.compile.scope,true);
+    if (source_code !== meta_code){
+      platform.io.backends.build.set.stringSync(path + '.meta', meta_code);
+      source_code = meta_code;
+    }
+  }
+
+  // logging
+  if (platform.configuration.debug.kernel.preprocess === true) {
+    if (path == null) {
+      console.debug('preprocessing runtime code');
+    } else {
+      console.debug('preprocessing %s', shortpath);
+      //console.debug('preprocessing %s', fullpath);
+    }
+  }
+
+  var esnext_prefix = 'exports.__promise_ = (async function(){';
+  var esnext_suffix = '\n})();';
+  var ast = platform.parser.js.parse(esnext_prefix + source_code + esnext_suffix, fullpath);
 
   var side = null;
   if (path != null) {
@@ -61,108 +98,135 @@ platform.kernel.preprocess = function(code, path, module){
     side = 'server';
   }
   var preprocessors = platform.kernel._preprocessors[side];
-  Object.keys(preprocessors).forEach(function(phase){
-    Object.keys(preprocessors[phase]).forEach(function(preprocessor){
+  Object.keys(preprocessors).forEach(function (phase) {
+    Object.keys(preprocessors[phase]).forEach(function (preprocessor) {
       var process = preprocessors[phase][preprocessor];
-      if (typeof process === 'function'){
-        if(platform.configuration.server.debugging.preprocess === true) {
+      if (typeof process === 'function') {
+        if (platform.configuration.debug.kernel.preprocess === true) {
           if (path == null) {
             console.debug('preprocessing runtime code phase %s (%s)', phase, preprocessor);
           } else {
-            console.debug('preprocessing %s phase %s (%s)', path, phase, preprocessor);
+            console.debug('preprocessing %s phase %s (%s)', shortpath, phase, preprocessor);
+            //console.debug('preprocessing %s phase %s (%s)', fullpath, phase, preprocessor);
           }
         }
-        process(ast,code,path,module,preprocessor);
+        process(ast, source_code, path, module, preprocessor);
       }
     });
   });
 
-  var generated_object = platform.parser.js.stringify(ast,false,false);
-  ast = null;
+  var generated = null;
 
-  var generated_code = generated_object.code;
-  var generated_map = generated_object.map.toJSON();
-
-  if (path != null) {
-
-    generated_map.sources = [ platform.io.resolve(path) ];
-    generated_map.sourcesContent = [ code ];
-
-    generated_code += '\n//# sourceMappingURL='+native.path.basename(path)+'.map';
-
-    //C: storing code to /runtime/ for debuggers (only for backend files...)
-    platform.kernel._backend.set.string(path, generated_code);
-    //C: storing sourcemap to /runtime/ for debuggers (only for backend files...)
-    platform.kernel._backend.set.string(path+'.map', JSON.stringify(generated_map));
-  } else {
-    //T: support source mapping for evals?
+  if (platform.configuration.debug.kernel.preprocess === true) {
+    if (path == null) {
+      console.debug('compiling runtime code');
+    } else {
+      console.debug('compiling %s', shortpath);
+      //console.debug('compiling %s', fullpath);
+    }
   }
 
-  return generated_code;
+  if (path != null) {
+    generated = platform.parser.js.stringify(ast, true, false, fullpath);
+    generated.map.sources = [ native.path.relative(native.path.join(platform.io.backends.build.base,path),fullpath).replace(/\\/g,'/').replace('../','') ];
+    generated.map.sourcesContent = [source_code];
+    // storing code to /runtime/ for debuggers (only for backend files...)
+    var sourcemap_comment = '//# sourceMappingURL=' + native.path.basename(path) + '.map';
+    // storing sourcemap to /runtime/ for debuggers (only for backend files...)
+    platform.io.backends.build.set.stringSync(path, generated.code + '\n' + sourcemap_comment);
+    platform.io.cache.set.stringSync(path, generated.code + '\n' + sourcemap_comment, 'built');
+    platform.io.backends.build.set.stringSync(path + '.map', JSON.stringify(generated.map));
+    if (platform.configuration.debug.kernel.preprocess === true) {
+      console.debug('optimizing %s', shortpath);
+      //console.debug('optimizing %s', fullpath);
+    }
+    var minified = native.parser.js.minifier.minify(generated.code, {
+      //inSourceMap: generated.map,
+      //outSourceMap: native.path.basename(path) + '.map',
+      mangle: false,
+      compress: true,
+      comments: 'all',
+      //sourceMapIncludeSources: true,
+      fromString: true
+    });
+    platform.io.backends.build.set.stringSync(path + '.min', minified.code);
+    platform.io.cache.set.stringSync(path + '.min', minified.code, 'built');
+    //platform.io.backends.build.set.stringSync(path + '.map', minified.map);
+  } else {
+    //TODO: add support for inline source map for eval code
+    generated = platform.parser.js.stringify(ast, false);
+  }
+
+  ast = null;
+
+  //if (code != null) {
+  return generated.code.toString();
+  //}
 };
 
-//F: Injects Javascript code to current environment.
-//A: code: Specifies Javascript code to be injected.
-//A: [file]: Specifies the file name containing code to be injected.
-//A: [module]: Specifies name of the module that is injecting code
-//A: [preprocess]: Specifies whether the code should be augmented before injection. Default is true.
-//R: Returns the return value from injected code.
-//H: Temporary implementation uses the global.eval function, it will be replaced with global.require to support debuggers.
-platform.kernel.inject = function (code,file,module,preprocess) {
+/**
+ * Injects Javascript code to current environment.
+ * @param {} code Specifies Javascript code to be injected.
+ * @param {} [file] Specifies the file name containing code to be injected.
+ * @param {} [module] Specifies name of the module that is injecting code
+ * @param {} [preprocess] Specifies whether the code should be augmented before injection. Default is false.
+ * @return {} Returns the return value from injected code.
+ * @alert  Temporary implementation uses the global.eval function, it will be replaced with global.require to support debuggers.
+*/
+platform.kernel.inject = async function (code,file,module,preprocess) {
   var preprocessed_code;
-  if (preprocess === true && platform.kernel.preprocess != null && typeof platform.kernel.preprocess === 'function') {
-    preprocessed_code = platform.kernel.preprocess(code,file,module);
+  if (preprocess === true) {
+    preprocessed_code = await platform.kernel.preprocess(file,module,code);
   } else {
-    preprocessed_code = code;
+    preprocessed_code = native.eval(code);
   }
   return global.eval.call(global,preprocessed_code);
 };
 
-//F: Loads Javascript file into current environment.
-//A: path: Specifies the file name containing code to be injected.
-//A: [module]: Specifies name of the module that is injecting code
-//A: [preprocess]: Specifies whether the code should be augmented before injection. Default is true.
-//R: Returns the return value from loaded code.
-//H: This function will resolve paths, augment code if requested, cache and inject into current environment.
-platform.kernel.load = function(path,module,preprocess) {
-  //preprocess = false;
-  //C: checking whether the file exists
-  if (platform.io.exists(path) === false) {
+/**
+ * Loads Javascript file into current environment.
+ * @param {} path Specifies the file name containing code to be injected.
+ * @param {} [module] Specifies name of the module that is injecting code
+ * @return {} Returns the return value from loaded code.
+ * @alert  This function will resolve paths, augment code if requested, cache and inject into current environment.
+*/
+platform.kernel.load = async function(path,module) {
+  var resolved_path_object = await platform.io.resolve(path);
+  // checking whether the file exists
+  if (resolved_path_object == null) {
     throw new Exception('resource %s not found', path);
   }
-  //C: detecting if file is already cached
-  var is_cached = platform.io.cache.is(path, 'built');
-  var preprocessed_code;
+  // detecting if file is already cached
+  var is_cached = platform.io.cache.isCachedSync(path, 'built');
   if (is_cached === false) {
-    //C: getting file content
-    var code = platform.io.get.string(path);
-    //C: preprocessing code if required
-    if ((preprocess == null || preprocess === true) && typeof platform.kernel.preprocess === 'function') {
-      preprocessed_code = platform.kernel.preprocess(code,path,module);
-    } else {
-      preprocessed_code = code;
-    }
-    //C: caching augmented file
-    //T: replace with sync set call
-    platform.io.cache.set.string(path, 'built', preprocessed_code);
-  } else {
-    //C: getting file from cache
-    preprocessed_code = platform.io.cache.get.string(path, 'built', true);
+    await platform.kernel.preprocess(path, module);
   }
-  //C: loading file through require
-  if(platform.configuration.server.debugging.load === true){
-    console.debug('loading %s', path);
+  // registering for file changes
+  var fullpath = resolved_path_object.fullpath;
+  if(platform.configuration.debug.load === true){
+    //console.info('loading %s',  resolved_path_object.shortpath);
+    console.info('loading %s from %s (%s)', resolved_path_object.shortpath, resolved_path_object.backend.name, resolved_path_object.fullpath);
   }
-  var fullpath = native.path.join(platform.kernel._backend.base,path);
-  var result = global.require(fullpath);
-  //C: invalidating main file from require cache
-  delete global.require.cache[fullpath];
-  return result;
+//? if (CLUSTER) {
+  platform.development.change.register(fullpath, platform.cluster.worker.id);
+//? } else {
+  platform.development.change.register(fullpath);
+//? }
+  // loading file through require
+  var path_to_load = native.path.join(platform.io.backends.build.base,path);
+  var exported = global.require(path_to_load + ((global.development === false) ? '.min' : ''));
+  // invalidating main file from require cache
+  delete global.require.cache[path_to_load];
+  try {
+    await exported.__promise_;
+    delete exported.__promise_;
+    return exported;
+  } catch(err) {
+    console.error(err);
+    throw err;
+  }
 };
 
-//C: registering 'runtime' store as new filesystem backend with app root path + /runtime/
-//T: allow build store override by configuration
-platform.io.store.register('runtime', platform.kernel.new('core.io.store.file', [ native.path.join(platform.runtime.path.app, 'runtime') ]), -1);
-
-//V: Stores the 'runtime' store backend.
-platform.kernel._backend = platform.io.store.getByName('runtime');
+// registering 'build' store as new filesystem backend with server root path + /runtime/
+//TODO: allow build store override by configuration
+platform.io.store.register('build', platform.kernel.new('core.io.store.file', [ native.path.join(platform.configuration.runtime.path.root, 'build') ]), -1, true);
