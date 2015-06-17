@@ -39,4 +39,5 @@ cache*
 data
 tmp
 bin
-config
+/app
+/config
