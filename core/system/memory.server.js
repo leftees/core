@@ -18,55 +18,57 @@
 
  */
 
+/**
+ * Contains system namespace.
+ * @namespace
+*/
 platform.system = platform.system || {};
 
-//T: add autostart support in configuration
-//O: Provides support for memory monitoring and management (based on memwatch).
-platform.system.memory = {};
-platform.system.memory._memwatch = require('memwatch');
+//TODO: add autostart support in configuration
+/**
+ * Provides support for memory monitoring and management (based on memwatch).
+ * @type {Object}
+*/
+platform.system.memory = platform.system.memory || {};
 
-//V: Contains HeapDiff class instance during heap diff analysis.
-platform.system.memory._heapdiff = null;
-
-//F: Starts memory heap diff analysis.
-platform.system.memory.start = function(){
-  platform.system.memory._heapdiff = new platform.system.memory._memwatch.HeapDiff();
-};
-
-//F: Stops memory heap and returns diff analysis.
-//R: Returns head diff object from memwatch module.
-platform.system.memory.stop = function(){
-  var heapdiff = platform.system.memory._heapdiff;
-  platform.system.memory._heapdiff = null;
-  return heapdiff.end();
-};
-
-//F: Demands a V8 runtime garbage collection.
+/**
+ * Demands a V8 runtime garbage collection.
+*/
 platform.system.memory.collect = function(){
-  if (platform.configuration.server.debugging.memory === true) {
-    platform.system.memory.log(true,false);
+  // print memory info before collecting
+  if (platform.configuration.debug.memory === true) {
+    platform.system.memory.log(true,true);
   }
+  // calculating time and executing garbage collector
   var time_start = Date.now();
-  platform.system.memory._memwatch.gc();
+  native.memwatch.gc();
   var time_stop = Date.now();
-  if (platform.configuration.server.debugging.memory === true) {
+  // logging
+  if (platform.configuration.debug.memory === true) {
     console.debug('memory garbage collected in %s',Number.toHumanTime(time_stop-time_start));
     platform.system.memory.log(true,true);
   }
+  return platform.system.memory.info();
 };
 
-//O: Stores memory data for trend analysis.
+/**
+ * Stores memory data for trend analysis.
+ * @type {Object}
+*/
 platform.system.memory._previous = {};
 platform.system.memory._previous.heap = 0;
 platform.system.memory._previous.rss = 0;
 platform.system.memory._previous.heap_label = null;
 platform.system.memory._previous.rss_label = null;
 
+/**
+ * Gets V8 memory and heap information.
+*/
 platform.system.memory.info = function(){
-  //C: extracting memory usage data
+  // extracting memory usage data
   var memory = process.memoryUsage();
 
-  //C: calculating memory usage trend
+  // calculating memory usage trend
   var trend_heap = Math.floor((memory.heapTotal-platform.system.memory._previous.heap)/platform.system.memory._previous.heap*10000)/100;
   var trend_rss = Math.floor((memory.rss-platform.system.memory._previous.rss)/platform.system.memory._previous.rss*10000)/100;
 
@@ -80,13 +82,16 @@ platform.system.memory.info = function(){
   };
 };
 
-//F: Prints V8 runtime memory usage.
-//A: [always]: Specifies to print info even if nothing has changed from last log. Default is false.
-platform.system.memory.log = function(always,rebase){
-  //C: extracting memory usage data
+/**
+ * Prints V8 runtime memory usage.
+ * @param {} [force] Specifies to print info even if nothing has changed from last log. Default is false.
+ * @param {} [rebase]:
+*/
+platform.system.memory.log = function(force,rebase){
+  // extracting memory usage data
   var memory_info = platform.system.memory.info();
 
-  //C: calculating memory usage trend
+  // calculating memory usage trend and converting to human-readable strings
   var trend_heap = memory_info.trend.heap;
   var trend_rss = memory_info.trend.rss;
   var trend_heap_label;
@@ -108,35 +113,52 @@ platform.system.memory.log = function(always,rebase){
   var heap_label = Number.toHumanSize(memory_info.heap);
   var rss_label = Number.toHumanSize(memory_info.rss);
 
-  if (always === true || heap_label !== platform.system.memory._previous.heap_label || rss_label !== platform.system.memory._previous.rss_label) {
+  // printing memory info only if label has changed from last time or we're forced to do so
+  if (force === true || heap_label !== platform.system.memory._previous.heap_label || rss_label !== platform.system.memory._previous.rss_label) {
     console.debug('memory status is %s ram%s with %s heap%s', rss_label, trend_rss_label, heap_label, trend_heap_label);
   }
 
+  // storing memory data for further trend analysis
   if(rebase === true) {
-    //C: storing memory data for further trend analysis
     platform.system.memory._previous.heap = memory_info.heap;
     platform.system.memory._previous.rss = memory_info.rss;
   }
 
+  // storing latest label
   platform.system.memory._previous.heap_label = heap_label;
   platform.system.memory._previous.rss_label = rss_label;
 };
 
-//C: starting memory watcher (only if debug is enabled)
-//T: add platform event for memory leak/stats
-//C: attaching to memwatch leak event
-platform.system.memory._memwatch.on('leak', #name('memwatch.on.info'):function (info) {
-  //T: investigate negative memory leaks?
-  //console.warn('possible memory leak detected: %s', info.reason);
-});
-//C: attaching to memwatch stats event
-platform.system.memory._memwatch.on('stats', #name('memwatch.on.stats'):function (stats) {
-  if (platform.configuration.server.debugging.memory === true) {
-    platform.system.memory.log();
+platform.events.attach('core.ready','memory.init',function(){
+  if (platform.configuration.system.memory.gc.force === true) {
+    // forcing garbage collector to clean memory
+    platform.system.memory.collect();
+    // starting forced gc interval if requested by configuration
+    platform.system.memory._interval = setInterval(platform.system.memory.collect, platform.configuration.system.memory.gc.interval);
   }
+  // attaching to memwatch leak event
+  platform.events.register('memory.leak',null,null,true);
+  native.memwatch.on('leak', /*#name('memwatch.on.info'):*/function (info) {
+    if (platform.configuration.debug.memory === true) {
+      console.warn('possible memory leak detected: %s', info.reason);
+    }
+    platform.events.raise('memory.leak', info);
+  });
+  // attaching to memwatch stats event
+  native.memwatch.on('stats', /*#name('memwatch.on.stats'):*/function (stats) {
+    if (platform.configuration.debug.memory === true) {
+      platform.system.memory.log();
+    }
+    if (platform.configuration.system.memory.gc.force === true) {
+      // forcing garbage collector to clean memory
+      platform.system.memory.collect();
+    }
+  });
+  platform.statistics.register('gauge', 'memory.heap',null,true);
+  platform.statistics.register('gauge', 'memory.rss',null,true);
+  setInterval(function(){
+    var memory_info = process.memoryUsage();
+    platform.statistics.get('memory.heap').set(memory_info.heapTotal);
+    platform.statistics.get('memory.rss').set(memory_info.rss);
+  },1000);
 });
-
-//C: starting forced gc interval if requested by configuration
-if (platform.configuration.server.memory.gc.force === true) {
-  platform.system.memory._interval = setInterval(platform.system.memory.collect, platform.configuration.server.memory.gc.interval);
-}
