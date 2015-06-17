@@ -18,216 +18,55 @@
 
  */
 
-//C: creating native namespace with references to node-specific modules
-global.native = {};
+var fs = require('fs');
+var path = require('path');
 
-//C: loading native modules and node-specific ones
-native.semver = require('semver');
-native.domain = require('domain');
-native.fs = require('fs-extra');
-native.fs.readdirp = require('readdirp');
-native.stream = require('stream');
-native.net = require('net');
-native.path = require('path');
-native.util = require('util');
-native.url = require('url');
-native.querystring = require('querystring');
-native.useragent = require('useragent');
-//T: fix update path for global installations
-//native.useragent(true);
-require('useragent/features');
-native.http = require('http');
-native.https = require('https');
-native.httpauth ={};
-native.httpauth.basic = require('http-auth').basic;
-native.httpauth.digest = require('http-auth').digest;
-native.crypto = require('crypto');
-native.websocket = {};
-native.websocket.server = require('ws').Server;
-native.args = require('yargs').argv;
-native.cli = {};
-native.cli.color = require('cli-color');
-
-//C: properly load zlib native module with sync implementations (on node version 0.10.0 - 0.11.11 we'll use our node-zlib-backport)
-if (native.semver.satisfies(native.semver.clean(process.version),'0.10.0 - 0.11.11') === true) {
-  native.zlib = require('node-zlib-backport');
-} else {
-  native.zlib = require('zlib');
-}
-
-native.body = {};
-native.body.text = require('body');
-native.body.json = require('body/json');
-native.body.form = require('body/form');
-native.body.multipart = require('multiparty').Form;
-native.cookie = require('cookie');
-native.cookie.create = native.cookie.serialize;
-native.cookie.serialize = function(data){
-  var result = [];
-  Object.keys(data).forEach(function(name){
-    result.push(name+'='+data[name]);
-  });
-  return result.join('; ');
-};
-native.cookie._signature = require('cookie-signature');
-native.cookie.sign = native.cookie._signature.sign;
-native.cookie.unsign = native.cookie._signature.unsign;
-native.dom = {};
-native.dom.html = require('jsdom');
-native.dom.html.defaultDocumentFeatures = {
-  FetchExternalResources: false,
-  ProcessExternalResources: false
-};
-native.dom.html = native.dom.html.jsdom;
-native.dom.xml = require('libxmljs').parseXml;
-native.request = require('request');
-native.moment = require('moment');
-native.parser = {};
-native.parser.js = {};
-native.parser.js.parse = require('esprima').parse;
-native.parser.js.traverse = require('estraverse').traverse;
-native.parser.js.utils = require('esutils');
-native.parser.js.codegen = require('escodegen').generate;
-native.parser.js.sourcemap = require('source-map');
-native.uuid = require('node-uuid');
-native.mail = require('nodemailer');
-native.async = require('async');
-native.watch = require('node-watch');
-native.database = require('caminte').Schema;
-
-//C: injecting core HTML5 classes implementation (we like a mirrored environment)
-//T: test W3C compliance for Worker
-global.Worker = require('webworker-threads').Worker;
-//T: test W3C compliance  for WebSocket
-global.WebSocket = require('ws');
-//T: test W3C compliance for XMLHttpRequest
-global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-//T: add localStorage/indexDB emulation?
-
-//C: creating global platform-wide exception object for managed error handling/remoting
-global.Exception = function(messageOrObject){
-  var error;
-  if (typeof messageOrObject === 'string') {
-    //C: getting message argument
-    var formatted_message = messageOrObject;
-    //C: sanitizing message to 'unknown' if missing
-    if (formatted_message == null) {
-      formatted_message = 'unknown';
-    }
-    //C: getting formatted message from arguments (emulating behavior of console.log)
-    var arguments_array = Array.prototype.slice.call(arguments);
-    if (arguments_array.length > 0) {
-      formatted_message = native.util.format.apply(native.util, arguments_array);
-    }
-    //C: removing original message from arguments
-    if (arguments_array.length > 0) {
-      arguments_array.shift();
-    }
-    error = new Error(formatted_message);
-    //C: storing arguments as exception data
-    error.data = arguments_array;
-  } else if (messageOrObject != null && typeof messageOrObject === 'object' && messageOrObject.constructor === Error) {
-    error = messageOrObject;
-    //C: storing arguments as exception data
-    error.data = Array.prototype.slice.call(arguments);
-  } else {
-    error = new Error('custom error object');
-    //C: storing arguments as exception data
-    error.data = Array.prototype.slice.call(arguments);
-  }
-  //C: initializing dump as null (will be populated by embedded runtime debugger)
-  error.dump = null;
-  //C: patching stack
-  error.stack = error.stack.replace(/\n\s*?at new global\.Exception.*?\n/, '\n');
-  return error;
-};
-//C: overriding toString() function to provide Error emulation
-global.Exception.prototype.toString = function(){
-  return this.message;
-};
-
-//C: referencing native node console
-native.console = {};
-['log', 'warn', 'info', 'error', 'dir'].forEach(function (level) {
-  native.console[level] = console[level];
-});
-
-//C: adding emulation for console.debug
-native.console.debug = native.console.log;
-
-//C: defining centralized print with level and color support (xterm int code as second argument)
-console._format_and_print = function (level,color,args) {
-  var formatted_message = native.util.format.apply(native.util, args);var now = Date.now();
-  return native.console[level](native.cli.color.xterm(color)(formatted_message));
-};
-
-//C: replacing console.log with coloured implementation
-console.log = function () {
-  console._format_and_print('log',7, Array.prototype.slice.call(arguments));
-};
-
-//C: replacing console.warn with coloured implementation
-console.warn = function () {
-  console._format_and_print('warn',220, Array.prototype.slice.call(arguments));
-};
-
-//C: replacing console.info with coloured implementation
-console.info = function () {
-  console._format_and_print('info',32, Array.prototype.slice.call(arguments));
-};
-
-//C: replacing console.error with coloured implementation
-console.error = function () {
-  console._format_and_print('error',1, Array.prototype.slice.call(arguments));
-};
-
-//C: replacing or defining console.debug with coloured implementation
-console.debug = function () {
-  console._format_and_print('debug',8, Array.prototype.slice.call(arguments));
-};
-
-//C: creating console.check with coloured implementation
-console.check = function () {
-  console._format_and_print('log',12, Array.prototype.slice.call(arguments));
-};
-
-//C: creating supported CLI commands hashtable (will be populated afterwards)
 global.main.commands = {};
+//if (process.env['MAIN_COMMAND'] == null) {
+  // creating supported CLI commands hashtable (will be populated afterwards)
 
-//C: defining legacy unknown CLI command (will be overridden by modular commands loading)
-global.main.commands.unknown = function(){
-  console.error('unsupported command');
-};
-
-//C: defining legacy test_ci CLI command (will be overridden by modular commands loading)
-global.main.commands.test = function(){
-  console.error('unsupported command');
-};
-
-//C: populating supported CLI commands from /core/main folder (whether exists)
-if (native.fs.existsSync(native.path.join(global.main.path.core,'/core/main')) === true) {
-  //C: getting files available in /core/main folder
-  var exec_files = native.fs.readdirSync(native.path.join(global.main.path.core,'/core/main'));
-  //C: loading every .js files available in /core/main folder
-  exec_files.forEach(function (file) {
-    if (file.endsWith('.js') === true) {
-      global.require.main._compile('\n' + native.fs.readFileSync(global.main.path.core + '/core/main/' + file, { encoding: 'utf-8' })/*, global.main.path.core + '/core/main/' + file*/);
+  // defining legacy unknown CLI command (will be overridden by modular commands loading)
+  global.main.commands.unknown = function (command) {
+    if (command == null) {
+      console.error('missing command');
+    } else {
+      console.error('unsupported command %s', command);
     }
-  });
-}
+  };
 
-//C: detecting CLI command requested by user
-var target_command = global.main.commands[native.args._[0]];
-//C: checking whether command doesn't exist or it's not executable
-if (!(target_command != null && typeof target_command === 'function')){
-  if (global.testing === false) {
-    //C: selecting unknown command by default (hopefully overridden by loaded modular commands)
-    target_command = global.main.commands.unknown;
-  } else {
-    //C: selecting test command by default (hopefully overridden by loaded modular commands)
-    target_command = global.main.commands.test(true);
+  // defining legacy test_ci CLI command (will be overridden by modular commands loading)
+  global.main.commands.test = function () {
+    console.error('unsupported command');
+  };
+
+  // populating supported CLI commands from /core/main folder (whether exists)
+  if (fs.existsSync(path.join(global.main.path.core, '/core/main')) === true) {
+    // getting files available in /core/main folder
+    var exec_files = fs.readdirSync(path.join(global.main.path.core, '/core/main'));
+    // loading every .js files available in /core/main folder
+    exec_files.forEach(function (file) {
+      if (file.endsWith('.js') === true) {
+        global.require.main._compile('\n' + fs.readFileSync(global.main.path.core + '/core/main/' + file, {encoding: 'utf-8'}));
+      }
+    });
   }
-}
 
-//C: executing CLI command
-target_command();
+  // detecting CLI command requested by user
+  var target_command = global.main.commands[process.argv[2]];
+  // checking whether command doesn't exist or it's not executable
+  if (!(target_command != null && typeof target_command === 'function')) {
+    if (global.testing === false) {
+      // selecting unknown command by default (hopefully overridden by loaded modular commands)
+      global.main.commands.unknown(process.argv[2]);
+    } else {
+      // selecting test command by default (hopefully overridden by loaded modular commands)
+      global.main.commands.test(true);
+    }
+  } else {
+    // executing CLI command
+    target_command();
+  }
+/*} else {
+  global.require.main._compile('\n' + fs.readFileSync(global.main.path.core + '/core/main/' + process.env['MAIN_COMMAND'], {encoding: 'utf-8'}));
+  global.main.commands[process.argv[2]]();
+}*/
