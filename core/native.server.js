@@ -196,8 +196,8 @@ defineNative(native.parser.js.sourcemap,'helper','source-map');
 defineNative(native.parser.js.sourcemap,'support','source-map-support');
 //native.parser.js.sourcemap.convert = require('convert-source-map');
 defineNative(native.parser.js.sourcemap,'convert','convert-source-map');
-//native.parser.js.sourcemap.concat = require('concat-with-sourcemaps');
-defineNative(native.parser.js.sourcemap,'concat','concat-with-sourcemaps');
+//native.parser.js.sourcemap.concat = require('concat-with-sourcemaps-next');
+defineNative(native.parser.js.sourcemap,'concat','concat-with-sourcemaps-next');
 //native.parser.js.esnext = require('babel-core');
 defineNative(native.parser.js,'esnext','babel-core');
 //native.parser.js.minifier = require('uglify-js');
@@ -263,8 +263,8 @@ defineNative(native.monitor,'uv','event-loop-lag');
 //native.sysconf = require('sysconfx-next');
 defineNative(native,'sysconf','sysconfx-next');
 if (process.platform === 'win32') {
-//native.perfcounter = require('cWinPerfCounter');
-  defineNative(native, 'perfcounter', 'cWinPerfCounter');
+//native.perfcounter = require('cwinperfcounter-next');
+  defineNative(native, 'perfcounter', 'cwinperfcounter-next');
 }
 //native.winston = require('winston');
 defineNative(native,'winston','winston');

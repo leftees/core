@@ -31,7 +31,7 @@
     "chai-as-promised": "*",
     "chokidar": "*",
     "codeclimate-test-reporter": "*",
-    "concat-with-sourcemaps-next": "https://github.com/marcominetti/concat-with-sourcemaps/tarball/master",
+    "concat-with-sourcemaps-next": "*",
     "convert-source-map": "*",
     "cookie": "*",
     "cookie-signature": "*",
@@ -68,7 +68,7 @@
     "node-watch": "*",
     "nodemailer": "*",
     "nodemailer-smtp-pool": "*",
-    "npm": "*",
+    "npm": "2.11.x",
     "pson": "*",
     "readdirp": "*",
     "request": "*",
@@ -92,7 +92,7 @@
   },
   "optionalDependencies" : {
     "sysconfx-next": "*",
-    "cwinperfcounter": "https://github.com/marcominetti/cwinperfcounter/tarball/master",
+    "cwinperfcounter-next": "*",
     "node-zlib-backport": "*"
   },
   "scripts": {
