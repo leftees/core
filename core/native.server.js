@@ -406,7 +406,7 @@ require('babel-core/polyfill');
 native.util.makeHybridCallbackPromise = function(callback, noreject){
   var hybrid_callback;
   var promise, resolve, reject;
-  if (native.util.isFunction(callback) === true) {
+  if (typeof callback === 'function') {
     hybrid_callback = callback;
     hybrid_callback.promise = undefined;
     hybrid_callback.resolve = function(result){
