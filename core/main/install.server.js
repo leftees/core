@@ -18,19 +18,19 @@
 
  */
 
-global.main.commands.install = function(next_command) {
+global.main.commands.install = function (next_command) {
   init_npm(next_command);
 };
 
-var init_npm = function(next_command){
+var init_npm = function (next_command) {
   var npm;
   try {
     npm = require('npm');
-    npm.load({'dev': false }, function () {
-      install_deps(npm,next_command);
+    npm.load({'dev': false}, function () {
+      install_deps(npm, next_command);
     });
   } catch (error) {
-    require('child_process').exec('npm link npm',function(error, stdout, stderr){
+    require('child_process').exec('npm install npm', function (error, stdout, stderr) {
       if (error != null) {
         throw error;
       } else {
@@ -43,7 +43,7 @@ var init_npm = function(next_command){
   }
 };
 
-var install_deps = function(npm,next_command){
+var install_deps = function (npm, next_command) {
   console.log('checking dependencies...');
   npm.commands.outdated([], true, function (error, info) {
     if (error != null) {
@@ -59,7 +59,7 @@ var install_deps = function(npm,next_command){
         //TODO: compare against real version (semver?) just in case of backported upgrades
         if (installed == null) {
           deps_missing.push(dependency);
-        } else if (installed !== latest && installed !== wanted) {
+        } else if (installed !== wanted && dependency !== 'npm') {
           deps_outdated.push(dependency);
         }
       });
@@ -100,7 +100,7 @@ var install_deps = function(npm,next_command){
   });
 };
 
-var done = function(next_command){
+var done = function (next_command) {
   console.log('done');
   if (next_command != null) {
     var target = global.main.commands[next_command];
@@ -112,7 +112,7 @@ var done = function(next_command){
   }
 };
 
-global.main.commands.install.man = function() {
+global.main.commands.install.man = function () {
   console.log('\
   install\n\
   Install required and missing dependencies.');

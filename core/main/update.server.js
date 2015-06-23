@@ -30,7 +30,7 @@ var init_npm = function (next_command) {
       update_ljve(npm, next_command);
     });
   } catch (error) {
-    require('child_process').exec('npm link npm', function (error, stdout, stderr) {
+    require('child_process').exec('npm install npm', function (error, stdout, stderr) {
       npm = require('npm');
       npm.load({'dev': false}, function () {
         update_ljve(npm, next_command);
@@ -93,7 +93,7 @@ var update_deps = function (npm, next_command) {
         //TODO: compare against real version (semver?) just in case of backported upgrades
         if (installed == null) {
           deps_missing.push(dependency);
-        } else if (installed !== latest && installed !== wanted && dependency !== 'npm') {
+        } else if (installed !== wanted && dependency !== 'npm') {
           deps_outdated.push(dependency);
         }
       });
@@ -107,7 +107,7 @@ var update_deps = function (npm, next_command) {
         if (process.platform === 'win32') {
           var npm_process = require('child_process').spawn(
             'cmd',
-            ['/c', 'npm', 'update'].concat(deps_outdated)
+            ['/c', 'npm', 'install'].concat(deps_outdated)
             , {
               'stdio': 'inherit'
             });
