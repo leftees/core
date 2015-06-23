@@ -35,9 +35,9 @@ node_modules*
 .project
 
 # Temporary runtime files
-cache*
-data
-tmp
-bin
+/cache
+/data
+/tmp
+/bin
 /app
 /config
