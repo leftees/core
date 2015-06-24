@@ -29,21 +29,19 @@ platform.configuration.development.tools.console.ports = {
   'agent': 9958,
   'ui': 9090
 };
-platform.configuration.development.tools.console.spawn = false;
+platform.configuration.development.tools.console.spawn = true;
 
 platform.configuration.development.tools.inspector = {};
 platform.configuration.development.tools.inspector.ports = {
-  'ui': 9091,
-  'spawn': true
+  'ui': 9091
 };
 platform.configuration.development.tools.inspector.spawn = true;
 
 
 platform.configuration.development.tools.ide = {};
 platform.configuration.development.tools.ide.ports = {
-  'ui': 9092,
-  'spawn': false
+  'ui': 9092
 };
-platform.configuration.development.tools.ide.spawn = false;
+platform.configuration.development.tools.ide.spawn = true;
 
 
