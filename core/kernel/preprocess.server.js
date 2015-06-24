@@ -52,7 +52,7 @@ platform.kernel.preprocess = async function(path, module, code){
   var resolved_path_object = null;
   if (source_code == null) {
     if (path != null) {
-      resolved_path_object = await platform.io.resolve(path);
+      resolved_path_object = platform.io.resolveSync(path);
       if (resolved_path_object == null) {
         throw new Exception('resource %s not found', path);
       }
