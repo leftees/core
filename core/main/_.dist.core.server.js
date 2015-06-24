@@ -38,6 +38,8 @@ global.main.commands['_.dist.core'] = function () {
   var args = require('yargs').argv;
   var fs = require('fs-extra');
   var path = require('path');
+  var async = require('neo-async');
+  var child_process = require('child_process');
 
   var optimizer = args._[1] || args.optimizer || 'closure';
 
@@ -47,69 +49,40 @@ global.main.commands['_.dist.core'] = function () {
     }
     fs.mkdirSync(path.join(global.main.path.core, '/dist/'));
     fs.mkdirSync(path.join(global.main.path.core, '/dist/docs/'));
-    require('child_process').spawnSync(process.execPath, [
-      global.main.path.core + '/node_modules/ljve-jsdoc/jsdoc.js',
-      global.main.path.core + '/build/pack/core.server.js',
-      '-c',
-      global.main.path.core + '/.jsdocrc',
-      '--verbose'
-    ], {
-      stdio: 'inherit'
-    });
     fs.mkdirSync(path.join(global.main.path.core, '/dist/boot/'));
-    switch (optimizer) {
-      case 'uglify':
-        require('child_process').spawnSync(process.execPath, [
-          global.main.path.core + '/node_modules/uglify-js/bin/uglifyjs',
-          global.main.path.core + '/build/core/bootstrap.server.js.boot',
-          '-o',
-          global.main.path.core + '/dist/boot/bootstrap.server.js.boot',
-          //'--in-source-map',
-          //global.main.path.core + '/build/core/bootstrap.server.js.boot.map',
-          //'--source-map',
-          //global.main.path.core + '/dist/boot/bootstrap.server.js.boot.map',
-          '--acorn',
-          '-c',
-          //'-m',
-          '-v',
-          '-p',
-          'relative',
-          //'--source-map-include-sources'
-        ], {
-          stdio: 'inherit'
-        });
-        break;
-      case 'closure':
-      default:
-        require('child_process').spawnSync('java', [
-          '-jar',
-          global.main.path.core + '/project/tools/compiler.jar',
-          '--js',
-          global.main.path.core + '/build/core/bootstrap.server.js.boot',
-          '--js_output_file',
-          global.main.path.core + '/dist/boot/bootstrap.server.js.boot',
-          '--language_in',
-          'ECMASCRIPT5',
-          '--compilation_level',
-          'SIMPLE_OPTIMIZATIONS'
-        ],{
-          stdio: 'inherit'
-        });
-        break;
 
-    }
-    ['core.server.js.boot', 'core.server.js'].forEach(function (file) {
+    var tasks = [];
+
+    tasks.push(function(callback) {
+      child_process.spawn(process.execPath, [
+        global.main.path.core + '/node_modules/ljve-jsdoc/jsdoc.js',
+        global.main.path.core + '/build/pack/core.server.js',
+        '-c',
+        global.main.path.core + '/.jsdocrc',
+        '--verbose'
+      ], {
+        stdio: 'inherit'
+      }).on('exit',function(code,signal){
+        if (code > 0) {
+          callback(new Error('jsdoc generation failed'));
+        } else {
+          callback();
+        }
+      });
+    });
+    tasks.push(function(callback) {
+      var child;
       switch (optimizer) {
         case 'uglify':
-          require('child_process').spawnSync(process.execPath, [
+          child = child_process.spawn(process.execPath, [
             global.main.path.core + '/node_modules/uglify-js/bin/uglifyjs',
-            global.main.path.core + '/build/pack/' + file,
+            global.main.path.core + '/build/core/bootstrap.server.js.boot',
             '-o',
-            global.main.path.core + '/dist/boot/' + file + '.min',
+            global.main.path.core + '/dist/boot/bootstrap.server.js.boot',
             //'--in-source-map',
-            //global.main.path.core + '/build/pack/' + file + '.map',
+            //global.main.path.core + '/build/core/bootstrap.server.js.boot.map',
             //'--source-map',
-            //global.main.path.core + '/dist/boot/' + file + '.map',
+            //global.main.path.core + '/dist/boot/bootstrap.server.js.boot.map',
             '--acorn',
             '-c',
             //'-m',
@@ -123,13 +96,13 @@ global.main.commands['_.dist.core'] = function () {
           break;
         case 'closure':
         default:
-          require('child_process').spawnSync('java', [
+          child = child_process.spawn('java', [
             '-jar',
             global.main.path.core + '/project/tools/compiler.jar',
             '--js',
-            global.main.path.core + '/build/pack/' + file,
+            global.main.path.core + '/build/core/bootstrap.server.js.boot',
             '--js_output_file',
-            global.main.path.core + '/dist/boot/' + file + '.min',
+            global.main.path.core + '/dist/boot/bootstrap.server.js.boot',
             '--language_in',
             'ECMASCRIPT5',
             '--compilation_level',
@@ -139,11 +112,77 @@ global.main.commands['_.dist.core'] = function () {
           });
           break;
       }
-      fs.copySync(global.main.path.core + '/build/pack/' + file,
-        global.main.path.core + '/dist/boot/' + file);
-      fs.copySync(global.main.path.core + '/build/pack/' + file + '.map',
-        global.main.path.core + '/dist/boot/' + file + '.map');
+      child.on('exit',function(code,signal){
+        if (code > 0) {
+          callback(new Error('minification of bootstrap failed'));
+        } else {
+          callback();
+        }
+      });
     });
+    ['core.server.js.boot', 'core.server.js'].forEach(function (file) {
+      tasks.push(function(callback) {
+        var child;
+        switch (optimizer) {
+          case 'uglify':
+            child = child_process.spawn(process.execPath, [
+              global.main.path.core + '/node_modules/uglify-js/bin/uglifyjs',
+              global.main.path.core + '/build/pack/' + file,
+              '-o',
+              global.main.path.core + '/dist/boot/' + file + '.min',
+              //'--in-source-map',
+              //global.main.path.core + '/build/pack/' + file + '.map',
+              //'--source-map',
+              //global.main.path.core + '/dist/boot/' + file + '.map',
+              '--acorn',
+              '-c',
+              //'-m',
+              '-v',
+              '-p',
+              'relative',
+              //'--source-map-include-sources'
+            ], {
+              stdio: 'inherit'
+            });
+            break;
+          case 'closure':
+          default:
+            child = child_process.spawn('java', [
+              '-jar',
+              global.main.path.core + '/project/tools/compiler.jar',
+              '--js',
+              global.main.path.core + '/build/pack/' + file,
+              '--js_output_file',
+              global.main.path.core + '/dist/boot/' + file + '.min',
+              '--language_in',
+              'ECMASCRIPT5',
+              '--compilation_level',
+              'SIMPLE_OPTIMIZATIONS'
+            ], {
+              stdio: 'inherit'
+            });
+            break;
+        }
+        child.on('exit', function (code, signal) {
+          if (code > 0) {
+            callback(new Error('minification of core ' + file + ' failed'));
+          } else {
+            fs.copySync(global.main.path.core + '/build/pack/' + file,
+              global.main.path.core + '/dist/boot/' + file);
+            fs.copySync(global.main.path.core + '/build/pack/' + file + '.map',
+              global.main.path.core + '/dist/boot/' + file + '.map');
+            callback();
+          }
+        });
+      });
+    });
+
+    async.waterfall(tasks,function(errors,results){
+      if (errors == null) {
+        console.log('done');
+      }
+    });
+
   } else {
     console.warn('please build before trying to generate dist files and docs');
   }
