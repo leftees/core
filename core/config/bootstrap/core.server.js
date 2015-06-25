@@ -73,7 +73,7 @@ platform.configuration.bootstrap.init = [
   //'kernel/preprocessors/sourcemap.stack.server.js',
   'kernel/preprocessors/exception.dump.server.js',
   'runtime/runtime.server.js',
-  'development/debug.server.js',
+  'development/inspector.server.js',
   'development/console.server.js',
   'development/live.server.js',
   'development/ide.server.js'

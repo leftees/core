@@ -35,8 +35,6 @@ platform.configuration.development.tools.inspector = {};
 platform.configuration.development.tools.inspector.ports = {
   'ui': 9091
 };
-platform.configuration.development.tools.inspector.spawn = true;
-
 
 platform.configuration.development.tools.ide = {};
 platform.configuration.development.tools.ide.ports = {

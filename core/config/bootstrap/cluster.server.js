@@ -95,7 +95,7 @@ platform.configuration.bootstrap.init = {};
  * @alert  Ignored/hardcoded within boot pack during building.
 */
 platform.configuration.bootstrap.init.generic = [
-  'development/debug.server.js',
+  'development/inspector.server.js',
   'development/console.server.js',
   'utility/recursive.server.js',
   'utility/function.server.js',
