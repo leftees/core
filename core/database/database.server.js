@@ -32,58 +32,63 @@ platform.database._store = platform.database._store || {};
  * @param {} db Specifies the settings object for new database schema instance.
  * @return {} Returns true if database is successfully registered.
 */
-platform.database.register = async function(name,db){
+platform.database.register = async function(name,settings){
   if (platform.database.exists(name) === false) {
-    switch(db.driver){
-      case 'firebird':
-        await load('node-firebird');
-        break;
-      case 'mongodb':
-        await load('mongodb');
-        break;
-      case 'mongoose':
-        await load('mongoose');
-        break;
-      case 'mysql':
-      case 'mariadb':
-        await load('mysql');
-        break;
-      case 'couchdb':
-      case 'couch':
-      case 'nano':
-        await load('nano');
-        break;
-      case 'neo4j':
-        await load('neo4j');
-        break;
-      case 'postgres':
-        await load('pg');
-        break;
-      case 'redis':
-        await load('redis');
-        await load('hiredis');
-        break;
-      case 'rethink':
-      case 'rethinkdb':
-        await load('rethinkdb');
-        break;
-      case 'riak':
-        await load('riak-js');
+    switch(settings.connector){
+      case 'memory':
+        // http://docs.strongloop.com/display/public/LB/Memory+connector
+        settings.connector = 'memory';
         break;
       case 'sqlite':
-      case 'sqlite3':
+        // https://github.com/Synerzip/loopback-connector-sqlite
         await load('sqlite3');
-        await platform.io.create(native.path.dirname(db.database)+native.path.sep);
-        db.database = platform.io.map(db.database);
+        settings.connector = await load('loopback-connector-sqlite');
+        settings.file_name = settings.file_name || settings.file;
+        delete settings.file;
         break;
-      case 'tingodb':
-        await load('tingodb');
+      case 'saphana':
+        // https://github.com/jensonzhao/loopback-connector-saphana
+        await load('hdb');
+        settings.connector = await load('loopback-connector-saphana');
+        break;
+      case 'mongodb':
+        // http://docs.strongloop.com/display/public/LB/MongoDB+connector
+        // https://github.com/strongloop/loopback-connector-mongodb
+        settings.connector = await load('loopback-connector-mongodb');
+        break;
+      case 'mysql':
+        // http://docs.strongloop.com/display/public/LB/MySQL+connector
+        // https://github.com/strongloop/loopback-connector-mysql
+        settings.connector = await load('loopback-connector-mysql');
+        break;
+      case 'redis':
+        // http://docs.strongloop.com/display/public/LB/Redis+connector
+        // https://github.com/strongloop/loopback-connector-redis
+        settings.connector = await load('loopback-connector-redis');
+        break;
+      case 'postgresql':
+        // http://docs.strongloop.com/display/public/LB/Oracle+connector
+        // https://github.com/strongloop/loopback-connector-oracle
+        settings.connector = await load('loopback-connector-postgresql');
+      case 'oracle':
+        // http://docs.strongloop.com/display/public/LB/PostgreSQL+connector
+        // https://github.com/strongloop/loopback-connector-oracle
+        settings.connector = await load('loopback-connector-oracle');
+      case 'couch':
+        // https://github.com/mattange/loopback-connector-couch
+        settings.connector = await load('loopback-connector-couch');
+        break;
+      case 'mssql':
+        // http://docs.strongloop.com/display/public/LB/SQL+Server+connector
+        // https://github.com/strongloop/loopback-connector-mssql
+        settings.connector = await load('loopback-connector-mssql');
         break;
       default:
-        throw new Exception('database connector %s not available',db.driver);
+        throw new Exception('database connector %s not available',settings.driver);
         break;
     }
-    platform.database._store[name] = new native.database.Schema(db.driver, db);
+    settings.name = name;
+    platform.database._store[name] = new native.database.DataSource(name,settings);
     return true;
   } else {
     throw new Exception('database %s already exists',name);
@@ -109,7 +114,6 @@ platform.database.unregister = function(name){
  * @return {} Returns database schema instance.
 */
 platform.database.get = function(name){
-  console.log(name)
   if (platform.database.exists(name) === true) {
     return platform.database._store[name];
   } else {
@@ -131,7 +135,7 @@ platform.database.exists = function(name){
 };
 
 platform.events.attach('core.ready','database.init', async function() {
-  await Object.keys(platform.configuration.database.schemas).forEachAwait(async function(name){
-    await platform.database.register(name,platform.configuration.database.schemas[name]);
+  await Object.keys(platform.configuration.database.sources).forEachAwait(async function(name){
+    await platform.database.register(name,platform.configuration.database.sources[name]);
   });
 });

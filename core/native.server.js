@@ -274,8 +274,8 @@ defineNative(native,'send','send');
 defineNative(native,'smtp','nodemailer-smtp-pool');
 //native.memwatch = require('memwatch-next');
 defineNative(native,'memwatch','memwatch-next');
-//native.database = require('caminte');
-defineNative(native,'database','caminte');
+//native.database = require('loopback-datasource-juggler');
+defineNative(native,'database','loopback-datasource-juggler');
 //native.metascript = require('metascript');
 defineNative(native,'metascript','metascript');
 

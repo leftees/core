@@ -20,10 +20,100 @@
 
 platform.configuration.database = {};
 
-platform.configuration.database.schemas = {
+platform.configuration.database.sources = {
   // Define settings object that should be passed to ORM schema initialization.
-  'accounts': {
-    'driver': 'sqlite3',
-    'database': '/data/db/accounts.db'
-  }
 };
+
+/*platform.configuration.database.sources.mymemory = {
+  'connector': 'memory',
+  'file': '/data/db/mymemory.json'
+};*/
+
+platform.configuration.database.sources.mysqlite = {
+  'connector': 'sqlite',
+  'file': '/data/db/accounts.db',
+  'debug': false
+};
+
+/*platform.configuration.database.sources.mysaphana = {
+  'connector': 'saphana',
+  'host': 'localhost',
+  'port': 30015,
+  'username': '',
+  'password': '',
+  'debug': false
+};*/
+
+/*platform.configuration.database.sources.mymongodb = {
+  'connector': 'mongodb',
+  'host': 'localhost',
+  'port': 27017,
+  'database': '',
+  'username': '',
+  'password': '',
+  'url': null,
+  'debug': false
+};*/
+
+/*platform.configuration.database.sources.mymysql = {
+  'connector': 'mysql',
+  'host': 'localhost',
+  'port': 3306,
+  'database': '',
+  'username': '',
+  'password': '',
+  'debug': false
+};*/
+
+/*platform.configuration.database.sources.myredis = {
+ 'connector': 'redis',
+ 'host': 'localhost',
+ 'port': 6379,
+ 'database': '',
+ 'username': '',
+ 'password': '',
+ 'debug': false
+ };*/
+
+/*platform.configuration.database.sources.mypostgresql = {
+ 'connector': 'postgresql',
+ 'host': '/var/run/postgresql/',
+ 'port': 5432,
+ 'database': '',
+ 'username': '',
+ 'password': '',
+ 'debug': false
+ };*/
+
+/*platform.configuration.database.sources.myoracle = {
+ 'connector': 'oracle',
+ 'host': 'localhost',
+ 'port': 1521,
+ 'database': '',
+ 'username': '',
+ 'password': ''
+};*/
+
+/*platform.configuration.database.sources.mycouch = {
+ 'connector': 'couch',
+ 'host': 'localhost',
+ 'port': 5984,
+ 'protocol': 'http',
+ 'auth': {
+   'admin': {
+     'username': '',
+     'password': ''
+   }
+ }
+};*/
+
+/*platform.configuration.database.sources.mymssql = {
+ 'connector': 'mssql',
+ 'host': 'localhost',
+ 'port': 1521,
+ 'database': '',
+ 'username': '',
+ 'password': '',
+ 'schema': '',
+ 'debug': false
+};*/

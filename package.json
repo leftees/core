@@ -26,7 +26,6 @@
     "benchmark": "*",
     "blanket": "*",
     "body": "*",
-    "caminte": "https://github.com/marcominetti/caminte/tarball/master",
     "chai": "*",
     "chai-as-promised": "*",
     "chokidar": "*",
@@ -68,7 +67,7 @@
     "node-watch": "*",
     "nodemailer": "*",
     "nodemailer-smtp-pool": "*",
-    "npm": "2.11.x",
+    "npm": "*",
     "pson": "*",
     "readdirp": "*",
     "request": "*",
@@ -88,7 +87,8 @@
     "xmlhttprequest": "*",
     "yamlparser": "*",
     "yargs": "*",
-    "to-fast-properties": "*"
+    "to-fast-properties": "*",
+    "loopback-datasource-juggler": "latest"
   },
   "optionalDependencies" : {
     "sysconfx-next": "*",
@@ -96,9 +96,6 @@
     "node-zlib-backport": "*"
   },
   "scripts": {
-    "coverage": "if [ -d \".git\" ]; then CWD=$(pwd)/tmp/test-root; NODE_ENV=testing node main.server.js coverage | sed \"s|$CWD/build/|$CWD/|g\" | sed \"s|$CWD/|/|g\" > project/stats/coverage.html; rm -rf tmp/test-root; wget `node_modules/sloc/bin/sloc --format json core | node project/tools/sloc.js` -O project/stats/comments.badge.png; wget http://img.shields.io/codeclimate/coverage/github/ljveio/core.png?style=flat -O project/stats/coverage.badge.png; fi;",
-    "test": "NODE_ENV=testing node main.server.js test",
-    "start": "node main.server.js"
   },
   "preferGlobal": true,
   "private": false,
