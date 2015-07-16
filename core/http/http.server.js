@@ -161,13 +161,15 @@ platform.server.http._init = function() {
       // instancing native HTTP listener
       //TODO: implement http auth internally (dismiss http-auth module)
       if (config.auth === 'basic' || config.auth === 'digest') {
-        // enabling httpauth module if requested
-        agent_http = native[protocol].createServer(native.httpauth[config.auth](
+        config.realm = '';
+        var checker = native.httpauth[config.auth](
           {
             'realm': config.realm
           },
           platform.engine.process.auth[config.auth].bind(null,config.realm)
-        ),options);
+        );
+        // enabling httpauth module if requested
+        agent_http = native[protocol].createServer(checker,options);
       } else {
         agent_http = native[protocol].createServer(options);
       }

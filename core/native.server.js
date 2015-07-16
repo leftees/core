@@ -56,7 +56,7 @@ var defineNative = function(root,property,module,member,callback){
 };
 
 // loading native modules and node-specific ones
-//native.httpauth.basic = require('http-auth').basic;
+//native.extend = require('util')._extend;
 defineNative(native,'extend','util','_extend');
 //native.semver = require('semver');
 defineNative(native,'semver','semver');

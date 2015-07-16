@@ -58,10 +58,6 @@ platform.configuration.server.http.ports = {
     */
     'auth': false,
     /**
-     *  Define realm for HTTP authorization on specified ports.
-    */
-    'realm': '',
-    /**
      *  Define port-specific regexp to reject request by URI (overrides defaults).
      * @alert  Filter is applied against request relative URI cleaned by querystring.
     */
@@ -113,10 +109,6 @@ platform.configuration.server.http.ports = {
      *  Define HTTP authorization type on specified ports: 'basic', 'digest' or false.
     */
     'auth': false,
-    /**
-     *  Define realm for HTTP authorization on specified ports.
-    */
-    'realm': null,
     /**
      *  Contains port-specific HTTP redirect configuration.
      * @alert  Filters are applied against request relative URI cleaned by querystring.
