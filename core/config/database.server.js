@@ -24,16 +24,22 @@ platform.configuration.database.sources = {
   // Define settings object that should be passed to ORM schema initialization.
 };
 
+platform.configuration.database.sources.accounts = {
+  'connector': 'sqlite',
+  'file': '/data/db/accounts.db',
+  'debug': false
+};
+
 /*platform.configuration.database.sources.mymemory = {
   'connector': 'memory',
   'file': '/data/db/mymemory.json'
 };*/
 
-platform.configuration.database.sources.mysqlite = {
+/*platform.configuration.database.sources.mysqlite = {
   'connector': 'sqlite',
-  'file': '/data/db/accounts.db',
+  'file': '/data/db/mysqlite.db',
   'debug': false
-};
+};*/
 
 /*platform.configuration.database.sources.mysaphana = {
   'connector': 'saphana',

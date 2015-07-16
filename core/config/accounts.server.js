@@ -18,31 +18,6 @@
 
  */
 
-platform.configuration.modules = platform.configuration.modules || {};
+platform.configuration.accounts = platform.configuration.accounts || {};
 
-platform.configuration.modules.core = {
-  'http': {
-    'engine': true,
-    'file': true,
-    'websocket': true
-  },
-  'database': true,
-  'accounts': true,
-  'runtime': true,
-  'statistics': true,
-  'development': {
-    'console': true,
-    'ide': true,
-    'live': true,
-    'debug': true
-  },
-  'messaging': {
-    'mail': true
-  },
-  'system': {
-    'cpu': true,
-    'memory': true,
-    'uv': true,
-    'npm': true
-  }
-};
+platform.configuration.accounts.digest = 'sha256';
