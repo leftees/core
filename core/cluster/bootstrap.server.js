@@ -302,11 +302,12 @@ console.logger.add(native.winston.transports.File,{
   'level': 'trace'
 });
 
-console.add = console.logger.log;
-console.log = console.logger.info;
-[/*'trace',*/'debug','verbose','info','data','warn','error'].forEach(function (level) {
-  console[level] = console.logger[level];
-});
+if (global.testing === false) {
+  console.log = console.logger.info;
+  [/*'trace',*/'debug','verbose','info','data','warn','error'].forEach(function (level) {
+    console[level] = console.logger[level];
+  });
+}
 
 ['/log/'+platform.cluster.worker.id].forEach(function (folder) {
   if (native.fs.existsSync(native.path.join(platform.configuration.runtime.path.root, folder)) === false) {

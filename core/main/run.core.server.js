@@ -19,7 +19,12 @@
  */
 
 // defining run CLI command
-global.main.commands['run'] = function(base){
+global.main.commands['run'] = function(base, callback){
+
+  if (callback == null && typeof base === 'function'){
+    callback = base;
+    base = null;
+  }
 
   var args = require('yargs').argv;
   var fs = require('fs');
@@ -83,7 +88,11 @@ global.main.commands['run'] = function(base){
     global.native.compile('/core/bootstrap.server.js', global.main.path.core, 'boot', true, true);
   }
 
-  bootstrap.post(true).catch(function(error){
+  bootstrap.post(true).then(function(){
+    if (callback != null) {
+      callback();
+    }
+  }).catch(function(error){
     console.error('uncaught exception: %s', error.stack || error.message, error);
   });
 };

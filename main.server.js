@@ -42,7 +42,7 @@ if (process.env.NODE_WRAPPER_MAIN !== 'false' && process.env.NODE_LOW_MEMORY !==
   args.shift();
   var execArgv = Array.prototype.slice.call(process.execArgv);
   execArgv.forEach(function(arg,index) {
-    if (arg === '--debug' || arg.startsWith('--debug=') === true || arg === '--debug-brk' || arg.startsWith('--debug-brk=') === true){
+    if (arg === '--debug' || arg.indexOf('--debug=') === 0 || arg === '--debug-brk' || arg.indexOf('--debug-brk=') === 0){
       execArgv.unshift('--debug='+(process.debugPort+1));
     } else if (process.env.NODE_ENV === 'debugging'){
       execArgv.unshift('--debug');
