@@ -86,7 +86,7 @@ platform.events.unregister = function(event){
  * @param {} event Specifies the name of the event to be unregistered.
  * @param {} [...] Supports dynamic arguments that will be passed throughout the attachers callbacks.
 */
-platform.events.raise = function(event){
+platform.events.raise = async function(event){
   var promises = [];
 
   // checking if event exists
@@ -110,7 +110,7 @@ platform.events.raise = function(event){
     // cloning attachers list to allow attacher detact/attach during raise
     var event_attachers = Array.prototype.slice.call(event_object.order);
     // processing attachers stack
-    event_attachers.forEach(function (attacher) {
+    await event_attachers.forEachAwaitSeries(async function (attacher) {
       try {
         var attacher_object = event_object.attachers[attacher];
         // checking whether the attacher has been disabled
@@ -174,19 +174,13 @@ platform.events.raise = function(event){
           console.debug('attacher %s raised for event %s', attacher, event);
         }
         // invoking callback
-        var result = attacher_object.callback.apply(attacher_object, data_object.arguments);
-        if (result != null && result.constructor === Promise) {
-          promises.push(result);
-        }
+        await attacher_object.callback.apply(attacher_object, data_object.arguments);
       } catch (err) {
         if (platform.configuration.debug.event === true) {
           console.warn('exception caught in attacher %s raise for event %s: %s', attacher, event, err.stack);
         }
       }
     });
-    if (promises.length > 0) {
-      return Promise.all(promises);
-    }
     return true;
   } else {
     throw new Exception('event %s does not exist',event);
