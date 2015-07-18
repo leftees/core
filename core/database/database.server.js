@@ -41,7 +41,6 @@ platform.database.register = async function(name,settings){
         break;
       case 'sqlite':
         // https://github.com/Synerzip/loopback-connector-sqlite
-        await load('sqlite3');
         settings.connector = await load('loopback-connector-sqlite');
         settings.file_name = settings.file_name || settings.file;
         delete settings.file;
