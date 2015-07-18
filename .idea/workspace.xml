@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e36ad4c1-aed7-43d7-8930-9f5a51e652bc" name="Default" comment="">
-    </list>
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,24 +13,47 @@
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
-  <component name="DaemonCodeAnalyzer">
-    <disable_hints />
-  </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
     <favorites_list name="ljve.io" />
   </component>
+  <component name="FileEditorManager">
+    <leaf />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" />
   <component name="JsGulpfileManager">
     <detection-done>true</detection-done>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="1669" />
-    <option name="y" value="46" />
-    <option name="width" value="1425" />
-    <option name="height" value="781" />
+  <component name="NamedScopeManager">
+    <order />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>Code quality toolsJavaScript</id>
+          </State>
+          <State>
+            <id>GeneralJavaScript</id>
+          </State>
+          <State>
+            <id>JavaScript</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>JavaScript</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -41,7 +62,7 @@
     <OptionsSetting value="true" id="Update" />
     <OptionsSetting value="true" id="Status" />
     <OptionsSetting value="true" id="Edit" />
-    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="1" id="Add" />
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectView">
@@ -57,7 +78,7 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -78,6 +99,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -86,56 +108,63 @@
     <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="FullScreen" value="false" />
     <property name="recentsLimit" value="5" />
-    <property name="options.lastSelected" value="web-ide.project.structure" />
+    <property name="options.lastSelected" value="preferences.lookFeel" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="LayoutCode.rearrangeEntriesJavaScript 1.5" value="false" />
+    <property name="js.eslint.nodeInterpreter" value="/usr/bin/node" />
+    <property name="js.eslint.eslintPackage" value="" />
+    <property name="editorconfig.notification" value="Applied .editorconfig settings" />
+    <property name="full.screen.before.presentation.mode" value="false" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.splitter.proportion" value="0.21645446" />
+    <property name="editor.config.accepted" value="true" />
   </component>
-  <component name="RunManager" selected="Node.js.ljve run - node system debugging">
+  <component name="RunManager" selected="Node.js.linux/mac core - io.js debugging">
+    <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
+      <method />
+    </configuration>
+    <configuration default="true" type="DartUnitRunConfigurationType" factoryName="DartUnit">
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma" config-file="">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="JsTestDriver-test-runner" factoryName="JsTestDriver">
+      <setting name="configLocationType" value="CONFIG_FILE" />
+      <setting name="settingsFile" value="" />
+      <setting name="serverType" value="INTERNAL" />
+      <setting name="preferredDebugBrowser" value="Chrome" />
+      <method />
+    </configuration>
     <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" working-dir="">
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node system development" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="/usr/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
-      <envs>
-        <env name="NODE_ENV" value="development" />
-      </envs>
+    <configuration default="true" type="NodeJSRemoteDebug" factoryName="Node.js Remote Debug">
+      <node-js-remote-debug />
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node system debugging" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="/usr/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
-      <envs>
-        <env name="NODE_ENV" value="debugging" />
-      </envs>
-      <RunnerSettings RunnerId="Basic" />
-      <ConfigurationWrapper RunnerId="Basic" />
+    <configuration default="true" type="cucumber.js" factoryName="Cucumber.js">
+      <option name="cucumberJsArguments" value="" />
+      <option name="executablePath" />
+      <option name="filePath" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve test - node system testing" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="/usr/bin/node" path-to-js-file="main.server.js" application-parameters="test" working-dir="$PROJECT_DIR$">
-      <envs>
-        <env name="NODE_ENV" value="development" />
-      </envs>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <arguments />
+      <pass-parent-envs>true</pass-parent-envs>
+      <envs />
       <method />
     </configuration>
-    <configuration default="false" name="ljve test - node system coverage" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="/usr/bin/node" path-to-js-file="main.server.js" application-parameters="coverage" working-dir="$PROJECT_DIR$">
-      <envs>
-        <env name="NODE_ENV" value="development" />
-      </envs>
-      <method />
-    </configuration>
-    <configuration default="false" name="ljve run - node system production" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="/usr/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
-      <method />
-    </configuration>
-    <configuration default="false" name="ljve run - node 0.10 development" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.10.35/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
-      <envs>
-        <env name="NODE_ENV" value="development" />
-      </envs>
-      <RunnerSettings RunnerId="Basic" />
-      <RunnerSettings RunnerId="NodeJS.debug" />
-      <RunnerSettings RunnerId="NodeJS.run" />
-      <ConfigurationWrapper RunnerId="Basic" />
-      <ConfigurationWrapper RunnerId="NodeJS.debug" />
-      <ConfigurationWrapper RunnerId="NodeJS.run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="ljve run - node 0.10 debugging" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="$USER_HOME$/.nvm/v0.10.35/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="linux/mac core - io.js debugging" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="debugging" />
       </envs>
@@ -149,7 +178,7 @@
       <ConfigurationWrapper RunnerId="debuggableProgram" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve test - node 0.10 testing" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.10.35/bin/node" path-to-js-file="main.server.js" application-parameters="test" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="linux/mac core - io.js testing" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="test" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="development" />
       </envs>
@@ -161,20 +190,22 @@
       <ConfigurationWrapper RunnerId="NodeJS.run" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve test - node 0.10 coverage" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="$USER_HOME$/.nvm/v0.10.35/bin/node" path-to-js-file="main.server.js" application-parameters="coverage" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="linux/mac core - io.js coverage" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="coverage" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="development" />
       </envs>
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node 0.10 production" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.10.35/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="linux/mac core - io.js production" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
       <RunnerSettings RunnerId="Basic" />
       <RunnerSettings RunnerId="NodeJS.run" />
+      <RunnerSettings RunnerId="debuggableProgram" />
       <ConfigurationWrapper RunnerId="Basic" />
       <ConfigurationWrapper RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="debuggableProgram" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node 0.11 development" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.11.14/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="linux/mac core - io.js development" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="development" />
       </envs>
@@ -188,61 +219,144 @@
       <ConfigurationWrapper RunnerId="debuggableProgram" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node 0.11 debugging" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="$USER_HOME$/.nvm/v0.11.14/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="linux/mac core - io.js building" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="BUILD" value="pack" />
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="windows core - node.js debugging" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="run" node-parameters="--debug" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="debugging" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="windows core - node.js testing" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="test" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="windows core - node.js coverage" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="coverage" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="windows core - node.js production" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+      <method />
+    </configuration>
+    <configuration default="false" name="windows core - node.js development" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="windows core - node.js building" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="BUILD" value="pack" />
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="linux/mac cluster - io.js debugging" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="run.cluster" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="debugging" />
       </envs>
       <RunnerSettings RunnerId="Basic" />
-      <RunnerSettings RunnerId="NodeJS.run" />
-      <RunnerSettings RunnerId="debuggableProgram" />
       <ConfigurationWrapper RunnerId="Basic" />
-      <ConfigurationWrapper RunnerId="NodeJS.run" />
-      <ConfigurationWrapper RunnerId="debuggableProgram" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve test - node 0.11 testing" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.11.14/bin/node" path-to-js-file="main.server.js" application-parameters="test" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="linux/mac cluster - io.js testing" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="test.cluster" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="linux/mac cluster - io.js coverage" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="coverage.cluster" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="linux/mac cluster - io.js production" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="run.cluster" working-dir="$PROJECT_DIR$">
+      <method />
+    </configuration>
+    <configuration default="false" name="linux/mac cluster - io.js development" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="run.cluster" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="development" />
       </envs>
       <RunnerSettings RunnerId="Basic" />
-      <RunnerSettings RunnerId="NodeJS.run" />
       <ConfigurationWrapper RunnerId="Basic" />
-      <ConfigurationWrapper RunnerId="NodeJS.run" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve test - node 0.11 coverage" type="NodeJSConfigurationType" factoryName="Node.js" singleton="false" path-to-node="$USER_HOME$/.nvm/v0.11.14/bin/node" path-to-js-file="main.server.js" application-parameters="coverage" working-dir="$PROJECT_DIR$">
+    <configuration default="false" name="linux/mac cluster - io.js building" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/iojs" path-to-js-file="main.server.js" application-parameters="run.cluster" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="BUILD" value="pack" />
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="windows cluster - node.js debugging" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="run.cluster" node-parameters="--debug" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="debugging" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="windows cluster - node.js testing" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="test.cluster" working-dir="$PROJECT_DIR$">
       <envs>
         <env name="NODE_ENV" value="development" />
       </envs>
-      <RunnerSettings RunnerId="Basic" />
-      <RunnerSettings RunnerId="debuggableProgram" />
-      <ConfigurationWrapper RunnerId="Basic" />
-      <ConfigurationWrapper RunnerId="debuggableProgram" />
       <method />
     </configuration>
-    <configuration default="false" name="ljve run - node 0.11 production" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/v0.11.14/bin/node" path-to-js-file="main.server.js" application-parameters="run" working-dir="$PROJECT_DIR$">
-      <RunnerSettings RunnerId="Basic" />
-      <RunnerSettings RunnerId="NodeJS.run" />
-      <ConfigurationWrapper RunnerId="Basic" />
-      <ConfigurationWrapper RunnerId="NodeJS.run" />
+    <configuration default="false" name="windows cluster - node.js coverage" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="coverage.cluster" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
       <method />
     </configuration>
-    <list size="15">
-      <item index="0" class="java.lang.String" itemvalue="Node.js.ljve run - node system development" />
-      <item index="1" class="java.lang.String" itemvalue="Node.js.ljve run - node system debugging" />
-      <item index="2" class="java.lang.String" itemvalue="Node.js.ljve test - node system testing" />
-      <item index="3" class="java.lang.String" itemvalue="Node.js.ljve test - node system coverage" />
-      <item index="4" class="java.lang.String" itemvalue="Node.js.ljve run - node system production" />
-      <item index="5" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.10 development" />
-      <item index="6" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.10 debugging" />
-      <item index="7" class="java.lang.String" itemvalue="Node.js.ljve test - node 0.10 testing" />
-      <item index="8" class="java.lang.String" itemvalue="Node.js.ljve test - node 0.10 coverage" />
-      <item index="9" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.10 production" />
-      <item index="10" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.11 development" />
-      <item index="11" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.11 debugging" />
-      <item index="12" class="java.lang.String" itemvalue="Node.js.ljve test - node 0.11 testing" />
-      <item index="13" class="java.lang.String" itemvalue="Node.js.ljve test - node 0.11 coverage" />
-      <item index="14" class="java.lang.String" itemvalue="Node.js.ljve run - node 0.11 production" />
+    <configuration default="false" name="windows cluster - node.js production" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="run.cluster" working-dir="$PROJECT_DIR$">
+      <method />
+    </configuration>
+    <configuration default="false" name="windows cluster - node.js development" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="run.cluster" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <configuration default="false" name="windows cluster - node.js building" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="main.server.js" application-parameters="run.cluster" working-dir="$PROJECT_DIR$">
+      <envs>
+        <env name="BUILD" value="pack" />
+        <env name="NODE_ENV" value="development" />
+      </envs>
+      <method />
+    </configuration>
+    <list size="24">
+      <item index="0" class="java.lang.String" itemvalue="Node.js.linux/mac core - io.js debugging" />
+      <item index="1" class="java.lang.String" itemvalue="Node.js.linux/mac core - io.js testing" />
+      <item index="2" class="java.lang.String" itemvalue="Node.js.linux/mac core - io.js coverage" />
+      <item index="3" class="java.lang.String" itemvalue="Node.js.linux/mac core - io.js production" />
+      <item index="4" class="java.lang.String" itemvalue="Node.js.linux/mac core - io.js development" />
+      <item index="5" class="java.lang.String" itemvalue="Node.js.linux/mac core - io.js building" />
+      <item index="6" class="java.lang.String" itemvalue="Node.js.windows core - node.js debugging" />
+      <item index="7" class="java.lang.String" itemvalue="Node.js.windows core - node.js testing" />
+      <item index="8" class="java.lang.String" itemvalue="Node.js.windows core - node.js coverage" />
+      <item index="9" class="java.lang.String" itemvalue="Node.js.windows core - node.js production" />
+      <item index="10" class="java.lang.String" itemvalue="Node.js.windows core - node.js development" />
+      <item index="11" class="java.lang.String" itemvalue="Node.js.windows core - node.js building" />
+      <item index="12" class="java.lang.String" itemvalue="Node.js.linux/mac cluster - io.js debugging" />
+      <item index="13" class="java.lang.String" itemvalue="Node.js.linux/mac cluster - io.js testing" />
+      <item index="14" class="java.lang.String" itemvalue="Node.js.linux/mac cluster - io.js coverage" />
+      <item index="15" class="java.lang.String" itemvalue="Node.js.linux/mac cluster - io.js production" />
+      <item index="16" class="java.lang.String" itemvalue="Node.js.linux/mac cluster - io.js development" />
+      <item index="17" class="java.lang.String" itemvalue="Node.js.linux/mac cluster - io.js building" />
+      <item index="18" class="java.lang.String" itemvalue="Node.js.windows cluster - node.js debugging" />
+      <item index="19" class="java.lang.String" itemvalue="Node.js.windows cluster - node.js testing" />
+      <item index="20" class="java.lang.String" itemvalue="Node.js.windows cluster - node.js coverage" />
+      <item index="21" class="java.lang.String" itemvalue="Node.js.windows cluster - node.js production" />
+      <item index="22" class="java.lang.String" itemvalue="Node.js.windows cluster - node.js development" />
+      <item index="23" class="java.lang.String" itemvalue="Node.js.windows cluster - node.js building" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
@@ -258,28 +372,37 @@
     </task>
     <servers />
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="1669" y="46" width="1425" height="781" extended-state="0" />
+    <frame x="1599" y="0" width="1602" height="901" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24964337" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1969601" sideWeight="0.4883041" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3264865" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32847896" sideWeight="0.5" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.328594" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4101266" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20297398" sideWeight="0.5116959" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.328594" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.44936708" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24903722" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3762162" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3886598" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -294,12 +417,14 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <option name="myTodoPanelSettings">
-      <TodoPanelSettings />
-    </option>
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/node_modules/node-ide" />
+    </ignored-roots>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="35" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
 </project>
