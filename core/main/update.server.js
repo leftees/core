@@ -30,11 +30,19 @@ var init_npm = function (next_command) {
       update_ljve(npm, next_command);
     });
   } catch (error) {
-    require('child_process').exec('npm install npm', function (error, stdout, stderr) {
-      npm = require('npm');
-      npm.load({'dev': false}, function () {
-        update_ljve(npm, next_command);
-      });
+    var command = 'npm install npm';
+    if (process.platform !== 'win32') {
+      command = 'npm link npm';
+    }
+    require('child_process').exec(command, function (error, stdout, stderr) {
+      //if (error != null) {
+      //throw error;
+      //} else {
+        npm = require('npm');
+        npm.load({'dev': false}, function () {
+          update_ljve(npm, next_command);
+        });
+      //}
     });
   }
 };
