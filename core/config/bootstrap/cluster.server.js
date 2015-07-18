@@ -226,7 +226,7 @@ platform.configuration.bootstrap.core.app = [
   'http/parsers/plain.server.js',
   'http/parsers/xml.server.js',
   'http/http.server.js',
-  'accounts/accounts.server.js',
+  'accounts/init.server.js',
   'environment/startup.server.js'
 ];
 
