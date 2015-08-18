@@ -37,12 +37,20 @@ platform.database.register = async function(name,settings){
     switch(settings.connector){
       case 'memory':
         // http://docs.strongloop.com/display/public/LB/Memory+connector
+        if (settings.file != null){
+          platform.io.createSync(native.path.dirname(settings.file) + native.path.sep);
+          settings.file = platform.io.map(settings.file);
+        }
         settings.connector = 'memory';
         break;
       case 'sqlite':
         // https://github.com/Synerzip/loopback-connector-sqlite
         settings.connector = await load('loopback-connector-sqlite');
-        settings.file_name = settings.file_name || settings.file;
+        if (settings.file != null && settings.file !== ':memory:'){
+          platform.io.createSync(native.path.dirname(settings.file) + native.path.sep);
+          settings.file = platform.io.map(settings.file);
+        }
+        settings.file_name = settings.file;
         delete settings.file;
         break;
       case 'saphana':
