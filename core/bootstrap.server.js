@@ -338,20 +338,12 @@ bootstrap.post = async function() {
 
 // defining function to resolve relative paths against server (default) or custom root
 bootstrap.map = function(path,root) {
-  var normalized_path = path;
   // sanitizing empty path
-  if (normalized_path === '') {
-    normalized_path = '/';
+  if (path == null || path === '') {
+    path = '/';
   }
-  //TODO: check if really neede on windows platforms
-  // fixing separator (is it useful?)
-  /*if (native.path.sep === '\\') {
-   normalized_path = normalized_path.replace('/', '\\');
-   }*/
-  // normalizing through natives
-  normalized_path = native.path.normalize(normalized_path);
   // returning path joined to custom or server root
-  return  native.path.join(root||platform.configuration.runtime.path.root, normalized_path);
+  return native.path.nornalize(native.path.join(root||platform.configuration.runtime.path.root, path));
 };
 
 // contains the load methods needed during bootstrap
