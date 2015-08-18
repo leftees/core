@@ -29,26 +29,15 @@ platform.io = platform.io || {};
 //TODO: implement iterator instead of forEach-ing list()
 
 /**
- * Maps the path against the absolute filesystem.
- * @param {} path Specifies the target path.
- * @param {} [root] Specifies the relative root. If missing, the path is mapped against the application root.
+ * Maps the relative path to absolute path through the first backend.
+ * @param {} path Specifies the relative path.
  * @return {} Returns the absolute path.
 */
-platform.io.map = function(path,root) {
-  var normalized_path = path;
-  // sanitizing empty path
-  if (normalized_path === '') {
-    normalized_path = '/';
-  }
-  //TODO: check if really neede on windows platforms
-  // fixing separator (is it useful?)
-  /*if (native.path.sep === '\\') {
-   normalized_path = normalized_path.replace('/', '\\');
-   }*/
-  // normalizing through natives
-  normalized_path = native.path.normalize(normalized_path);
-  // returning path joined to custom or server root
-  return native.path.join(root||platform.configuration.runtime.path.root, normalized_path);
+platform.io.map = function(path) {
+  // getting first backend
+  var backend = platform.io.store.getByPriority(0);
+
+  return backend.map(path);
 };
 
 platform.io.getShortPath = function(fullpath){

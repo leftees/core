@@ -42,6 +42,20 @@ var filesystem_backend = function(root) {
   this.base = base;
 
   /**
+   * Maps a path against backend base path.
+   * @param {} path Specifies the target path.
+   * @return {} Returns full path.
+   */
+  this.map = function(path){
+    // sanitizing empty path
+    if (path == null || path === '') {
+      path = '/';
+    }
+    // returning path joined to custom or server root
+    return native.path.normalize(native.path.join(base, path));
+  };
+
+  /**
   * Checks whether path exist (file or directory).
   * @param {} path Specifies the target path.
   * @param {} [callback(exists)] Callback for async support. If missing, the function operates syncronously.
