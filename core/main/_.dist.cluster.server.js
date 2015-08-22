@@ -77,7 +77,24 @@ global.main.commands['_.dist.cluster'] = function () {
     tasks.push(function(callback) {
       var child;
       switch (optimizer) {
+        case 'closure':
+          child = child_process.spawn('java', [
+            '-jar',
+            global.main.path.core + '/project/tools/compiler.jar',
+            '--js',
+            global.main.path.core + '/build/core/cluster/bootstrap.server.js.boot',
+            '--js_output_file',
+            global.main.path.core + '/dist/boot/bootstrap.server.js.boot',
+            '--language_in',
+            'ECMASCRIPT5',
+            '--compilation_level',
+            'SIMPLE_OPTIMIZATIONS'
+          ],{
+            stdio: 'inherit'
+          });
+          break;
         case 'uglify':
+        default:
           child = child_process.spawn(process.execPath, [
             global.main.path.core + '/node_modules/uglify-js/bin/uglifyjs',
             global.main.path.core + '/build/core/cluster/bootstrap.server.js.boot',
@@ -98,23 +115,6 @@ global.main.commands['_.dist.cluster'] = function () {
             stdio: 'inherit'
           });
           break;
-        case 'closure':
-        default:
-          child = child_process.spawn('java', [
-            '-jar',
-            global.main.path.core + '/project/tools/compiler.jar',
-            '--js',
-            global.main.path.core + '/build/core/cluster/bootstrap.server.js.boot',
-            '--js_output_file',
-            global.main.path.core + '/dist/boot/bootstrap.server.js.boot',
-            '--language_in',
-            'ECMASCRIPT5',
-            '--compilation_level',
-            'SIMPLE_OPTIMIZATIONS'
-          ],{
-            stdio: 'inherit'
-          });
-          break;
       }
       child.on('exit',function(code,signal){
         if (code > 0) {
@@ -129,44 +129,44 @@ global.main.commands['_.dist.cluster'] = function () {
         tasks.push(function(callback) {
           var child;
             switch (optimizer) {
-            case 'uglify':
-              child = child_process.spawn(process.execPath, [
-                global.main.path.core + '/node_modules/uglify-js/bin/uglifyjs',
-                global.main.path.core + '/build/pack/' + file,
-                '-o',
-                global.main.path.core + '/dist/boot/' + file + '.min',
-                //'--in-source-map',
-                //global.main.path.core + '/build/pack/' + file + '.map',
-                //'--source-map',
-                //global.main.path.core + '/dist/boot/' + file + '.map',
-                '--acorn',
-                '-c',
-                //'-m',
-                '-v',
-                '-p',
-                'relative',
-                //'--source-map-include-sources'
-              ], {
-                stdio: 'inherit'
-              });
-              break;
-            case 'closure':
-            default:
-              child = child_process.spawn('java', [
-                '-jar',
-                global.main.path.core + '/project/tools/compiler.jar',
-                '--js',
-                global.main.path.core + '/build/pack/' + file,
-                '--js_output_file',
-                global.main.path.core + '/dist/boot/' + file + '.min',
-                '--language_in',
-                'ECMASCRIPT5',
-                '--compilation_level',
-                'SIMPLE_OPTIMIZATIONS'
-              ], {
-                stdio: 'inherit'
-              });
-              break;
+              case 'closure':
+                child = child_process.spawn('java', [
+                  '-jar',
+                  global.main.path.core + '/project/tools/compiler.jar',
+                  '--js',
+                  global.main.path.core + '/build/pack/' + file,
+                  '--js_output_file',
+                  global.main.path.core + '/dist/boot/' + file + '.min',
+                  '--language_in',
+                  'ECMASCRIPT5',
+                  '--compilation_level',
+                  'SIMPLE_OPTIMIZATIONS'
+                ], {
+                  stdio: 'inherit'
+                });
+                break;
+              case 'uglify':
+              default:
+                child = child_process.spawn(process.execPath, [
+                  global.main.path.core + '/node_modules/uglify-js/bin/uglifyjs',
+                  global.main.path.core + '/build/pack/' + file,
+                  '-o',
+                  global.main.path.core + '/dist/boot/' + file + '.min',
+                  //'--in-source-map',
+                  //global.main.path.core + '/build/pack/' + file + '.map',
+                  //'--source-map',
+                  //global.main.path.core + '/dist/boot/' + file + '.map',
+                  '--acorn',
+                  '-c',
+                  //'-m',
+                  '-v',
+                  '-p',
+                  'relative',
+                  //'--source-map-include-sources'
+                ], {
+                  stdio: 'inherit'
+                });
+                break;
           }
           child.on('exit', function (code, signal) {
             if (code > 0) {
