@@ -41,7 +41,7 @@ global.main.commands['_.dist.core'] = function () {
   var async = require('neo-async');
   var child_process = require('child_process');
 
-  var optimizer = args._[1] || args.optimizer || 'closure';
+  var optimizer = args._[1] || args.optimizer || 'uglify';
 
   if (fs.existsSync(path.join(global.main.path.core, '/build/pack/core.server.js')) === true) {
     if (fs.existsSync(path.join(global.main.path.core, '/dist/')) === true) {
