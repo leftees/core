@@ -31,9 +31,9 @@ var init_npm = function (next_command) {
     });
   } catch (error) {
     var command = 'npm install npm';
-    if (process.platform !== 'win32') {
-      command = 'npm link npm';
-    }
+    //if (process.platform !== 'win32') {
+      //command = 'npm link npm';
+    //}
     require('child_process').exec(command, function (error, stdout, stderr) {
       //if (error != null) {
         //throw error;
@@ -63,8 +63,8 @@ var install_deps = function (npm, next_command) {
         //TODO: compare against real version (semver?) just in case of backported upgrades
         if (installed == null) {
           deps_missing.push(dependency);
-        } else if (installed !== wanted && dependency !== 'npm') {
-          deps_outdated.push(dependency);
+        } else if (/*installed !== latest &&*/ installed !== wanted /*&& dependency !== 'npm'*/) {
+          deps_outdated.push(dependency + '@' + wanted);
         }
       });
       if (deps_outdated.length > 0) {
