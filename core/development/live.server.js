@@ -105,9 +105,18 @@ platform.development.change.process.delete = async function(path, file, backend)
 if (platform.state !== platform._states.PRELOAD) {
   if (platform.configuration.runtime.development === true) {
     platform.events.attach('application.ready', 'change.watcher.init', function () {
+      var skip_root_core = false;
+      if (platform.io.backends.root.base === platform.io.backends.core.base) {
+        skip_root_core = true;
+      }
       platform.io.store.list().forEach(function (backend) {
+        if (skip_root_core === true && backend.name === 'root') {
+          return;
+        }
         var backend_priority = platform.io.store.getPriority(backend.name);
         if (backend_priority > -1 && backend_priority < 100) {
+          //TODO: avoid watching on temporary or external folders (e.g. node_modules)
+          //FIXME: causes EMFILE exception in darwin platform (probably because of watching huge node_modules folder) 
           native.watch(backend.base, platform.development.change.process.bind(null, backend));
         }
       });
