@@ -62,9 +62,9 @@ platform.system.uv.info = function(){
 };
 
 platform.events.attach('core.ready','uv.init',function() {
-  platform.statistics.register('gauge', 'uv.latency.current',null,true);
-  platform.statistics.register('gauge', 'uv.latency.average',null,true);
-  platform.statistics.register('gauge', 'uv.latency.peak',null,true);
+  platform.statistics.register('gauge', 'uv.latency.current','ms',null,true);
+  platform.statistics.register('gauge', 'uv.latency.average','ms',null,true);
+  platform.statistics.register('gauge', 'uv.latency.peak','ms',null,true);
   setInterval(function () {
     platform.statistics.get('uv.latency.current').set(_poller());
     platform.statistics.get('uv.latency.average').set(_average);

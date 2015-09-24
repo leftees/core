@@ -134,9 +134,9 @@ platform.system.cpu.info = function () {
 };
 
 platform.events.attach('core.ready', 'cpu.init', function () {
-  platform.statistics.register('gauge', 'cpu.total', null, true);
-  platform.statistics.register('gauge', 'cpu.user', null, true);
-  platform.statistics.register('gauge', 'cpu.system', null, true);
+  platform.statistics.register('gauge', 'cpu.total','%', null, true);
+  platform.statistics.register('gauge', 'cpu.user','%', null, true);
+  platform.statistics.register('gauge', 'cpu.system','%', null, true);
   setInterval(function () {
     platform.statistics.get('cpu.total').set(_total);
     platform.statistics.get('cpu.user').set(_user);

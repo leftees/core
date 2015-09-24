@@ -61,9 +61,9 @@ if (process.platform !== 'win32') {
   };
 
   platform.events.attach('core.ready', 'cluster.cpu.init', async function () {
-    await platform.cluster.statistics.register('gauge', 'cpu.total', null, true);
-    await platform.cluster.statistics.register('gauge', 'cpu.user', null, true);
-    await platform.cluster.statistics.register('gauge', 'cpu.system', null, true);
+    await platform.cluster.statistics.register('gauge', 'cpu.total' ,'%', null, true);
+    await platform.cluster.statistics.register('gauge', 'cpu.user','%', null, true);
+    await platform.cluster.statistics.register('gauge', 'cpu.system','%', null, true);
   });
 
 } else {

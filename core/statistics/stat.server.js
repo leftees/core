@@ -38,7 +38,7 @@ var _interval = null;
 var _resolution = 1000;
 
 //TODO: define standard specification for names (e.g. http.request.active)
-platform.statistics.register = function(type,name,options,force){
+platform.statistics.register = function(type,name,unit,options,force){
   // checking whether a metric with same name has been registered
   if (platform.statistics.exists(name) === false) {
     //TODO: check if every method is implemented (interface?)
@@ -55,7 +55,7 @@ platform.statistics.register = function(type,name,options,force){
       case 'gauge':
         platform.statistics._store[name] = new Gauge(options);
         break;
-      //TODO: implement histograms and timers?
+        //TODO: implement histograms and timers?
       default:
         throw new Exception('metric of type %s is not supported',type);
         return false;
@@ -63,12 +63,15 @@ platform.statistics.register = function(type,name,options,force){
     // extending with type/name
     platform.statistics._store[name].type = type;
     platform.statistics._store[name].name = name;
+    platform.statistics._store[name].unit = unit;
+
 
     //TODO: get value persistent across restart from storage
 
     return true;
   } else if (force === true && platform.statistics._store[name].type === type) {
     //TODO: merge options
+    platform.statistics._store[name].unit = unit || platform.statistics._store[name].unit;
   } else {
     throw new Exception('metric %s already exists with type %s',name,type);
   }
@@ -170,6 +173,7 @@ Counter.prototype.toJSON = function(){
     'value': this._count,
     'min': this._min,
     'max': this._max,
+    'unit': this.unit
   };
 };
 
@@ -203,6 +207,7 @@ Meter.prototype.toJSON = function(){
     'value': this._value,
     'min': this._min,
     'max': this._max,
+    'unit': this.unit
   };
 };
 
@@ -232,6 +237,7 @@ Gauge.prototype.toJSON = function(){
     'value': this._value,
     'min': this._min,
     'max': this._max,
+    'unit': this.unit
   };
 };
 

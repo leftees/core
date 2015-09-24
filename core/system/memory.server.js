@@ -154,8 +154,8 @@ platform.events.attach('core.ready','memory.init',function(){
       platform.system.memory.collect();
     }
   });
-  platform.statistics.register('gauge', 'memory.heap',null,true);
-  platform.statistics.register('gauge', 'memory.rss',null,true);
+  platform.statistics.register('gauge', 'memory.heap','bytes',null,true);
+  platform.statistics.register('gauge', 'memory.rss','bytes',null,true);
   setInterval(function(){
     var memory_info = process.memoryUsage();
     platform.statistics.get('memory.heap').set(memory_info.heapTotal);

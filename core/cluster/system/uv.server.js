@@ -59,7 +59,7 @@ platform.cluster.system.uv.info = async function(){
 };
 
 platform.events.attach('core.ready','cluster.uv.init', async function(){
-  await platform.cluster.statistics.register('gauge', 'uv.latency.current',null,true);
-  await platform.cluster.statistics.register('gauge', 'uv.latency.average',null,true);
-  await platform.cluster.statistics.register('gauge', 'uv.latency.peak',null,true);
+  await platform.cluster.statistics.register('gauge', 'uv.latency.current','ms',null,true);
+  await platform.cluster.statistics.register('gauge', 'uv.latency.average','ms',null,true);
+  await platform.cluster.statistics.register('gauge', 'uv.latency.peak','ms',null,true);
 });

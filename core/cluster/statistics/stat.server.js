@@ -30,7 +30,7 @@ platform.cluster.statistics = platform.cluster.statistics || {};
 */
 platform.cluster.statistics._store = platform.cluster.statistics._store || {};
 
-platform.cluster.statistics._register = function(type,name,options,force){
+platform.cluster.statistics._register = function(type,name,unit,options,force){
   // checking whether a metric with same name has been registered
   if (platform.cluster.statistics.exists(name) === false) {
     //TODO: check if every method is implemented (interface?)
@@ -53,12 +53,14 @@ platform.cluster.statistics._register = function(type,name,options,force){
     // extending with type/name
     platform.cluster.statistics._store[name].type = type;
     platform.cluster.statistics._store[name].name = name;
+    platform.cluster.statistics._store[name].unit = unit;
 
     //TODO: get value persistent across restart from storage
 
     return true;
   } else if (force === true && platform.cluster.statistics._store[name].type === type) {
     //TODO: merge options
+    platform.cluster.statistics._store[name].unit = unit || platform.cluster.statistics._store[name].unit;
   } else {
     throw new Exception('cluster metric %s already exists with type %s',name,type);
   }
@@ -202,17 +204,20 @@ var RemoteMetric = function(options){
 
 RemoteMetric.prototype.toJSON = function(callback){
 
+  var self = this;
+
   callback = native.util.makeHybridCallbackPromise(callback);
 
   // requesting json to statistics node within the cluster
   platform.cluster.ipc.sendAwait('*','statistics.tojson',{
-    'name': this.name
+    'name': self.name
   },function(errors,results){
     if (results != null && results.succeed.length === results.destinations.length) {
       var result = {
         'value': 0,
         'min': 0,
-        'max': 0
+        'max': 0,
+        'unit': self.unit
       };
       results.forEach(function(remote_result){
         if (remote_result != null) {

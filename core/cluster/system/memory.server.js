@@ -110,6 +110,6 @@ platform.cluster.system.memory.log = async function(force){
 };
 
 platform.events.attach('core.ready','cluster.memory.init', async function(){
-  await platform.cluster.statistics.register('gauge', 'memory.heap',null,true);
-  await platform.cluster.statistics.register('gauge', 'memory.rss',null,true);
+  await platform.cluster.statistics.register('gauge', 'memory.heap','bytes',null,true);
+  await platform.cluster.statistics.register('gauge', 'memory.rss','bytes',null,true);
 });

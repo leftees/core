@@ -637,23 +637,23 @@ platform.server.http._check_redirect = function(url,redirectors){
 };
 
 //? if (CLUSTER) {
-platform.cluster.statistics.register('counter','http.request.total',null,true);
-platform.cluster.statistics.register('counter','http.request.active',null,true);
-platform.cluster.statistics.register('meter','http.request.rate',null,true);
-platform.cluster.statistics.register('counter','http.request.redirect',null,true);
-platform.cluster.statistics.register('counter','http.request.reject',null,true);
-platform.cluster.statistics.register('counter','http.request.error',null,true);
-platform.cluster.statistics.register('counter','http.upgrade.websocket',null,true);
-platform.cluster.statistics.register('counter','http.upgrade.unimplemented',null,true);
+platform.cluster.statistics.register('counter','http.request.total','',null,true);
+platform.cluster.statistics.register('counter','http.request.active','',null,true);
+platform.cluster.statistics.register('meter','http.request.rate','req/s',null,true);
+platform.cluster.statistics.register('counter','http.request.redirect','',null,true);
+platform.cluster.statistics.register('counter','http.request.reject','',null,true);
+platform.cluster.statistics.register('counter','http.request.error','',null,true);
+platform.cluster.statistics.register('counter','http.upgrade.websocket','',null,true);
+platform.cluster.statistics.register('counter','http.upgrade.unimplemented','',null,true);
 //? } else {
-platform.statistics.register('counter','http.request.total',null,true);
-platform.statistics.register('counter','http.request.active',null,true);
-platform.statistics.register('meter','http.request.rate',null,true);
-platform.statistics.register('counter','http.request.redirect',null,true);
-platform.statistics.register('counter','http.request.reject',null,true);
-platform.statistics.register('counter','http.request.error',null,true);
-platform.statistics.register('counter','http.upgrade.websocket',null,true);
-platform.statistics.register('counter','http.upgrade.unimplemented',null,true);
+platform.statistics.register('counter','http.request.total','',null,true);
+platform.statistics.register('counter','http.request.active','',null,true);
+platform.statistics.register('meter','http.request.rate','req/s',null,true);
+platform.statistics.register('counter','http.request.redirect','',null,true);
+platform.statistics.register('counter','http.request.reject','',null,true);
+platform.statistics.register('counter','http.request.error','',null,true);
+platform.statistics.register('counter','http.upgrade.websocket','',null,true);
+platform.statistics.register('counter','http.upgrade.unimplemented','',null,true);
 //? }
 
 // initializing and starting HTTP(S) listeners
