@@ -76,7 +76,8 @@ platform.configuration.bootstrap.init = [
   'development/inspector.server.js',
   'development/console.server.js',
   'development/live.server.js',
-  'development/ide.server.js'
+  'development/ide.server.js',
+  'development/terminal.server.js'
 ];
 
 /**

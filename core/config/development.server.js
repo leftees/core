@@ -42,4 +42,8 @@ platform.configuration.development.tools.ide.ports = {
 };
 platform.configuration.development.tools.ide.spawn = true;
 
-
+platform.configuration.development.tools.terminal = {};
+platform.configuration.development.tools.terminal.ports = {
+  'ui': 9093
+};
+platform.configuration.development.tools.terminal.spawn = true;

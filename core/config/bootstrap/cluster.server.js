@@ -125,7 +125,8 @@ platform.configuration.bootstrap.init.generic = [
  * @alert  Ignored/hardcoded within boot pack during building.
 */
 platform.configuration.bootstrap.init.master = [
-  'development/ide.server.js'
+  'development/ide.server.js',
+  'development/terminal.server.js'
 ];
 
 /**

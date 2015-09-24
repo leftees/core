@@ -47,6 +47,7 @@
     "json-stringify-safe": "latest",
     "libxmljs": "latest",
     "ljve-inspector": "latest",
+    "ljve-terminal": "latest",
     "ljve-jsdoc": "latest",
     "ljve-jsdoc-template": "latest",
     "source-map-support": "latest",
