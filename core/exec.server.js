@@ -39,7 +39,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // setting the debugger port
-if (process.version.indexOf('v0.10.') === 0) {
+if ([ 'v0.10.', 'v4.'].some(function(version){ return (process.version.indexOf(version) === 0); }) === true) {
   // fixing cluster node debug ports
   if (cluster.isWorker === true) {
     process.debugPort += cluster.worker.id;
