@@ -45,7 +45,7 @@ platform.database.register = async function(name,settings){
         break;
       case 'sqlite':
         // https://github.com/Synerzip/loopback-connector-sqlite (forked)
-        settings.connector = await load('loopback-connector-sqlite-next');
+        settings.connector = await load('loopback-connector-sqlite');
         if (settings.file != null && settings.file !== ':memory:'){
           platform.io.createSync(native.path.dirname(settings.file) + native.path.sep);
           settings.file = platform.io.map(settings.file);
