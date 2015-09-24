@@ -81,7 +81,7 @@
     "universal-analytics": "latest",
     "useragent": "latest",
     "v8-debug-protocol": "latest",
-    "webworker-threads": "latest",
+    "webworker-threads": "https://github.com/audreyt/node-webworker-threads/tarball/master",
     "winston": "latest",
     "ws": "latest",
     "xmlhttprequest": "latest",
