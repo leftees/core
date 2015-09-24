@@ -93,10 +93,10 @@ platform.development.tools.console.start = function(agent_port,ui_port){
       if (platform.development.tools.console._wrapper === undefined) {
         platform.development.tools.console._wrapper = require('node-console');
       }
-      platform.development.tools.console._wrapper.agent.start(agent_port, '0.0.0.0');
+      platform.development.tools.console._wrapper.agent.start(agent_port || platform.development.tools.console.port, '0.0.0.0');
     } else {
       platform.development.tools.console._agent = global.require(platform.configuration.runtime.path.core + platform.development.tools.console._agent_path);
-      platform.development.tools.console._agent.start(agent_port, '0.0.0.0');
+      platform.development.tools.console._agent.start(agent_port || platform.development.tools.console.port, '0.0.0.0');
     }
 //? if(CLUSTER) {
     if (platform.cluster.worker.master === true) {
@@ -104,15 +104,15 @@ platform.development.tools.console.start = function(agent_port,ui_port){
       if (platform.configuration.development.tools.console.spawn === false) {
         platform.development.tools.console._wrapper.server.start({
           webHost: '0.0.0.0',
-          webPort: ui_port,
-          debugPort: agent_port
+          webPort: ui_port || platform.configuration.development.tools.inspector.ports.ui,
+          debugPort: agent_port || platform.development.tools.console.port
         });
       } else {
         // executing tool separate process(es)
         platform.development.tools.console._process = require('child_process').spawn(process.execPath, [
           platform.configuration.runtime.path.core + platform.development.tools.console._process_path,
-          agent_port,
-          ui_port,
+          agent_port || platform.development.tools.console.port,
+          ui_port || platform.configuration.development.tools.inspector.ports.ui,
           '0.0.0.0'
         ]);
       }

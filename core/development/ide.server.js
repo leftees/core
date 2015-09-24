@@ -74,7 +74,7 @@ platform.development.tools.ide.start = function(port){
         platform.development.tools.ide._wrapper = require('ljve-ide/lib/server');
       }
       platform.development.tools.ide._wrapper.start(
-        port,
+        port || platform.configuration.development.tools.ide.ports.ui,
         {
           supportDir: native.path.join(data_fs.base, '/data/ide'),
           projectsDir: platform.configuration.runtime.path.root,
@@ -86,7 +86,7 @@ platform.development.tools.ide.start = function(port){
       platform.development.tools.ide._process = require('child_process').spawn(process.execPath, [
         platform.configuration.runtime.path.core + platform.development.tools.ide._process_path,
         '--port',
-        port,
+        port || platform.configuration.development.tools.ide.ports.ui,
         '--proj-dir',
         platform.configuration.runtime.path.root,
         '--supp-dir',

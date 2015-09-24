@@ -68,31 +68,13 @@ if (platform.cluster.worker.master === true) {
   */
   platform.development.tools.inspector.start = function (port) {
     if (platform.development.tools.inspector._running === false) {
-      /*if (platform.configuration.development.tools.inspector.spawn === false) {
-        if (platform.development.tools.inspector._wrapper === undefined) {
-          platform.development.tools.inspector._wrapper = new (require('ljve-inspector/lib/debug-server').DebugServer)();
-        }
-        platform.development.tools.inspector._wrapper.start({
-          sslCert: '',
-          sslKey: '',
-          debugBrk: true,
-          stackTraceLimit: 50,
-          hidden: [],
-          inject: true,
-          preload: false,
-          saveLiveEdit: false,
-          debugPort: process.debugPort,
-          webHost: '0.0.0.0',
-          webPort: 9091
-        });
-      } else {*/
         // executing tool separate process(es)
         platform.development.tools.inspector._process = require('child_process').spawn(process.execPath, [
           platform.configuration.runtime.path.core + platform.development.tools.inspector._process_path,
           '--web-host',
           '0.0.0.0',
           '--web-port',
-          port,
+          port || platform.configuration.development.tools.inspector.ports.ui,
           '--debug-port',
           process.debugPort,
           '--no-save-live-edit',
@@ -112,13 +94,10 @@ if (platform.cluster.worker.master === true) {
   */
   platform.development.tools.inspector.stop = function () {
     if (platform.development.tools.inspector._running === true) {
-      //if (platform.configuration.development.tools.inspector.spawn === false) {
-      //  platform.development.tools.inspector._wrapper.stop();
-      //} else {
-        // killing separate process(es)
-        platform.development.tools.inspector._process.kill();
-        platform.development.tools.inspector._process = undefined;
-      //}
+      // killing separate process(es)
+      platform.development.tools.inspector._process.kill();
+      platform.development.tools.inspector._process = undefined;
+      }
       platform.development.tools.inspector._running = false;
     } else {
       throw new Exception('inspector tool is not running');
@@ -153,13 +132,9 @@ if (platform.cluster.worker.master === true) {
     if (platform.configuration.runtime.debugging === true) {
       platform.events.attach('core.ready','devtools.init.inspector.ui', function(){
 
-        //if (platform.configuration.development.tools.inspector.spawn === false) {
-        //  platform.development.tools.inspector.start(platform.configuration.development.tools.inspector.ports.ui);
-        //} else {
-          setTimeout(function(){
-            platform.development.tools.inspector.start(platform.configuration.development.tools.inspector.ports.ui);
-          },5000);
-        //}
+        setTimeout(function(){
+          platform.development.tools.inspector.start(platform.configuration.development.tools.inspector.ports.ui);
+        },5000);
 
         if (process.debugActive === true) {
 //? if (CLUSTER) {

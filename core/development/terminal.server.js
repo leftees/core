@@ -115,7 +115,7 @@ if (platform.cluster.worker.master === true) {
   */
   platform.development.tools.terminal.start = function (port) {
     if (platform.development.tools.terminal._running === false) {
-      platform.development.tools.terminal._options.port = port;
+      platform.development.tools.terminal._options.port = port || platform.configuration.development.tools.inspector.ports.ui;
       if (platform.configuration.development.tools.terminal.spawn === false) {
         if (platform.development.tools.terminal._wrapper === undefined) {
           platform.development.tools.terminal._wrapper = require('ljve-terminal').createServer(platform.development.tools.terminal._options);
