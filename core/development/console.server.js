@@ -58,7 +58,7 @@ platform.development.tools.console._agent = platform.development.tools.console._
 /**
  *  Define separated process path for console.
  */
-platform.development.tools.console._process_path = '/node_modules/node-console/server.run.js';
+platform.development.tools.console._process_path = '/node_modules/node-console/run.server.js';
 
 /**
  *  Define agent path for inspector.
@@ -105,8 +105,7 @@ platform.development.tools.console.start = function(agent_port,ui_port){
         platform.development.tools.console._wrapper.server.start({
           webHost: '0.0.0.0',
           webPort: ui_port,
-          debugPort: agent_port,
-          babel: '7'
+          debugPort: agent_port
         });
       } else {
         // executing tool separate process(es)
@@ -114,8 +113,7 @@ platform.development.tools.console.start = function(agent_port,ui_port){
           platform.configuration.runtime.path.core + platform.development.tools.console._process_path,
           agent_port,
           ui_port,
-          '0.0.0.0',
-          '7'
+          '0.0.0.0'
         ]);
       }
 //? if (CLUSTER) {
