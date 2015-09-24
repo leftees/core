@@ -97,7 +97,6 @@ if (platform.cluster.worker.master === true) {
       // killing separate process(es)
       platform.development.tools.inspector._process.kill();
       platform.development.tools.inspector._process = undefined;
-      }
       platform.development.tools.inspector._running = false;
     } else {
       throw new Exception('inspector tool is not running');
