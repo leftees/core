@@ -145,6 +145,7 @@ var update_deps = function (npm, next_command) {
 };
 
 var done = function (next_command) {
+  console.log();
   console.log('done');
   if (next_command != null) {
     var target = global.main.commands[next_command];
