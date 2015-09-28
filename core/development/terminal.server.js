@@ -32,7 +32,7 @@ platform.development.tools = platform.development.tools || {};
 
 //? if(CLUSTER) {
 if (platform.cluster.worker.master === true) {
-  //? }
+//? }
 
   /**
   * Provides support for terminal.
@@ -119,6 +119,10 @@ if (platform.cluster.worker.master === true) {
         if (platform.development.tools.terminal._wrapper === undefined) {
           platform.development.tools.terminal._wrapper = require('ljve-terminal').createServer(platform.development.tools.terminal._options);
         }
+        platform.development.tools.terminal._wrapper.setAuth(function(request,response,callback){
+          //TODO: implement authentication integration
+          callback();
+        });
         platform.development.tools.terminal._wrapper.listen();
       } else {
         // saving options configuration file
@@ -196,15 +200,6 @@ if (platform.cluster.worker.master === true) {
   }
 
   }
-  //? if(CLUSTER) {
+//? if(CLUSTER) {
 }
 //? }
-
-
-
-
-
-
-//app.setAuth(function(a,b,c){
-//c();
-//});
