@@ -34,6 +34,7 @@ var init_npm = function (next_command) {
     //if (process.platform !== 'win32') {
       //command = 'npm link npm';
     //}
+    console.log('installing npm...');
     require('child_process').exec(command, function (error, stdout, stderr) {
       //if (error != null) {
       //throw error;
@@ -110,7 +111,8 @@ var update_deps = function (npm, next_command) {
       }
       if (deps_outdated.length > 0) {
         console.log('upgradable dependencies: %s', deps_outdated.join(', '));
-        console.log('upgrading outdated dependencies');
+        console.log('upgrading %s outdated dependencies', deps_outdated.length);
+        console.log();
 
         if (process.platform === 'win32') {
           var npm_process = require('child_process').spawn(

@@ -68,7 +68,7 @@
     "node-watch": "latest",
     "nodemailer": "latest",
     "nodemailer-smtp-pool": "latest",
-    "npm": "latest",
+    "npm": "^2.14.6",
     "pson": "latest",
     "readdirp": "latest",
     "request": "latest",

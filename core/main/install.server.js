@@ -34,6 +34,7 @@ var init_npm = function (next_command) {
     //if (process.platform !== 'win32') {
       //command = 'npm link npm';
     //}
+    console.log('installing npm...');
     require('child_process').exec(command, function (error, stdout, stderr) {
       //if (error != null) {
         //throw error;
@@ -72,7 +73,8 @@ var install_deps = function (npm, next_command) {
       }
       if (deps_missing.length > 0) {
         console.log('missing dependencies: %s', deps_missing.join(', '));
-        console.log('installing missing dependencies');
+        console.log('installing %s missing dependencies...',deps_missing.length);
+        console.log();
 
         if (process.platform === 'win32') {
           var npm_process = require('child_process').spawn(
