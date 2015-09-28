@@ -44,44 +44,44 @@ if (platform.cluster.worker.master === true) {
    *  Contains default options for tty.js.
    */
   platform.development.tools.terminal._options = {
-    "users": {
+    'users': {
     },
-    "port": null,
-    "hostname": "0.0.0.0",
-    "shell": "bash",
-    "limitGlobal": 1000,
-    "limitPerUser": 100,
-    "localOnly": false,
-    "cwd": process.cwd(),
-    "syncSession": true,
-    "sessionTimeout": 300000,
-    "log": false,
-    "debug": false,
-    "term": {
-      "termName": "xterm",
-      "geometry": [80, 24],
-      "scrollback": 0,
-      "visualBell": true,
-      "popOnBell": true,
-      "cursorBlink": true,
-      "screenKeys": true,
-      "colors": [
-        "#2e3436",
-        "#cc0000",
-        "#4e9a06",
-        "#c4a000",
-        "#3465a4",
-        "#75507b",
-        "#06989a",
-        "#d3d7cf",
-        "#555753",
-        "#ef2929",
-        "#8ae234",
-        "#fce94f",
-        "#729fcf",
-        "#ad7fa8",
-        "#34e2e2",
-        "#eeeeec"
+    'port': null,
+    'hostname': '0.0.0.0',
+    'shell': (process.platform !== 'win32') ? 'bash' : 'cmd.exe',
+    'limitGlobal': 1000,
+    'limitPerUser': 100,
+    'localOnly': false,
+    'cwd': process.cwd(),
+    'syncSession': false,
+    'sessionTimeout': 300000,
+    'log': false,
+    'debug': false,
+    'term': {
+      'termName': '...',
+      'geometry': [80, 24],
+      'scrollback': 0,
+      'visualBell': true,
+      'popOnBell': true,
+      'cursorBlink': true,
+      'screenKeys': true,
+      'colors': [
+        '#2e3436',
+        '#cc0000',
+        '#4e9a06',
+        '#c4a000',
+        '#3465a4',
+        '#75507b',
+        '#06989a',
+        '#d3d7cf',
+        '#555753',
+        '#ef2929',
+        '#8ae234',
+        '#fce94f',
+        '#729fcf',
+        '#ad7fa8',
+        '#34e2e2',
+        '#eeeeec'
       ]
     }
   };
@@ -127,15 +127,15 @@ if (platform.cluster.worker.master === true) {
       } else {
         // saving options configuration file
         var data_fs = platform.io.store.getByName('root');
-        if (data_fs.exists('/data/terminal/') === false){
-          data_fs.create('/data/terminal/');
+        if (data_fs.exists('/data/tty/') === false){
+          data_fs.create('/data/tty/');
         }
-        data_fs.set.stringSync('/data/terminal/config.json',JSON.stringify(platform.development.tools.terminal._options));
+        data_fs.set.stringSync('/data/tty/config.json',JSON.stringify(platform.development.tools.terminal._options));
         // executing tool separate process(es)
         platform.development.tools.terminal._process = require('child_process').spawn(process.execPath, [
           platform.configuration.runtime.path.core + platform.development.tools.terminal._process_path,
           '--config',
-          native.path.join(data_fs.base,'/data/terminal/config.json')
+          native.path.join(data_fs.base,'/data/tty/config.json')
         ]);
       }
       platform.development.tools.terminal._running = true;
