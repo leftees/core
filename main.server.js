@@ -41,13 +41,28 @@ if (process.env.NODE_WRAPPER_MAIN !== 'false' && process.env.NODE_LOW_MEMORY !==
   var args = Array.prototype.slice.call(process.argv);
   args.shift();
   var execArgv = Array.prototype.slice.call(process.execArgv);
-  execArgv.forEach(function(arg,index) {
+
+  // workaround for missing SIG_USR1 signal and late debugger enabling
+  if (process.platform === 'win32'){
+    args.forEach(function(arg,index){
+      if (arg === 'debug' || arg === 'debug.cluster') {
+        process.env.NODE_ENV = 'debugging';
+      }
+    });
+  }
+
+  var debugArgv = null;
+  execArgv = execArgv.map(function(arg) {
     if (arg === '--debug' || arg.indexOf('--debug=') === 0 || arg === '--debug-brk' || arg.indexOf('--debug-brk=') === 0){
-      execArgv.unshift('--debug='+(process.debugPort+1));
-    } else if (process.env.NODE_ENV === 'debugging'){
-      execArgv.unshift('--debug');
+      debugArgv = arg;
+      return ('--debug='+(process.debugPort+1));
     }
+    return arg;
   });
+  if (debugArgv == null && process.env.NODE_ENV === 'debugging'){
+    execArgv.unshift('--debug');
+  }
+
   var parallel_process = child_process.spawn(path.join(parallel_node_path, 'node'), execArgv.concat(args), {
     'cwd': process.cwd(),
     'env': env
