@@ -56,7 +56,6 @@ if (platform.cluster.worker.master === true) {
     "syncSession": true,
     "sessionTimeout": 300000,
     "log": false,
-    "io": { "log": false },
     "debug": false,
     "term": {
       "termName": "xterm",
@@ -133,7 +132,7 @@ if (platform.cluster.worker.master === true) {
           platform.configuration.runtime.path.core + platform.development.tools.terminal._process_path,
           '--config',
           native.path.join(data_fs.base,'/data/terminal/config.json')
-        ],{stdio:'inherit'});
+        ]);
       }
       platform.development.tools.terminal._running = true;
     } else {
