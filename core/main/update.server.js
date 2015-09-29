@@ -111,7 +111,7 @@ var update_deps = function (npm, next_command) {
       }
       if (deps_outdated.length > 0) {
         console.log('upgradable dependencies: %s', deps_outdated.join(', '));
-        console.log('upgrading %s outdated dependencies', deps_outdated.length);
+        console.log('upgrading %s outdated dependencies...', deps_outdated.length);
         console.log();
 
         if (process.platform === 'win32') {
