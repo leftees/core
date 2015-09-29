@@ -1,11 +1,6 @@
-# ljve.io
+# ljve.io (alpha)
 
-(porting in progress, please do not mind about status below)  
-
-[![Build Status](http://img.shields.io/travis/ljveio/core.png?style=flat)](https://travis-ci.org/ljveio/core)  
-![Comment Coverage](https://raw.githubusercontent.com/ljveio/core/master/project/stats/comments.badge.png)  
-[![Test Coverage](http://img.shields.io/codeclimate/coverage/github/ljveio/core.png?style=flat)](https://codeclimate.com/github/ljveio/core)  
-[![Code Climate](http://img.shields.io/codeclimate/github/ljveio/core.png?style=flat)](https://codeclimate.com/github/ljveio/core)  
+Currently the project is still under development.
 
 [![Package Status](http://img.shields.io/npm/v/ljve.svg?style=flat)](https://www.npmjs.org/package/ljve) 
 
@@ -13,7 +8,29 @@
 
 ## Usage
 
-...
+You can get it to through npm with:
+
+```bash
+npm install ljve -g
+```
+
+Node.js 4.0 is our runtime for project development. The project targets 0.10.x (to support old ARM without VFP4) and 0.12.x branches too.
+
+To list the supported commands and start ljve.io with:
+
+```bash
+# print available commands
+ljve help
+
+# launch environment without development tools (production) 
+ljve run
+
+# launch environment with development tools (web terminal, console and ide)
+ljve develop
+
+# launch environment with both development tools (see above) and debugger (http://localhost:9091/)
+ljve debug
+```
 
 
 
@@ -21,16 +38,13 @@
 
 If you want to contribute to the ljve.io project development, please carefully read and mind the following guidelines.
 
-
-### Communication
-
-...
+Project management tools (Atlassian JIRA and more) are available at https://epm.novetica.org/ (public sign-up is enabled).
 
 
 
 ### Documentation
 
-You can find project documentation here as PDF.
+Work in progress. The project web site will be available at http://ljve.io/.
 
 
 
@@ -38,11 +52,11 @@ You can find project documentation here as PDF.
 
 The following tools have been used to develop the ljve.io project:
 
+  * [Brackets](http://www.brackets.io/)  
+  Brackets.io is a modern, open source text editor that understands web design.
+  
   * [WebStorm](http://www.jetbrains.com/webstorm/)  
   JetBrains WebStorm is one of the smartest and most complete IDE for JavaScript development with Node.js support.
-
-  * [Nodeclipse](http://www.nodeclipse.org)  
-  Nodeclipse is a free open-source solution that provides a cross-platform Node.js IDE through Eclipse.
 
 
 
