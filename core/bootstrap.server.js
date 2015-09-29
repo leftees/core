@@ -269,10 +269,10 @@ bootstrap.post = async function() {
     if (process.env.BUILD != null && platform.state === platform._states.CORE_INIT) {
       var dist_source_map = JSON.parse(native.fs.readFileSync(native.path.join(native.compile.basepath, relativepath) + '.map', { 'encoding': 'utf8' }));
       dist_source_map.sources = dist_source_map.sources.map(function(source_path){
-        return source_path.replace(/^(\.\.\/)*/g,'../../');
+        return source_path.replace(/^(\.\.\/)*/g,'../../../');
       });
       bootstrap.dist.core.add(
-        '../../' + path.replace(/\\/g,'/'),
+        '../../../' + path.replace(/\\/g,'/'),
         native.fs.readFileSync(native.path.join(native.compile.basepath, relativepath), { 'encoding': 'utf8' }).replace(/\n\s*\/\/\# sourceMappingURL=.*?\n|\n\s*\/\/\# sourceMappingURL=.*?$/gi,''),
         JSON.stringify(dist_source_map)
       );
@@ -387,10 +387,10 @@ bootstrap.load.file = function(path,root,callback){
       if (process.env.BUILD != null && platform.state === platform._states.PRELOAD) {
         var dist_source_map = JSON.parse(native.fs.readFileSync(native.path.join(native.compile.basepath, relativepath) + '.' + basename + '.boot.map', { 'encoding': 'utf8' }));
         dist_source_map.sources = dist_source_map.sources.map(function(source_path){
-          return source_path.replace(/^(\.\.\/)*/g,'../../') + '.boot';
+          return source_path.replace(/^(\.\.\/)*/g,'../../../') + '.boot';
         });
         bootstrap.dist.boot.add(
-          '../../' + path.replace(/\\/g,'/') + '.boot',
+          '../../../' + path.replace(/\\/g,'/') + '.boot',
           native.fs.readFileSync(native.path.join(native.compile.basepath, relativepath) + '.' + basename + '.boot', { 'encoding': 'utf8' }).replace(/\n\s*\/\/\# sourceMappingURL=.*?\n|\n\s*\/\/\# sourceMappingURL=.*?$/gi,''),
           JSON.stringify(dist_source_map)
         );
