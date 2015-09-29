@@ -82,7 +82,7 @@
     "universal-analytics": "latest",
     "useragent": "latest",
     "v8-debug-protocol": "latest",
-    "webworker-threads": "https://github.com/audreyt/node-webworker-threads/tarball/master",
+    "webworker-threads": "latest",
     "winston": "latest",
     "ws": "latest",
     "xmlhttprequest": "latest",
@@ -101,8 +101,5 @@
   "preferGlobal": true,
   "private": false,
   "analyze": true,
-  "license": "AGPL-3.0",
-  "publishConfig": {
-    "registry": "https://npm.novetica.org/"
-  }
+  "license": "AGPL-3.0"
 }
