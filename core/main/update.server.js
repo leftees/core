@@ -50,21 +50,21 @@ var init_npm = function (next_command) {
 
 var update_ljve = function (npm, next_command) {
   if (require('fs').existsSync(require('path').join(global.main.path.core, '.git')) === false) {
-    require('child_process').exec('npm -g list ljve', function (error, stdout, stderr) {
+    require('child_process').exec('npm -g list ljve.io', function (error, stdout, stderr) {
       if (error == null) {
-        console.log('checking for ljve update...');
-        npm.commands.show(['ljve', 'version'], true, function (error, version) {
+        console.log('checking for ljve.io update...');
+        npm.commands.show(['ljve.io', 'version'], true, function (error, version) {
           if (error == null) {
             var current = require('./package.json').version;
             var latest = Object.keys(version);
             //TODO: compare against real version (semver?) just in case of backported upgrades
             if (current != latest) {
-              console.warn('ljve upgrade available: %s (installed %s)', latest, current);
-              console.log('upgrading ljve...');
-              require('child_process').exec('npm -g update ljve', function (error, stdout, stderr) {
+              console.warn('ljve.io upgrade available: %s (installed %s)', latest, current);
+              console.log('upgrading ljve.io...');
+              require('child_process').exec('npm -g update ljve.io', function (error, stdout, stderr) {
                 if (error == null) {
                   console.log(stdout);
-                  console.log('ljve upgraded');
+                  console.log('ljve.io upgraded');
                   update_deps(npm, next_command);
                 } else {
                   console.error(stderr);
@@ -76,12 +76,12 @@ var update_ljve = function (npm, next_command) {
           }
         });
       } else {
-        console.warn('ljve upgrade skipped (local install detected)');
+        console.warn('ljve.io upgrade skipped (local install detected)');
         update_deps(npm, next_command);
       }
     });
   } else {
-    console.warn('ljve upgrade skipped (development/git mode detected)');
+    console.warn('ljve.io upgrade skipped (development/git mode detected)');
     update_deps(npm, next_command);
   }
 };
@@ -160,7 +160,7 @@ var done = function (next_command) {
 global.main.commands.update.man = function () {
   console.log('\
   update\n\
-  Update application server and upgradable dependencies.');
+  Update ljve.io application server and upgradable dependencies.');
 };
 
 /*var update_node = function (next_command) {
