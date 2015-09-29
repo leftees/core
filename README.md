@@ -11,7 +11,7 @@ Currently the project is still under development.
 You can get it to through npm with:
 
 ```bash
-npm install ljve -g
+npm install ljve.io -g
 ```
 
 Node.js 4.0 is our runtime for project development. The project targets 0.10.x (to support old ARM without VFP4) and 0.12.x branches too.
