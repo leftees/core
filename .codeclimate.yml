@@ -1,7 +1,16 @@
-languages:
-  Ruby: false
-  JavaScript: true
-  PHP: false
-  Python: false
-# exclude_paths:
-# - "foo/bar.rb"
+engines:
+  eslint:
+    enabled: true
+  csslint:
+    enabled: true
+
+#ratings:
+#  paths:
+#  - app/**
+#  - lib/**
+#  - "**.rb"
+#  - "**.go"
+
+#exclude_paths:
+#- spec/**/*
+#- vendor/**/*
