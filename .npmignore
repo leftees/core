@@ -17,6 +17,7 @@
 /.gitmodules
 /.travis.yml
 /.npmignore
+/Dockerfile
 
 # Temporary runtime files
 /build
