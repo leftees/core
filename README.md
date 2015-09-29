@@ -2,7 +2,7 @@
 
 Currently the project is still under development.
 
-[![Package Status](http://img.shields.io/npm/v/ljve.svg?style=flat)](https://www.npmjs.org/package/ljve) 
+[![Package Status](http://img.shields.io/npm/v/ljve.io.svg?style=flat)](https://www.npmjs.org/package/ljve.io) 
 
 
 
