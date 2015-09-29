@@ -263,7 +263,7 @@ defineNative(native.monitor,'uv','event-loop-lag');
 //native.sysconf = require('sysconfx-next');
 defineNative(native,'sysconf','sysconfx-next');
 if (process.platform === 'win32') {
-//native.perfcounter = require('cwinperfcounter-next');
+  //native.perfcounter = require('cwinperfcounter-next');
   defineNative(native, 'perfcounter', 'cwinperfcounter-next');
 }
 //native.winston = require('winston');
@@ -612,23 +612,27 @@ native.compile.optional = [];
 } catch(err){}*/
 native.compile.basepath = native.path.join(global.main.path.root,'build');
 native.compile.scope = {
-// order is important to make development branches run
-//? if (DIST) {
+  // order is important to make development branches run
+  //? if (DIST) {
   'DIST': true,
-//? } else {
+  //? } else {
   'DIST': false,
-//? }
+  //? }
   'CLUSTER': false
 };
 native.compile.init = function(){
-//? if (!DIST) {
+  //? if (!DIST) {
   // cleaning cache/build when building boot/core packs
   if (process.env.BUILD === 'pack'){
     if (native.cluster == null || (native.cluster != null && native.cluster.isMaster === true)) {
       console.debug('cleaning for new build');
       native.fs.removeSync(native.path.join(global.main.path.root,'/build/'));
       native.fs.removeSync(native.path.join(global.main.path.root,'/cache/'));
-      native.fs.removeSync(native.path.join(global.main.path.root,'/dist/'));
+      if (native.cluster == null) {
+        native.fs.removeSync(native.path.join(global.main.path.root,'/dist/core/'));
+      } else {
+        native.fs.removeSync(native.path.join(global.main.path.root,'/dist/cluster/'));
+      }
     }
   }
 
@@ -647,7 +651,7 @@ native.compile.init = function(){
       native.fs.writeFileSync(scope_path, JSON.stringify(native.compile.scope));
     }
   }
-//? }
+  //? }
 };
 
 native.sleep = global.sleep = function (ms) {

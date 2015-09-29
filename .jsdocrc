@@ -27,7 +27,6 @@
     "linenums": false
   },
   "opts": {
-    "destination": "./dist/docs/",
     "encoding": "utf8",
     "private": false,
     "recurse": true,

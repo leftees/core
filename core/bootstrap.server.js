@@ -232,7 +232,7 @@ bootstrap.post = async function() {
 
   // preloading core bootstrap modules or boot pack
   //TODO: support remote build store
-  var boot_dist_path = native.path.join(platform.configuration.runtime.path.core,'dist/boot/core.server.js.boot');
+  var boot_dist_path = native.path.join(platform.configuration.runtime.path.core,'dist/core/boot/core.server.js.boot');
   if (process.env.BUILD == null && native.fs.existsSync(boot_dist_path + ((platform.configuration.runtime.development === false) ? '.min' : '')) === true){
     console.log('preloading built-in core boot modules');
     require(boot_dist_path + ((platform.configuration.runtime.development === false) ? '.min' : ''));
@@ -282,7 +282,7 @@ bootstrap.post = async function() {
 
   // loading core modules or core pack
   //TODO: support remote build store
-  var core_dist_path = native.path.join(platform.configuration.runtime.path.core,'dist/boot/core.server.js');
+  var core_dist_path = native.path.join(platform.configuration.runtime.path.core,'dist/core/boot/core.server.js');
   if (process.env.BUILD == null && native.fs.existsSync(core_dist_path + ((platform.configuration.runtime.development === false) ? '.min' : '')) === true){
     console.log('loading built-in core modules');
     require(core_dist_path + ((platform.configuration.runtime.development === false) ? '.min' : ''));

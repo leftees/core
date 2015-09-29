@@ -81,7 +81,7 @@ global.main.commands['run'] = function(base, callback){
   native.compile.init();
 
   // loading ljve application server
-  var bootstrap_dist_path = path.join(global.main.path.core,'dist/boot/bootstrap.server.js.boot');
+  var bootstrap_dist_path = path.join(global.main.path.core,'dist/core/boot/bootstrap.server.js.boot');
   if (process.env.BUILD == null && fs.existsSync(bootstrap_dist_path) === true) {
     require(bootstrap_dist_path);
   } else {

@@ -44,12 +44,12 @@ global.main.commands['_.dist.cluster'] = function () {
   var optimizer = args._[1] || args.optimizer || 'uglify';
 
   if (fs.existsSync(path.join(global.main.path.core, '/build/pack/master.server.js')) === true) {
-    if (fs.existsSync(path.join(global.main.path.core, '/dist/')) === true) {
-      rmdirSync(path.join(global.main.path.core, '/dist/'));
+    if (fs.existsSync(path.join(global.main.path.core, '/dist/cluster/')) === true) {
+      rmdirSync(path.join(global.main.path.core, '/dist/cluster/'));
     }
-    fs.mkdirSync(path.join(global.main.path.core, '/dist/'));
-    fs.mkdirSync(path.join(global.main.path.core, '/dist/docs/'));
-    fs.mkdirSync(path.join(global.main.path.core, '/dist/boot/'));
+    fs.mkdirSync(path.join(global.main.path.core, '/dist/cluster/'));
+    fs.mkdirSync(path.join(global.main.path.core, '/dist/cluster/docs/'));
+    fs.mkdirSync(path.join(global.main.path.core, '/dist/cluster/boot/'));
 
     var tasks = [];
 
@@ -63,6 +63,8 @@ global.main.commands['_.dist.cluster'] = function () {
         global.main.path.core + '/build/pack/runtime.server.js',
         '-c',
         global.main.path.core + '/.jsdocrc',
+        '-d',
+        global.main.path.core + '/dist/cluster/docs/',
         '--verbose'
       ], {
         stdio: 'inherit'
@@ -84,7 +86,7 @@ global.main.commands['_.dist.cluster'] = function () {
             '--js',
             global.main.path.core + '/build/core/cluster/bootstrap.server.js.boot',
             '--js_output_file',
-            global.main.path.core + '/dist/boot/bootstrap.server.js.boot',
+            global.main.path.core + '/dist/cluster/boot/bootstrap.server.js.boot',
             '--language_in',
             'ECMASCRIPT5',
             '--compilation_level',
@@ -99,11 +101,11 @@ global.main.commands['_.dist.cluster'] = function () {
             global.main.path.core + '/node_modules/uglify-js/bin/uglifyjs',
             global.main.path.core + '/build/core/cluster/bootstrap.server.js.boot',
             '-o',
-            global.main.path.core + '/dist/boot/bootstrap.server.js.boot',
+            global.main.path.core + '/dist/cluster/boot/bootstrap.server.js.boot',
             //'--in-source-map',
             //global.main.path.core + '/build/core/cluster/bootstrap.server.js.boot.map',
             //'--source-map',
-            //global.main.path.core + '/dist/boot/bootstrap.server.js.boot.map',
+            //global.main.path.core + '/dist/cluster/boot/bootstrap.server.js.boot.map',
             '--acorn',
             '-c',
             //'-m',
@@ -136,7 +138,7 @@ global.main.commands['_.dist.cluster'] = function () {
                   '--js',
                   global.main.path.core + '/build/pack/' + file,
                   '--js_output_file',
-                  global.main.path.core + '/dist/boot/' + file + '.min',
+                  global.main.path.core + '/dist/cluster/boot/' + file + '.min',
                   '--language_in',
                   'ECMASCRIPT5',
                   '--compilation_level',
@@ -151,11 +153,11 @@ global.main.commands['_.dist.cluster'] = function () {
                   global.main.path.core + '/node_modules/uglify-js/bin/uglifyjs',
                   global.main.path.core + '/build/pack/' + file,
                   '-o',
-                  global.main.path.core + '/dist/boot/' + file + '.min',
+                  global.main.path.core + '/dist/cluster/boot/' + file + '.min',
                   //'--in-source-map',
                   //global.main.path.core + '/build/pack/' + file + '.map',
                   //'--source-map',
-                  //global.main.path.core + '/dist/boot/' + file + '.map',
+                  //global.main.path.core + '/dist/cluster/boot/' + file + '.map',
                   '--acorn',
                   '-c',
                   //'-m',
@@ -173,9 +175,9 @@ global.main.commands['_.dist.cluster'] = function () {
               callback(new Error('minification of core ' + file + ' failed'));
             } else {
               fs.copySync(global.main.path.core + '/build/pack/' + file,
-                global.main.path.core + '/dist/boot/' + file);
+                global.main.path.core + '/dist/cluster/boot/' + file);
               fs.copySync(global.main.path.core + '/build/pack/' + file + '.map',
-                global.main.path.core + '/dist/boot/' + file + '.map');
+                global.main.path.core + '/dist/cluster/boot/' + file + '.map');
               callback();
             }
           });
