@@ -14,6 +14,7 @@
 /data
 /log
 /tmp
+/dist/*
 
 # Project and core development files
 /bin
