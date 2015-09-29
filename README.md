@@ -32,6 +32,17 @@ ljve develop
 ljve debug
 ```
 
+To get started, create a new application boilerplate with:
+
+```bash
+mkdir -p ~/ljve/hello
+cd ~/ljve/hello
+ljve create
+ljve debug
+```
+
+You can now have fun visiting ports 9090 (web console), 9091 (web debugger), 9092 (web ide) and 9093 (web terminal).
+
 
 
 ## Contribute
