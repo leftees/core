@@ -24,6 +24,10 @@ var cluster = require('cluster');
 var fs = require('fs');
 var path = require('path');
 
+// adding both core and root node_modules folders to require
+require('app-module-path').addPath(path.join(process.cwd(),'node_modules'));
+require('app-module-path').addPath(path.join(path.dirname(require.main.filename),'node_modules'));
+
 // creating temporary main namespace for modular CLI command support
 global.main = {};
 

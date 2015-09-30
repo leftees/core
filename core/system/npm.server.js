@@ -109,10 +109,10 @@ platform.system.npm.install = function(name,version,callback){
     if(versions.length > 0) {
       console.info('npm installing %s', name);
 
-      if (process.platform === 'win32') {
+      //if (process.platform === 'win32') {
         var npm_process = require('child_process').spawn(
-          'cmd',
-          ['/c', 'npm', 'install', name],
+          (process.platform === 'win32') ? 'cmd' : '/bin/bash',
+          (process.platform === 'win32') ? ['/c', 'npm', 'install', name] : ['-c', '-l', `npm install ${name}`],
           {
             'stdio': 'inherit'
           });
@@ -123,7 +123,7 @@ platform.system.npm.install = function(name,version,callback){
             callback.reject(new Exception('install failed, see above and retry'));
           }
         });
-      } else {
+      /*} else {
         platform.system.npm._wrapper.commands.install([name], function (error, info) {
           if (error) {
             return callback.reject(error);
@@ -135,7 +135,7 @@ platform.system.npm.install = function(name,version,callback){
             callback.resolve();
           }
         });
-      }
+      }*/
     } else {
       callback.reject(new Exception('npm package %s not found',name));
     }
@@ -148,12 +148,28 @@ platform.system.npm.uninstall = function(name,callback){
   callback = native.util.makeHybridCallbackPromise(callback);
 
   console.info('npm uninstalling %s', name);
-  platform.system.npm._wrapper.commands.uninstall([name], function (error, info) {
-    if (error) {
-      return callback.reject(error);
-    }
-    callback.resolve();
-  });
+  //if (process.platform === 'win32') {
+    var npm_process = require('child_process').spawn(
+      (process.platform === 'win32') ? 'cmd' : '/bin/bash',
+      (process.platform === 'win32') ? ['/c', 'npm', 'uninstall', name] : ['-c', '-l', `npm uninstall ${name}`],
+      {
+        'stdio': 'inherit'
+      });
+    npm_process.on('exit', function (code, signal) {
+      if (code === 0) {
+        callback.resolve(name);
+      } else {
+        callback.reject(new Exception('uninstall failed, see above and retry'));
+      }
+    });
+  /*} else {
+    platform.system.npm._wrapper.commands.uninstall([name], function (error, info) {
+      if (error) {
+        return callback.reject(error);
+      }
+      callback.resolve();
+    });
+  }*/
 
   return callback.promise;
 };
@@ -206,12 +222,17 @@ platform.events.attach('core.init', 'npm.init', async function(){
 
 global.load = async function(name){
   var lockid = await runtime.waitAndLock('maintenance');
+  var unlock = function(){
+    runtime.unlock('maintenance',lockid);
+  };
   var result;
   try {
     result = require(name);
   } catch(e) {
     await platform.system.npm.install(name);
-    result = require(name);
+    try {
+      result = require(name);
+    } catch(e) {}
   }
   runtime.unlock('maintenance',lockid);
   return result;
