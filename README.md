@@ -3,7 +3,7 @@
 Currently the project is still under development.
 
 [![Package Status](http://img.shields.io/npm/v/ljve.io.svg?style=flat)](https://www.npmjs.org/package/ljve.io) 
-
+[![Build Status](http://img.shields.io/travis/ljveio/core.png?style=flat)](https://travis-ci.org/ljveio/core)  
 
 
 ## Usage
