@@ -89,8 +89,7 @@
     "yamlparser": "latest",
     "yargs": "latest",
     "to-fast-properties": "latest",
-    "loopback-datasource-juggler": "latest",
-    "nan": "^2.0.9"
+    "loopback-datasource-juggler": "latest"
   },
   "optionalDependencies" : {
     "sysconfx-next": "latest",
