@@ -4,13 +4,9 @@ engines:
   csslint:
     enabled: true
 
-#ratings:
-#  paths:
-#  - app/**
-#  - lib/**
-#  - "**.rb"
-#  - "**.go"
+ratings:
+  paths:
+  - "core/**"
 
-#exclude_paths:
-#- spec/**/*
-#- vendor/**/*
+exclude_paths:
+- "_**"
