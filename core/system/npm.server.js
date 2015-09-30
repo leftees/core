@@ -227,11 +227,11 @@ global.load = async function(name){
   };
   var result;
   try {
-    result = require(name);
+    result = global.require(name);
   } catch(e) {
     await platform.system.npm.install(name);
     try {
-      result = require(name);
+      result = global.require(name);
     } catch(e) {}
   }
   runtime.unlock('maintenance',lockid);
