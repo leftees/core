@@ -1,4 +1,4 @@
-# ljve.io (alpha)
+# ljve.io
 
 Currently the project is still under development.
 
@@ -11,7 +11,11 @@ Currently the project is still under development.
 You can get it to through npm with:
 
 ```bash
+# Windows
 npm install ljve.io -g
+
+# Linux/Mac
+sudo npm install ljve.io -g
 ```
 
 Node.js 4.0 is our runtime for project development. The project targets 0.10.x (to support old ARM without VFP4) and 0.12.x branches too.
@@ -28,16 +32,32 @@ ljve run
 # launch environment with development tools (web terminal, console and ide)
 ljve develop
 
-# launch environment with both development tools (see above) and debugger (http://localhost:9091/)
+# launch environment with both development tools (see above) and debugger enabled
 ljve debug
 ```
 
 To get started, create a new application boilerplate with:
 
 ```bash
+# create a folder that will contain app files on Linux/Mac
 mkdir -p ~/ljve/hello
 cd ~/ljve/hello
+# initialiaze boilerplate using default template (in current folder)
 ljve create
+```
+
+```bash
+# create a folder that will contain app files on Windows
+mkdir -p %HOMEPATH%\Desktop\ljve\hello
+cd %HOMEPATH%\Desktop\ljve\hello
+# initialiaze boilerplate using default template (in current folder)
+ljve create
+```
+
+Start the environment and empty application with:
+
+```bash
+# launch environment and application with all development tools enabled
 ljve debug
 ```
 
