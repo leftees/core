@@ -39,7 +39,3 @@ WORKDIR /ljve/
 EXPOSE 8080 9090 9091 9092 9093
 
 ENTRYPOINT [ "/usr/local/bin/ljve" ]
-
-
-
-docker run -v $(pwd):/ljve/ -i -t ljveio/core:development run
