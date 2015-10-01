@@ -23,13 +23,13 @@
     "acorn": "latest",
     "acorn-babel-codetag": "latest",
     "babel-core": "latest",
+    "babel-eslint": "latest",
     "benchmark": "latest",
     "blanket": "latest",
     "body": "latest",
     "chai": "latest",
     "chai-as-promised": "latest",
     "chokidar": "latest",
-    "codeclimate-test-reporter": "latest",
     "concat-with-sourcemaps-next": "latest",
     "convert-source-map": "latest",
     "cookie": "latest",
@@ -90,7 +90,12 @@
     "yargs": "latest",
     "to-fast-properties": "latest",
     "loopback-datasource-juggler": "latest",
-    "app-module-path": "*"
+    "app-module-path": "latest",
+    "grunt-cli": "latest",
+    "grunt-jscs": "latest",
+    "grunt-eslint": "latest",
+    "grunt-exec": "latest",
+    "grunt-available-tasks": "latest"
   },
   "optionalDependencies" : {
     "sysconfx-next": "latest",
@@ -98,6 +103,7 @@
     "node-zlib-backport": "latest"
   },
   "scripts": {
+    "test": "node node_modules/grunt-cli/bin/grunt test"
   },
   "preferGlobal": true,
   "private": false,
