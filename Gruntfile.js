@@ -1,16 +1,21 @@
 module.exports = function(grunt) {
+  grunt.loadNpmTasks('grunt-available-tasks');
   grunt.loadNpmTasks('grunt-jscs');
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-shell');
-  grunt.loadNpmTasks('grunt-available-tasks');
+  grunt.loadNpmTasks('grunt-release');
 
   grunt.initConfig({
     availabletasks: {
       tasks: {
         options: {
-          showTasks: ['user'],
-          filter: 'exclude',
-          tasks: ['default']
+          filter: 'include',
+          tasks: [
+            'clean',
+            'test',
+            'build',
+            'release'
+          ]
         }
       }
     },
@@ -49,21 +54,41 @@ module.exports = function(grunt) {
         command: "node main.server.js _.dist.cluster",
         options: {}
       }
+    },
+    release: {
+      options: {
+        bump: true,
+        changelog: false,
+        add: true,
+        commit: true,
+        tag: true,
+        push: true,
+        pushTags: true,
+        npm: true,
+        tagName: '<%= version %>',
+        commitMessage: 'Released <%= version %>.',
+        tagMessage: 'Tagged release <%= version %>', //default: 'Version <%= version %>',
+      }
     }
   });
 
   grunt.registerTask('default', [ 'availabletasks' ]);
+
+  grunt.registerTask('clean', [
+    'shell:clean'
+  ]);
 
   grunt.registerTask('test', [
     'jscs',
     'eslint'
   ]);
 
-  grunt.registerTask('dist', [
+  grunt.registerTask('build', [
     'shell:clean',
     'shell:buildcore',
     'shell:distcore',
     'shell:buildcluster',
     'shell:distcluster'
   ]);
+
 };
