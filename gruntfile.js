@@ -130,6 +130,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', [ 'availabletasks' ]);
 
   grunt.registerTask('publish', [
+    'clean'
     'build',
     'release',
     'dockerize',
