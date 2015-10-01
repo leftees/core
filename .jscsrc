@@ -15,5 +15,8 @@
     "app/*/*",
     "config/*/*",
     "core/_old/**"
-  ]
+  ],
+  "maximumLineLength": 120,
+  "requireCamelCaseOrUpperCaseIdentifiers": false,
+  "maxErrors": -1
 }
