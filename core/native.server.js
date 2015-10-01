@@ -498,6 +498,7 @@ native.eval = function(code,esnext,silent){
     });
     native.fs.writeFileSync(generated_path + '.min', minified.code);
     //native.fs.writeFileSync(generated_path + '.map', minified.map);
+    native.memwatch.gc();
   }
   try {
     // injecting code
@@ -593,6 +594,7 @@ native.compile = function(path,base,tag,esnext,silent){
       //native.fs.writeFileSync(generated_path + '.map', minified.map);
       native.fs.utimesSync(generated_path, source_stat.atime, source_stat.mtime);
       //native.fs.utimesSync(generated_path + '.map', source_stat.atime, source_stat.mtime);
+      native.memwatch.gc();
     }
   }
   try {

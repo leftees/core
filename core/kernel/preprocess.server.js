@@ -158,6 +158,7 @@ platform.kernel.preprocess = async function(path, module, code){
   }
 
   ast = null;
+  native.memwatch.gc();
 
   //if (code != null) {
   return generated.code.toString();
