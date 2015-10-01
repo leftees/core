@@ -67,7 +67,8 @@ module.exports = function(grunt) {
         npm: true,
         tagName: '<%= version %>',
         commitMessage: 'Released <%= version %>.',
-        tagMessage: 'Tagged release <%= version %>', //default: 'Version <%= version %>',
+        tagMessage: 'Tagged release <%= version %>.',
+        remote: 'public'
       }
     }
   });
