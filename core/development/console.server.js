@@ -180,15 +180,21 @@ if (platform.state === platform._states.PRELOAD) {
     });
   });
 
-  if (platform.configuration.runtime.development === true) {
-    // starting development tools (only if development is enabled - NODE_ENV=development)
-    platform.development.tools.console.start(platform.development.tools.console.port, platform.configuration.development.tools.console.ports.ui);
-  }
-
 } else {
 
   if (platform.configuration.runtime.development === true) {
+    platform.events.attach('core.ready','devtools.init.console',function(){
+
+      if (process.env.BUILD === 'pack') return;
+
+      // starting development tools (only if development is enabled - NODE_ENV=development)
+      platform.development.tools.console.start(platform.development.tools.console.port, platform.configuration.development.tools.console.ports.ui);
+    });
+
     platform.events.attach('core.ready','devtools.init.console.ui', function(){
+
+      if (process.env.BUILD === 'pack') return;
+
 //? if (CLUSTER) {
       console.warn('console agent for node %s listening on port %s', platform.cluster.worker.id, platform.development.tools.console.port);
       if (platform.cluster.worker.master === true) {

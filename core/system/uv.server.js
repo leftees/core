@@ -65,6 +65,9 @@ platform.events.attach('core.ready','uv.init',function() {
   platform.statistics.register('gauge', 'uv.latency.current','ms',null,true);
   platform.statistics.register('gauge', 'uv.latency.average','ms',null,true);
   platform.statistics.register('gauge', 'uv.latency.peak','ms',null,true);
+
+  if (process.env.BUILD === 'pack') return;
+
   setInterval(function () {
     platform.statistics.get('uv.latency.current').set(_poller());
     platform.statistics.get('uv.latency.average').set(_average);

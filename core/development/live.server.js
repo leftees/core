@@ -105,6 +105,9 @@ platform.development.change.process.delete = async function(path, file, backend)
 if (platform.state !== platform._states.PRELOAD) {
   if (platform.configuration.runtime.development === true) {
     platform.events.attach('application.ready', 'change.watcher.init', function () {
+
+      if (process.env.BUILD === 'pack') return;
+
       var skip_root_core = false;
       if (platform.io.backends.root.base === platform.io.backends.core.base) {
         skip_root_core = true;

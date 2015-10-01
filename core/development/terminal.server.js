@@ -190,11 +190,17 @@ if (platform.cluster.worker.master === true) {
 
     if (platform.configuration.runtime.development === true) {
     platform.events.attach('core.ready','devtools.init.terminal',function(){
+
+      if (process.env.BUILD === 'pack') return;
+
       // starting development tools (only if development is enabled - NODE_ENV=development)
       platform.development.tools.terminal.start(platform.configuration.development.tools.terminal.ports.ui);
     });
 
     platform.events.attach('core.ready','devtools.init.terminal.ui', function(){
+
+      if (process.env.BUILD === 'pack') return;
+
       console.warn('terminal ui available at http://localhost:%s/', platform.configuration.development.tools.terminal.ports.ui);
     });
   }

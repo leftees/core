@@ -131,6 +131,8 @@ if (platform.cluster.worker.master === true) {
     if (platform.configuration.runtime.debugging === true) {
       platform.events.attach('core.ready','devtools.init.inspector.ui', function(){
 
+        if (process.env.BUILD === 'pack') return;
+
         setTimeout(function(){
           platform.development.tools.inspector.start(platform.configuration.development.tools.inspector.ports.ui);
         },5000);
@@ -151,6 +153,9 @@ if (platform.cluster.worker.master === true) {
 } else if (platform.state !== platform._states.PRELOAD) {
 
   platform.events.attach('core.ready','devtools.init.debugger', function(){
+
+    if (process.env.BUILD === 'pack') return;
+
     if (process.debugActive === true) {
       console.warn('debugger agent for node %s listening on port %s', platform.cluster.worker.id, process.debugPort);
     }

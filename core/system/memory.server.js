@@ -130,6 +130,7 @@ platform.system.memory.log = function(force,rebase){
 };
 
 platform.events.attach('core.ready','memory.init',function(){
+  if (process.env.BUILD === 'pack') return;
   if (platform.configuration.system.memory.gc.force === true) {
     // forcing garbage collector to clean memory
     platform.system.memory.collect();
@@ -156,6 +157,9 @@ platform.events.attach('core.ready','memory.init',function(){
   });
   platform.statistics.register('gauge', 'memory.heap','bytes',null,true);
   platform.statistics.register('gauge', 'memory.rss','bytes',null,true);
+
+  if (process.env.BUILD === 'pack') return;
+
   setInterval(function(){
     var memory_info = process.memoryUsage();
     platform.statistics.get('memory.heap').set(memory_info.heapTotal);

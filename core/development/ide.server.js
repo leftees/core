@@ -140,11 +140,17 @@ if (platform.state === platform._states.PRELOAD) {
 
   if (platform.configuration.runtime.development === true) {
     platform.events.attach('core.ready','devtools.init.ide',function(){
+
+      if (process.env.BUILD === 'pack') return;
+
       // starting development tools (only if development is enabled - NODE_ENV=development)
       platform.development.tools.ide.start(platform.configuration.development.tools.ide.ports.ui);
     });
 
     platform.events.attach('core.ready','devtools.init.ide.ui', function(){
+
+      if (process.env.BUILD === 'pack') return;
+
       console.warn('ide ui available at http://localhost:%s/', platform.configuration.development.tools.ide.ports.ui);
     });
   }
