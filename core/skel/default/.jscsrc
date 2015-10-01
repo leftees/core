@@ -1,4 +1,16 @@
 {
   "preset": "google",
-  "esnext": true
+  "esnext": true,
+  "excludeFiles": [
+    "bin/*",
+    "data/*",
+    "lib/*",
+    "log/*",
+    "project/*",
+    "tmp/*",
+    "**/build/*",
+    "**/cache/*",
+    "**/dist/*",
+    "**/node_modules/*"
+  ]
 }
