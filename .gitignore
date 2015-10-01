@@ -17,6 +17,7 @@
 /dist/*
 
 # Project and core development files
+/Dockerfile
 /bin
 /app
 /config

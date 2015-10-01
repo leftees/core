@@ -4,6 +4,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-release');
+  grunt.loadNpmTasks('grunt-replace');
 
   grunt.initConfig({
     availabletasks: {
@@ -14,24 +15,25 @@ module.exports = function(grunt) {
             'clean',
             'test',
             'build',
-            'release'
+            'dockerize',
+            'publish'
           ]
         }
       }
     },
     jscs: {
-      src: "./"
+      src: './'
     },
     eslint: {
       target: ['./']
     },
     shell: {
       clean: {
-        command: "node main.server.js _.clean",
+        command: 'node main.server.js _.clean',
         options: {}
       },
       buildcore: {
-        command: "node main.server.js _.build.core",
+        command: 'node main.server.js _.build.core',
         options: {
           execOptions: {
             maxBuffer: 1024*1024
@@ -39,11 +41,11 @@ module.exports = function(grunt) {
         }
       },
       distcore: {
-        command: "node main.server.js _.dist.core",
+        command: 'node main.server.js _.dist.core',
         options: {}
       },
       buildcluster: {
-        command: "node main.server.js _.build.cluster",
+        command: 'node main.server.js _.build.cluster',
         options: {
           execOptions: {
             maxBuffer: 1024*1024
@@ -51,8 +53,29 @@ module.exports = function(grunt) {
         }
       },
       distcluster: {
-        command: "node main.server.js _.dist.cluster",
+        command: 'node main.server.js _.dist.cluster',
         options: {}
+      },
+      dockerinit: {
+        command: 'cp dockerfile.in Dockerfile',
+        options: {}
+      }
+      ,
+      dockerbuild: {
+        command: 'docker build -t ljveio/core:latest .',
+        options: {
+          execOptions: {
+            maxBuffer: 1024*1024
+          }
+        }
+      },
+      dockerpush: {
+        command: 'docker push ljveio/core:latest',
+        options: {
+          execOptions: {
+            maxBuffer: 1024*1024
+          }
+        }
       }
     },
     release: {
@@ -70,10 +93,48 @@ module.exports = function(grunt) {
         tagMessage: 'Tagged release <%= version %>.',
         remote: 'public'
       }
+    },
+    replace: {
+      dockerfile: {
+        options: {
+          patterns: [
+            {
+              match: 'UBUNTU',
+              replacement: 'latest'
+            },
+            {
+              match: 'NODE',
+              replacement: 'stable'
+            },
+            {
+              match: 'LJVE',
+              replacement: function(){
+                var fs = require('fs');
+                var path = require('path');
+                packagejson = JSON.parse(fs.readFileSync(path.join(process.cwd(),'package.json'), 'utf8'));
+                return packagejson.version;
+              }
+            },
+          ]
+        },
+        files: [
+          { expand: true,
+           flatten: true,
+           src: ['Dockerfile']
+          }
+        ]
+      }
     }
   });
 
   grunt.registerTask('default', [ 'availabletasks' ]);
+
+  grunt.registerTask('publish', [
+    'build',
+    'release',
+    'dockerize',
+    'shell:dockerpush'
+  ]);
 
   grunt.registerTask('clean', [
     'shell:clean'
@@ -90,6 +151,12 @@ module.exports = function(grunt) {
     'shell:distcore',
     'shell:buildcluster',
     'shell:distcluster'
+  ]);
+
+  grunt.registerTask('dockerize', [
+    'shell:dockerinit',
+    'replace:dockerfile',
+    'shell:dockerbuild'
   ]);
 
 };

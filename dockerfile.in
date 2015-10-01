@@ -1,0 +1,45 @@
+FROM ubuntu:@@UBUNTU
+MAINTAINER Marco Minetti <marco.minetti@novetica.org>
+
+RUN mv /bin/sh /bin/sh.backup && ln -s /bin/bash /bin/sh
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+RUN apt-get update
+RUN apt-get -y dist-upgrade
+RUN apt-get -y install gcc make curl git python python-dev libssl-dev build-essential ca-certificates
+
+RUN apt-get clean
+RUN rm /var/lib/apt/lists/* -rf
+
+ENV NVM_DIR /usr/local/nvm
+ENV PROFILE /etc/bash.bashrc
+ENV NODE_VERSION @@NODE
+
+RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.25.4/install.sh | bash \
+    && source $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION
+
+RUN echo -e "#!/bin/bash\n. /etc/bash.bashrc\nexport NVM_DIR=\"$NVM_DIR\"\n[ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"\nnode \$@" > /usr/local/bin/node
+RUN chmod +x /usr/local/bin/node
+
+RUN echo -e "#!/bin/bash\n. /etc/bash.bashrc\nexport NVM_DIR=\"$NVM_DIR\"\n[ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"\nnpm \$@" > /usr/local/bin/npm
+RUN chmod +x /usr/local/bin/npm
+
+RUN node -v
+RUN npm -v
+
+RUN npm install -g ljve.io@@@LJVE
+
+RUN echo -e "#!/bin/bash\n. /etc/bash.bashrc\nexport NVM_DIR=\"$NVM_DIR\"\n[ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"\nljve \$@" > /usr/local/bin/ljve
+RUN chmod +x /usr/local/bin/ljve
+
+WORKDIR /ljve/
+
+EXPOSE 8080 9090 9091 9092 9093
+
+ENTRYPOINT [ "/usr/local/bin/ljve" ]
+
+
+
+docker run -v $(pwd):/ljve/ -i -t ljveio/core:development run

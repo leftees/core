@@ -96,7 +96,8 @@
     "grunt-jscs": "latest",
     "grunt-eslint": "latest",
     "grunt-shell": "latest",
-    "grunt-release": "latest"
+    "grunt-release": "latest",
+    "grunt-replace": "latest"
   },
   "optionalDependencies": {
     "sysconfx-next": "latest",
