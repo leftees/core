@@ -11,6 +11,8 @@
 # Git and CI related data
 /.coveralls.yml
 /.codeclimate.yml
+/.eslintrc
+/.eslintignore
 /.jshintrc
 /.jsdocrc
 /.jscsrc
@@ -18,6 +20,7 @@
 /.travis.yml
 /.npmignore
 /Dockerfile
+/Gruntfile.js
 
 # Temporary runtime files
 /build
