@@ -70,7 +70,7 @@ module.exports = function(grunt) {
         }
       },
       dockerpush: {
-        command: 'docker push ljveio/core:latest',
+        command: 'bash project/tools/docker.push.sh',
         options: {
           execOptions: {
             maxBuffer: 1024*1024
