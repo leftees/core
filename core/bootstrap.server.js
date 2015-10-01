@@ -381,7 +381,7 @@ bootstrap.load.file = function(path,root,callback){
       //if (platform.state === platform._states.POST) {
         //native.compile(path, root, null, false, false);
       //} else {
-        native.compile(relativepath, rootpath, basename + '.boot', true, false);
+        native.compile(relativepath, rootpath, basename + '.boot', true, !platform.configuration.runtime.development);
       //}
       //TODO: support remote build store
       if (process.env.BUILD != null && platform.state === platform._states.PRELOAD) {
