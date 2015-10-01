@@ -58,7 +58,7 @@ if (platform.cluster.worker.master === true) {
     'log': false,
     'debug': false,
     'term': {
-      'termName': '...',
+      'termName': 'xterm',
       'geometry': [80, 24],
       'scrollback': 0,
       'visualBell': true,
