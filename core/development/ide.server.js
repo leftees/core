@@ -91,7 +91,7 @@ platform.development.tools.ide.start = function(port){
         platform.configuration.runtime.path.root,
         '--supp-dir',
         native.path.join(data_fs.base,'/data/ide')
-      ]);
+      ], { 'stdio': [ 'ignore', 'ignore',  process.stderr ] });
     }
     platform.development.tools.ide._running = true;
   } else {

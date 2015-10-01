@@ -136,7 +136,7 @@ if (platform.cluster.worker.master === true) {
           platform.configuration.runtime.path.core + platform.development.tools.terminal._process_path,
           '--config',
           native.path.join(data_fs.base,'/data/tty/config.json')
-        ]);
+        ], { 'stdio': [ 'ignore', 'ignore',  process.stderr ] });
       }
       platform.development.tools.terminal._running = true;
     } else {

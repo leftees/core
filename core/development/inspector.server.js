@@ -79,7 +79,7 @@ if (platform.cluster.worker.master === true) {
           process.debugPort,
           '--no-save-live-edit',
           '--no-preload'
-        ]);
+        ], { 'stdio': [ 'ignore', 'ignore',  process.stderr ] });
       //}
       platform.development.tools.inspector._running = true;
     } else {

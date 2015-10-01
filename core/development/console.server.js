@@ -114,7 +114,7 @@ platform.development.tools.console.start = function(agent_port,ui_port){
           agent_port || platform.development.tools.console.port,
           ui_port || platform.configuration.development.tools.inspector.ports.ui,
           '0.0.0.0'
-        ]);
+        ], { 'stdio': [ 'ignore', 'ignore',  process.stderr ] });
       }
 //? if (CLUSTER) {
     }
