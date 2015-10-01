@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-jscs');
   grunt.loadNpmTasks('grunt-eslint');
-  grunt.loadNpmTasks('grunt-exec');
+  grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-available-tasks');
 
   grunt.initConfig({
@@ -20,12 +20,35 @@ module.exports = function(grunt) {
     eslint: {
       target: ['./']
     },
-    exec: {
-      clean: "node main.server.js _.clean",
-      buildcore: "node main.server.js _.build.core",
-      distcore: "node main.server.js _.dist.core",
-      buildcluster: "node main.server.js _.build.cluster",
-      distcluster: "node main.server.js _.dist.cluster",
+    shell: {
+      clean: {
+        command: "node main.server.js _.clean",
+        options: {}
+      },
+      buildcore: {
+        command: "node main.server.js _.build.core",
+        options: {
+          execOptions: {
+            maxBuffer: 1024*1024
+          }
+        }
+      },
+      distcore: {
+        command: "node main.server.js _.dist.core",
+        options: {}
+      },
+      buildcluster: {
+        command: "node main.server.js _.build.cluster",
+        options: {
+          execOptions: {
+            maxBuffer: 1024*1024
+          }
+        }
+      },
+      distcluster: {
+        command: "node main.server.js _.dist.cluster",
+        options: {}
+      }
     }
   });
 
@@ -37,10 +60,10 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('dist', [
-    'exec:clean',
-    'exec:buildcore',
-    'exec:distcore',
-    'exec:buildcluster',
-    'exec:distcluster'
+    'shell:clean',
+    'shell:buildcore',
+    'shell:distcore',
+    'shell:buildcluster',
+    'shell:distcluster'
   ]);
 };

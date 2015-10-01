@@ -94,7 +94,7 @@
     "grunt-cli": "latest",
     "grunt-jscs": "latest",
     "grunt-eslint": "latest",
-    "grunt-exec": "latest",
+    "grunt-shell": "latest",
     "grunt-available-tasks": "latest"
   },
   "optionalDependencies" : {
