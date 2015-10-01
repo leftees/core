@@ -57,7 +57,11 @@ if(platform.cluster.worker.role !== 'compile') {
     var fullpath = resolved_path_object.fullpath;
     if (platform.configuration.debug.load === true) {
       //console.info('loading %s', resolved_path_object.shortpath);
-      console.info('loading %s from %s (%s)', resolved_path_object.shortpath, resolved_path_object.backend.name, resolved_path_object.fullpath);
+      if (platform.configuration.runtime.development === true) {
+        console.info('loading %s from %s (%s)', resolved_path_object.shortpath, resolved_path_object.backend.name, resolved_path_object.fullpath);
+      } else {
+        console.info('loading %s from %s', resolved_path_object.shortpath, resolved_path_object.backend.name);
+      }
     }
     await platform.cluster.kernel.invoke('compile', 'platform.development.change.register', [fullpath, platform.cluster.worker.id]);
     // loading file through require
