@@ -1,12 +1,13 @@
-engines:
-  eslint:
-    enabled: true
-  csslint:
-    enabled: true
-
-ratings:
-  paths:
-  - "core/**"
+languages:
+  Ruby: false
+  JavaScript: true
+  PHP: false
+  Python: false
 
 exclude_paths:
-- "_**"
+- "app/*/**"
+- "config/**"
+- "core/_old/**"
+- "lib/**"
+- "project/**"
+- "test/**"
