@@ -4,7 +4,7 @@ platform.x = function(destinations,optional,callback){
     callback = optional;
     optional = null;
   }
-
+  //TODO: serialize args?
   callback = native.util.makeHybridCallbackPromise(callback);
 
   //TODO: serialize args?
