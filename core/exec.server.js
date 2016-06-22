@@ -19,6 +19,7 @@
  */
 
 // loading native modules for main phase
+//TODO: serialize args?
 var child_process = require('child_process');
 var cluster = require('cluster');
 var fs = require('fs');
